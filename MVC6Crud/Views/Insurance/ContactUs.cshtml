@@ -1,0 +1,541 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Insurence.cshtml";
+}
+
+@{
+    ViewData["Title"] = "Insurance List - Payman Insurance";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Insurance Premium Payments by Payman</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --light-bg: #f8f9fa;
+            --dark-color: #343a40;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            padding-top: 76px; /* Account for fixed navbar */
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 60px 0 40px;
+            margin-bottom: 40px;
+        }
+
+            .page-header h1 {
+                font-size: 2.8rem;
+                margin-bottom: 10px;
+            }
+
+            .page-header .subtitle {
+                font-size: 1.2rem;
+                opacity: 0.9;
+                font-weight: 300;
+            }
+
+        .contact-info-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            padding: 30px;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+            .contact-info-card:hover {
+                transform: translateY(-5px);
+            }
+
+        .contact-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .contact-form-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            padding: 30px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-control, .form-select {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+            }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+            .submit-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+            }
+
+        .address-box {
+            background: var(--light-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .business-hours {
+            background: white;
+            border: 1px solid #eaeaea;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .hours-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+            .hours-list li {
+                padding: 10px 0;
+                border-bottom: 1px solid #eee;
+                display: flex;
+                justify-content: space-between;
+            }
+
+                .hours-list li:last-child {
+                    border-bottom: none;
+                }
+
+        .day {
+            font-weight: 500;
+        }
+
+        .time {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .faq-section {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid #eee;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: rgba(0, 123, 255, 0.1);
+            color: var(--primary-color);
+        }
+
+        .accordion-button:focus {
+            box-shadow: none;
+            border-color: rgba(0, 123, 255, 0.25);
+        }
+
+        .map-container {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            height: 300px;
+            background: var(--light-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .map-placeholder {
+            text-align: center;
+            color: #666;
+        }
+
+        .map-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+       
+    </style>
+</head>
+<body>
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1>Contact Us</h1>
+            <p class="subtitle">Get in touch with our support team for assistance with insurance premium payments</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Contact Information Section -->
+        <div class="row mb-5">
+            <div class="col-lg-4 mb-4">
+                <div class="contact-info-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <h4>Phone Support</h4>
+                    <p>For immediate assistance with payment transactions or technical issues.</p>
+                    <div class="mt-4">
+                        <h5 class="text-primary">+91 9652724937</h5>
+                        <p class="text-muted">Monday to Friday, 9:00 AM to 6:00 PM IST</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mb-4">
+                <div class="contact-info-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h4>Email Support</h4>
+                    <p>For inquiries, feedback, or detailed assistance with your transactions.</p>
+                    <div class="mt-4">
+                        <h5 class="text-primary">support@paymanfintech.in</h5>
+                        <p class="text-muted">We typically respond within 24 hours</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mb-4">
+                <div class="contact-info-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h4>Registered Office</h4>
+                    <p>Visit our registered office for official correspondence.</p>
+                    <div class="mt-4">
+                        <h5 class="text-primary">Hyderabad, Telangana</h5>
+                        <p class="text-muted">500076, India</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Form & Details Section -->
+        <div class="row">
+            <!-- Contact Form -->
+            <div class="col-lg-8 mb-5">
+                <div class="contact-form-card">
+                    <h3 class="mb-4">Send us a Message</h3>
+                    <p class="text-muted mb-4">Fill out the form below and our team will get back to you as soon as possible.</p>
+
+                    <form id="contactForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fullName" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="fullName" placeholder="Enter your full name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" placeholder="Enter your phone number">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="subject" class="form-label">Subject *</label>
+                                <select class="form-select" id="subject" required>
+                                    <option value="" selected disabled>Select a subject</option>
+                                    <option value="payment-issue">Payment Issue</option>
+                                    <option value="transaction-query">Transaction Query</option>
+                                    <option value="refund-request">Refund Request</option>
+                                    <option value="technical-support">Technical Support</option>
+                                    <option value="partnership">Business Partnership</option>
+                                    <option value="feedback">Feedback & Suggestions</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="policyNumber" class="form-label">Policy Number (if applicable)</label>
+                            <input type="text" class="form-control" id="policyNumber" placeholder="Enter your policy number">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="message" class="form-label">Message *</label>
+                            <textarea class="form-control" id="message" rows="5" placeholder="Please provide details about your inquiry..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="consent" required>
+                                <label class="form-check-label" for="consent">
+                                    I agree to the <a href="#" class="text-primary">Privacy Policy</a> and allow Payman to contact me regarding this inquiry.
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Contact Details -->
+            <div class="col-lg-4 mb-5">
+                <div class="address-box">
+                    <h4 class="mb-3">Registered Address</h4>
+                    <p class="mb-2"><strong>PAYMAN FINTECH SOLUTIONS PVT LTD</strong></p>
+                    <p class="mb-1">9-12 HMT NAGAR STNUMBER 1,</p>
+                    <p class="mb-1">NACHARAM, HYDERABAD, Telangana, 500076</p>
+                    <p class="mb-0"><strong>500076</strong></p>
+                </div>
+
+                <div class="business-hours">
+                    <h4 class="mb-3">Business Hours</h4>
+                    <ul class="hours-list">
+                        <li>
+                            <span class="day">Monday - Friday</span>
+                            <span class="time">9:00 AM - 6:00 PM</span>
+                        </li>
+                        <li>
+                            <span class="day">Saturday</span>
+                            <span class="time">10:00 AM - 2:00 PM</span>
+                        </li>
+                        <li>
+                            <span class="day">Sunday</span>
+                            <span class="time">Closed</span>
+                        </li>
+                    </ul>
+                    <p class="text-muted mt-3 small">* Support available during business hours. Emergency payment issues may be addressed outside hours.</p>
+                </div>
+
+                <div class="map-container">
+                    <div class="map-placeholder">
+                        <i class="fas fa-map-marked-alt map-icon"></i>
+                        <h5>Hyderabad Office</h5>
+                        <p>NACHARAM, Hyderabad</p>
+                        <p class="small">Map integration available</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <h3 class="mb-4">Frequently Asked Questions</h3>
+            <p class="text-muted mb-4">Find quick answers to common questions about contacting us.</p>
+
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            What information should I provide when contacting about a payment issue?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Please provide your Transaction ID, payment date, amount, insurance company name, and policy number (if applicable). This helps us locate your transaction quickly and provide faster assistance.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            How long does it take to get a response to my inquiry?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            We aim to respond to all inquiries within 24 hours during business days. Payment-related issues are prioritized and typically receive a response within 4-6 hours during business hours.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            Can I visit your office for payment assistance?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Our registered office is for official correspondence only. We are a digital payment platform and do not process cash payments or in-person transactions at our office. All payments must be made through our secure online platform.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                            Who should I contact for policy-related questions?
+                        </button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            For questions about policy coverage, claims, terms, or premium amounts, please contact your insurance company directly. Payman only facilitates premium payments and cannot provide information about insurance policies.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Note -->
+        <div class="alert alert-info mt-5">
+            <h5><i class="fas fa-info-circle me-2"></i>Important Note</h5>
+            <p class="mb-0">Payman is a payment facilitator only. For insurance policy-related inquiries, claims, or coverage questions, please contact your respective insurance company directly. We can only assist with payment transaction issues on our platform.</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Insurance by Payman</h5>
+                    <p>Secure insurance premium payment facilitation platform.</p>
+                    <p class="mb-1"><i class="fas fa-phone-alt me-2"></i>+91 9652724937</p>
+                    <p class="mb-0"><i class="fas fa-envelope me-2"></i>support@paymanfintech.in</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1">&copy; 2026 Payman Fintech Solutions Private Limited. All rights reserved.</p>
+                    <p class="mb-0">Operated under RBI guidelines and regulations.</p>
+                    <div class="mt-3">
+                        <a asp-controller="Insurance" asp-action="Terms" class="text-white me-3">Terms & Conditions</a>
+                        <a asp-controller="Insurance" asp-action="Privacy" class="text-white me-3">Privacy Policy</a>
+                        <a asp-controller="Insurance" asp-action="RefundPolcy" class="text-white me-3">Refund Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Script -->
+    <script>
+        // Update navbar for logged in state
+        function updateNavbarForLoggedIn() {
+            const navbar = document.querySelector('#navbarNav .navbar-nav');
+            if (navbar) {
+                // Remove login/signup buttons
+                const loginBtn = navbar.querySelector('button[data-bs-target="#loginModal"]');
+                const signupLink = navbar.querySelector('a[data-bs-target="#signupModal"]');
+                const contactItem = navbar.querySelector('.nav-item .nav-link[href="/contact.html"]').parentElement;
+
+                if (loginBtn) loginBtn.parentElement.remove();
+                if (signupLink) signupLink.parentElement.remove();
+                if (contactItem) contactItem.remove();
+
+                // Add user info
+                const userLi = document.createElement('li');
+                userLi.className = 'nav-item ms-2';
+                userLi.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-user-circle me-2 text-primary"></i>
+                        <span class="fw-bold">Ajay Ajay</span>
+                    </div>
+                `;
+                navbar.appendChild(userLi);
+            }
+        }
+
+        // Contact Form Submission
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Get form values
+            const formData = {
+                name: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                subject: document.getElementById('subject').value,
+                policyNumber: document.getElementById('policyNumber').value,
+                message: document.getElementById('message').value
+            };
+
+            // Basic validation
+            if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            // In a real application, you would send this data to a server
+            // For now, we'll just show a success message
+            alert('Thank you for your message! We will get back to you within 24 hours.');
+
+            // Reset form
+            this.reset();
+
+            // Log form data (for development)
+            console.log('Contact form submitted:', formData);
+        });
+
+        // Initialize tooltips (if any)
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>

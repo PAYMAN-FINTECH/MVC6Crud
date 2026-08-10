@@ -1,0 +1,997 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Quick Stats -->
+<div class="container py-4">
+    <h2 class="mb-4">Admin Dashboard</h2>
+
+    <div class="col-md-6">
+        <label class="form-label">User</label>
+        <select class="form-select" id="userDropdown1" required></select>
+    </div>
+
+    <!-- Date Range -->
+    <!-- Date Range + Action Buttons -->
+    <div class="row align-items-end mb-3">
+        <div class="col-md-3">
+            <label>Start Date</label>
+            <input type="date" class="form-control" id="startDate" />
+        </div>
+        <div class="col-md-3">
+            <label>End Date</label>
+            <input type="date" class="form-control" id="endDate" />
+        </div>
+        <div class="col-md-6 text-end">
+            <button class="btn btn-primary btn-sm me-2" onclick="filterByDate()">
+                <i class="bi bi-funnel-fill"></i> Filter
+            </button>
+            <button class="btn btn-success btn-sm me-2" onclick="$('#addPayInModal').modal('show'); loadDropdowns();">
+                <i class="bi bi-plus-circle"></i> Add PayIn
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="addPayOut()">
+                <i class="bi bi-plus-circle"></i> Add PayOut
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="GetInvoicesByDate()">
+                <i class="bi bi-plus-circle"></i> Get Inovices
+            </button>
+         
+
+        </div>
+    </div>
+
+
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card text-white bg-primary shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-people-fill fs-3 float-end"></i>
+                    <h5 class="card-title">Total Users</h5>
+                    <h3 id="userCount">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card text-white bg-success shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-arrow-down-circle fs-3 float-end"></i>
+                    <h5 class="card-title">Total PayIn</h5>
+                    <h3 id="totalPayIn">₹0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card text-white bg-danger shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-arrow-up-circle fs-3 float-end"></i>
+                    <h5 class="card-title">Total PayOut</h5>
+                    <h3 id="totalPayOut">₹0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card text-white bg-secondary shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-wallet2 fs-3 float-end"></i>
+                    <h5 class="card-title">Total Balance</h5>
+                    <h3 id="totalBalance">₹0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toggles -->
+    <div class="card mb-4">
+        <div class="card-header fw-bold">Service Access Toggles</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="togglePayIn">
+                        <label class="form-check-label" for="togglePayIn">PayIn Access</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="togglePayOut">
+                        <label class="form-check-label" for="togglePayOut">PayOut Access</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="toggleCCBill">
+                        <label class="form-check-label" for="toggleCCBill">CC Bill Access</label>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="toggleInstantPay">
+                        <label class="form-check-label" for="toggleInstantPay">Instant Pay Access</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="toggleBillAvenue">
+                        <label class="form-check-label" for="toggleBillAvenue">Bill Avenue Access</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="toggleEasebuzz1">
+                        <label class="form-check-label" for="toggleEasebuzz1">Easebuzz1</label>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="toggleEasebuzz2">
+                        <label class="form-check-label" for="toggleEasebuzz2">Easebuzz2</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="toggleEduCashfree">
+                        <label class="form-check-label" for="toggleEduCashfree">EduCashfree</label>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="togglePineLab">
+                        <label class="form-check-label" for="togglePineLab">Pine Lab</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="toggleCSbBank">
+                        <label class="form-check-label" for="toggleCSbBank">CSB Bank</label>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="toggleTravelvegaah">
+                        <label class="form-check-label" for="toggleTravelvegaah">Vegaah</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="toggleEduRozerpay">
+                        <label class="form-check-label" for="toggleEduRozerpay">RozorPay Edu</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion" id="adminAccordion">
+
+        <!-- All Users -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingUsers">
+                <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUsers" aria-expanded="true" aria-controls="collapseUsers">
+                    All Users
+                </button>
+            </h2>
+            <div id="collapseUsers" class="accordion-collapse collapse show" aria-labelledby="headingUsers" data-bs-parent="#adminAccordion">
+                <div class="accordion-body">
+                    <table class="table table-bordered table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Phone</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>App Pin</th>
+                                <th>Web Pass</th>
+                                <th>Pay In</th>
+                                <th>PayIn comm</th>
+                                <th>Pay Out</th>
+                                <th>Avl Bal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable">
+                            <!-- Loaded via AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PayIns -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingPayIns">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePayIns" aria-expanded="false" aria-controls="collapsePayIns">
+                    PayIns
+                </button>
+            </h2>
+            <div id="collapsePayIns" class="accordion-collapse collapse" aria-labelledby="headingPayIns" data-bs-parent="#adminAccordion">
+                <div class="accordion-body">
+                    <table class="table table-bordered table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Txn ID</th>
+                                <th>Phone</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payInsTable">
+                            <!-- Loaded via AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PayOuts -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingPayOuts">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePayOuts" aria-expanded="false" aria-controls="collapsePayOuts">
+                    PayOuts
+                </button>
+            </h2>
+            <div id="collapsePayOuts" class="accordion-collapse collapse" aria-labelledby="headingPayOuts" data-bs-parent="#adminAccordion">
+                <div class="accordion-body">
+                    <table class="table table-bordered table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Ref ID</th>
+                                <th>Phone</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Mode</th>
+                                <th>Date</th>
+                                <th>Refund</th> <!-- Refund column -->
+                            </tr>
+                        </thead>
+                        <tbody id="payOutsTable">
+                            <!-- Loaded via AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Add PayIn Modal -->
+    <div class="modal fade" id="addPayInModal" tabindex="-1" aria-labelledby="addPayInModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="addPayInForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addPayInModalLabel">Add PayIn</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Order RefId</label>
+                            <input type="text" class="form-control" id="orderRefId" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Card Number</label>
+                            <input type="text" class="form-control" id="cardNumber" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Amount</label>
+                            <input type="text" class="form-control" id="amount" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">User</label>
+                            <select class="form-select" id="userDropdown" required></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Gateway</label>
+                            <select class="form-select" id="gatewayDropdown" required></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Card</label>
+                            <select class="form-select" id="cardDropdown" required></select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add PayOut Modal -->
+    <div class="modal fade" id="addPayoutModal" tabindex="-1" aria-labelledby="addPayoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form id="payoutForm" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add PayOut</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Order Ref ID</label>
+                        <input type="text" class="form-control" id="payoutOrderRefId" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Account Holder Name</label>
+                        <input type="text" class="form-control" id="payoutHolderName" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Bank</label>
+                        <select class="form-select" id="payoutBank" required></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Account Number</label>
+                        <input type="text" class="form-control" id="payoutAccountNumber" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">User</label>
+                        <select class="form-select" id="payoutUser" required></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Amount</label>
+                        <input type="number" class="form-control" id="payoutAmount" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.14/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        $(function () {
+            const today = new Date().toISOString().split('T')[0];
+             $('#startDate').val(today);
+             $('#endDate').val(today);
+
+           // loadDashboard();
+            loadToggles();
+            filterByDate(); // load default data
+             loadUsers();
+             loadDropdowns();
+            // loadPayIns();
+            // loadPayOuts();
+
+         $('.form-check-input').change(function () {
+            const feature = $(this).attr("id").replace("toggle", "");
+            const enabled = $(this).is(":checked");
+
+            $.ajax({
+                url: '/Home/UpdateFeatureAccess',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ feature: feature, enabled: enabled }),
+                success: function (res) {
+                    // Show success toast
+                    showToast(`Feature "${feature}" has been ${enabled ? 'enabled' : 'disabled'}.`, 'success');
+                },
+                error: function () {
+                    showToast("Failed to update feature access.", 'danger');
+                }
+            });
+        });
+
+        });
+
+
+
+        function addPayOut() {
+            // Load dropdown values when modal is triggered
+            loadPayoutUsers();
+            loadPayoutBanks();
+
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('addPayoutModal'));
+            modal.show();
+        }
+
+        function loadPayoutUsers() {
+            $.getJSON('/Home/GetUsers', function (data) {
+                const userSelect = $('#payoutUser');
+                userSelect.empty().append('<option value="">Select User</option>');
+                data.forEach(u => userSelect.append(`<option value="${u.phone}">${u.name} (${u.phone})</option>`));
+            });
+        }
+
+        function loadPayoutBanks() {
+            $.getJSON('/Home/GetBanks', function (data) {
+                const bankSelect = $('#payoutBank');
+                bankSelect.empty().append('<option value="">Select Bank</option>');
+                data.forEach(b => bankSelect.append(`<option value="${b.name}">${b.name}</option>`));
+            });
+        }
+
+        function loadToggles() {
+            $.getJSON("/Home/GetFeatureAccess", function (res) {
+                if (res.success) {
+                    const a = res.data;
+                    $('#togglePayIn').prop('checked', a.payIn);
+                    $('#togglePayOut').prop('checked', a.payOut);
+                    $('#toggleCCBill').prop('checked', a.ccBill);
+                     $('#toggleInstantPay').prop('checked', a.instantPay);
+                     $('#toggleBillAvenue').prop('checked', a.billAvenue);
+
+                     $('#toggleEasebuzz1').prop('checked', a.easebyzz1);
+                     $('#toggleEasebuzz2').prop('checked', a.easebuzz2);
+                     $('#toggleEduCashfree').prop('checked', a.eduCashfree);
+
+                     $('#togglePineLab').prop('checked', a.pineLab);
+                     $('#toggleCSbBank').prop('checked', a.csbBank);
+
+                     $('#toggleEduRozerpay').prop('checked', a.rozorpayedu);
+                     $('#toggleTravelvegaah').prop('checked', a.edutrav);
+                }
+            });
+        }
+
+        function loadUsers() {
+            $.getJSON("/Home/GetAllUsers", function (res) {
+                $('#usersTable').empty();
+                debugger;
+                res.data.forEach(u => {
+                    $('#usersTable').append(`<tr><td>${u.userPhone}</td><td>${u.name}</td><td>${u.email}</td><td>${u.userPin}</td><td>${u.webPass}</td><td>${u.payIn}</td><td>${u.payIncomm}</td><td>${u.payOut}</td><td>${u.walletBalance}</td></tr>`);
+                });
+            });
+        }
+
+
+        function filterByDate() {
+            const start = $('#startDate').val();
+            const end = $('#endDate').val();
+
+            $.ajax({
+                url: '/Home/GetDashboardStats',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ startDate: start, endDate: end }),
+                success: function (res) {
+                    $('#userCount').text(res.data.totalUsers);
+                    $('#totalPayIn').text('₹' + res.data.totalPayIns);
+                    $('#totalPayOut').text('₹' + res.data.totalPayOuts);
+                    $('#totalBalance').text('₹' + res.data.totalBalance);
+                }
+            });
+
+            $.getJSON('/Home/GetAllPayIns?startDate=' + start + '&endDate=' + end, function (res) {
+                $('#payInsTable').empty();
+                res.data.forEach(p => {
+                    $('#payInsTable').append(`<tr>
+                        <td>${p.transactionId}</td>
+                        <td>${p.userPhone}</td>
+                        <td>₹${p.amount}</td>
+                        <td>${p.status}</td>
+                        <td>${formatDate(p.date)}</td>
+                    </tr>`);
+                });
+            });
+
+            $.getJSON('/Home/GetAllPayOuts?startDate=' + start + '&endDate=' + end, function (res) {
+                $('#payOutsTable').empty();
+                res.data.forEach(p => {
+                     const refundBtn = `<button class="btn btn-sm btn-danger refund-btn" data-id="${p.id}">Refund</button>`;
+                     const rdfSuccess = `<button class="btn btn-sm btn-success readonly refund-btn" disabled data-id="${p.id}">Refunded</button>`;
+
+                     const result = p.result === "Refunded" ? rdfSuccess : refundBtn;
+
+                    $('#payOutsTable').append(`<tr>
+                        <td>${p.refId}</td>
+                        <td>${p.userPhone}</td>
+                        <td>₹${p.amount}</td>
+                        <td>${p.status}</td>
+                        <td>${p.mode}</td>
+                        <td>${formatDate(p.date)}</td>
+                        <td>${result}</td>
+                    </tr>`);
+                });
+            });
+        }
+
+        function loadDropdowns() {
+            // Users dropdown
+            $.getJSON('/Home/GetUsers', function (data) {
+                const userSelect = $('#userDropdown');
+                userSelect.empty().append('<option value="">-- Select User --</option>');
+                data.forEach(u => userSelect.append(`<option value="${u.phone}">${u.name} (${u.phone})</option>`));
+
+                const userSelect1 = $('#userDropdown1');
+                userSelect1.empty().append('<option value="">-- Select User --</option>');
+                data.forEach(u => userSelect1.append(`<option value="${u.phone}">${u.name} (${u.phone})</option>`));
+            });
+
+            // Gateway dropdown
+            $.getJSON('/Home/GetGateways', function (data) {
+                const gatewaySelect = $('#gatewayDropdown');
+                gatewaySelect.empty().append('<option value="">-- Select Gateway --</option>');
+                data.forEach(g => gatewaySelect.append(`<option value="${g.id}">${g.name}</option>`));
+            });
+
+            // Card dropdown
+            $.getJSON('/Home/GetCards', function (data) {
+                const cardSelect = $('#cardDropdown');
+                cardSelect.empty().append('<option value="">-- Select Card --</option>');
+                data.forEach(c => cardSelect.append(`<option value="${c.number}">${c.number}</option>`));
+            });
+        }
+
+        // async function GetInvoicesByDate() {
+        //     const start = $('#startDate').val();
+        //     const end = $('#endDate').val();
+
+        //     const payouts = await $.getJSON(`/Home/GetAllPayOuts?startDate=${start}&endDate=${end}`);
+
+        //     for (const p of payouts.data) {
+        //         await processInvoice(p.refId); // wait for each invoice to complete before moving on
+        //     }
+        // }
+
+        // function processInvoice(txnId) {
+        //     return new Promise((resolve, reject) => {
+        //         $.ajax({
+        //             url: '/PayOut/GetInvoiceDetails',
+        //             type: 'GET',
+        //             data: { txn: txnId },
+        //             success: async function (invoice) {
+        //    try {
+        //     const { jsPDF } = window.jspdf;
+        //     const doc = new jsPDF();
+
+        //     // QR & Logo URLs
+        //     const logoUrl = '/images/home1.png';
+        //     const qrLink = `https://paymanfintech.in/PayOut/ViewInvoice?txn=${invoice.transactionId}`;
+        //     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(qrLink)}`;
+
+        //     const [logoBase64, qrBase64] = await Promise.all([
+        //         getBase64Image(logoUrl),
+        //         getBase64Image(qrUrl)
+        //     ]);
+
+        //     // Watermark
+        //     doc.setFontSize(50);
+        //     doc.setTextColor(230, 230, 230);
+        //     doc.text("PAYMAN FINTECH", 105, 150, { angle: 45, align: "center" });
+
+        //     // Logo (smaller)
+        //     doc.addImage(logoBase64, 'PNG', 10, 10, 25, 12);
+
+        //     // Title
+        //     doc.setFontSize(16);
+        //     doc.setTextColor(0, 0, 0);
+        //     doc.text("TAX INVOICE", 105, 18, { align: "center" });
+
+        //     // QR Code (top right)
+        //     doc.addImage(qrBase64, 'PNG', 165, 10, 30, 30);
+
+        //             // From / To Boxes
+        // const fromY = 45;
+        // doc.rect(10, fromY, 90, 34);
+        // doc.rect(110, fromY, 90, 34);
+        // doc.setFontSize(10);
+
+        // // From block with wrapped text
+        // doc.text("From:", 12, fromY + 6);
+        // let fromAddressLines = doc.splitTextToSize(invoice.from.address, 86);
+        // doc.text(invoice.from.name, 12, fromY + 11);
+        // doc.text(fromAddressLines, 12, fromY + 16);
+        // doc.text(`GSTIN: ${invoice.from.gstin}`, 12, fromY + 26);
+
+        // // To block with wrapped text
+        // doc.text("To:", 112, fromY + 6);
+        // let toAddressLines = doc.splitTextToSize(invoice.to.address, 86);
+        // doc.text(invoice.to.name, 112, fromY + 11);
+        // doc.text(toAddressLines, 112, fromY + 16);
+        // doc.text(`GSTIN: ${invoice.to.gstin}`, 112, fromY + 26);
+
+        //     // Invoice Info Row
+        //     const infoY = fromY + 44;
+        //     doc.rect(10, infoY, 190, 18);
+        //     doc.text(`Invoice No: ${invoice.invoiceNo}`, 12, infoY + 7);
+        //     doc.text(`Date: ${invoice.date}`, 150, infoY + 7);
+        //     doc.text("Payment Mode: Credit Card", 12, infoY + 12);
+        //     doc.text(`Transaction ID: ${invoice.transactionId}`, 150, infoY + 12);
+
+        //     // Table
+        //     doc.autoTable({
+        //         startY: infoY + 25,
+        //         head: [['S.No.', 'Service', 'HSN/SAC', 'Qty', 'Unit Price', 'Amount']],
+        //         body: (invoice.lineItems || []).map(li => [
+        //             li.sNo,
+        //             li.service,
+        //             li.hsnSac,
+        //             li.qty,
+        //             `₹${li.unitPrice}`,
+        //             `₹${li.amount}`
+        //         ]),
+        //         theme: 'grid',
+        //         styles: { fontSize: 10, halign: 'center' },
+        //         headStyles: { fillColor: [41, 128, 185], textColor: 255 }
+        //     });
+
+        //             // GST Summary Box
+        // let finalY = doc.lastAutoTable.finalY + 8;
+        // doc.rect(120, finalY - 6, 80, 36);
+        // doc.setFontSize(10);
+        // doc.text(`CGST (8%): ₹${invoice.cgst.toFixed(2)}`, 124, finalY, { align: "left" });
+        // doc.text(`SGST (8%): ₹${invoice.sgst.toFixed(2)}`, 124, finalY + 6, { align: "left" });
+        // doc.text(`Total GST: ₹${(invoice.cgst + invoice.sgst).toFixed(2)}`, 124, finalY + 12, { align: "left" });
+
+        // doc.setFont(undefined, 'bold');
+        // doc.text(`Grand Total: ₹${invoice.total.toFixed(2)}`, 124, finalY + 24, { align: "left" });
+        // doc.setFont(undefined, 'normal');
+        //     // Declaration
+        //     doc.setFontSize(9);
+        //     doc.text(
+        //         "Declaration: This is a system-generated invoice for the service fee charged towards credit card bill payment.",
+        //         12,
+        //         finalY + 40,
+        //         { maxWidth: 186 }
+        //     );
+
+        //     // Footer
+        //     doc.text("Authorized Signatory", 12, finalY + 58);
+        //     doc.setFont(undefined, 'bold');
+        //     doc.text("PayMan Fintech Solutions Pvt. Ltd.", 12, finalY + 63);
+
+        //     // Save file
+        //     doc.save(`TaxInvoice_${invoice.transactionId}.pdf`);
+        //     resolve();
+        // } catch (err) {
+        //     reject(err);
+        // }
+
+        //             },
+        //             error: function (err) {
+        //                 reject(err);
+        //             }
+        //         });
+        //     });
+        // }
+
+
+        //  function getBase64Image(url) {
+        //      return new Promise((resolve, reject) => {
+        //          let img = new Image();
+        //          img.setAttribute('crossOrigin', 'anonymous');
+        //          img.onload = function () {
+        //              let canvas = document.createElement('canvas');
+        //              canvas.width = img.width;
+        //              canvas.height = img.height;
+        //              let ctx = canvas.getContext('2d');
+        //              ctx.drawImage(img, 0, 0);
+        //              resolve(canvas.toDataURL('image/png'));
+        //          };
+        //          img.onerror = () => reject();
+        //          img.src = url;
+        //      });
+        //  }
+
+
+        $('#addPayInForm').submit(function (e) {
+            e.preventDefault();
+
+            const payload = {
+                orderRefId: $('#orderRefId').val().trim(),
+                cardNumber: $('#cardNumber').val().trim(),
+                amount: $('#amount').val().trim(),
+                userPhone: $('#userDropdown').val(),
+                gatewayId: $('#gatewayDropdown').val(),
+                card: $('#cardDropdown').val()
+            };
+
+            // Validate
+            if (!payload.orderRefId || !payload.cardNumber || !payload.userPhone || !payload.gatewayId || !payload.card) {
+                alert("Please fill all required fields.");
+                return;
+            }
+
+            $.ajax({
+                url: '/Home/AddPayIn',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (res) {
+                    if (res.success) {
+                        $('#addPayInModal').modal('hide');
+                        $('#addPayInForm')[0].reset();
+                        location.reload(); // Refresh page
+                        showToast("Added PayIn successfully", 'success');
+                    } else {
+                        alert("Failed to save PayIn: " + (res.message || "Unknown error"));
+                    }
+                },
+                error: function () {
+                    alert("Something went wrong while saving.");
+                }
+            });
+        });
+
+
+        $('#payoutForm').submit(function (e) {
+            e.preventDefault();
+
+            const model = {
+                OrderRefId: $('#payoutOrderRefId').val().trim(),
+                AccountHolderName: $('#payoutHolderName').val().trim(),
+                Bank: $('#payoutBank').val(),
+                AccountNumber: $('#payoutAccountNumber').val().trim(),
+                UserPhone: $('#payoutUser').val(),
+                Amount: parseFloat($('#payoutAmount').val()),
+                CreatedBy: 'admin'
+            };
+
+            $.ajax({
+                url: '/Home/AddPayOut',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+                success: function (res) {
+                    if (res.success) {
+                        $('#addPayoutModal').modal('hide');
+                        $('#payoutForm')[0].reset();
+                        location.reload(); // Refresh page
+                        showToast("PayOut added successfully", 'success');
+                    } else {
+                        showToast('Failed to add payout', 'danger');
+                    }
+                },
+                error: function () {
+                    showToast('Server error while adding payout', 'danger');
+                }
+            });
+        });
+
+
+        function formatDate(dateStr) {
+            if (!dateStr) return "NA";
+            const d = new Date(dateStr);
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
+            return d.toLocaleString('en-IN', options).replace(',', '');
+        }
+
+        $(document).on('click', '.refund-btn', function () {
+            const payoutId = $(this).data('id');
+
+            if (!confirm("Are you sure you want to refund this payout?")) return;
+
+            $.ajax({
+                url: '/Home/RefundPayout',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: payoutId }),
+                success: function (res) {
+                    if (res.success) {
+                         showToast("Refund successful", 'success');
+                        loadPayOuts(); // Refresh list
+                    } else {
+                        showToast("Refund failed ", 'danger');
+                    }
+                },
+                error: function () {
+                    showToast('Server error while adding payout', 'danger');
+                }
+            });
+        });
+
+
+    </script>
+
+
+    <div id="invoiceTemplate" style="display:none; background:#fff;"></div>
+
+    <!-- Include libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        async function GetInvoicesByDate() {
+             $('#Loader1').show();
+            const start = $('#startDate').val();
+            const end = $('#endDate').val();
+            const userPhonae = $('#userDropdown1').val();
+            alert(userPhonae);
+
+            const payouts = await $.getJSON(`/Home/GetAllPayOutsForGstInvoice?startDate=${start}&endDate=${end}&userPhone=${userPhonae}`);
+
+            for (const p of payouts.data) {
+                if(p.refId != null){
+                    await processInvoice(p.refId);
+                }
+                
+            }
+             $('#Loader1').hide();
+        }
+
+        function processInvoice(txnId) {
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: '/PayOut/GetInvoiceDetails',
+                    type: 'GET',
+                    data: { txn: txnId },
+                    success: function (invoice) {
+                        renderInvoiceTemplate(invoice).then(resolve).catch(reject);
+                    },
+                    error: function (err) {
+                        reject(err);
+                    }
+                });
+            });
+        }
+
+        function renderInvoiceTemplate(invoice) {
+               // <!-- Watermark -->
+               //  <div class="watermark" style="position:absolute; top:50%; left:3%; opacity:0.05; font-size:80px; font-weight:bold; transform:rotate(-30deg); white-space:nowrap;">
+               //      PAYMAN FINTECH
+               //  </div>
+            return new Promise((resolve) => {
+                               const template = `
+            <div style="width:330mm; min-height:330mm; padding:10mm; font-family:Arial; font-size:14pt; position:relative; background:#fff; color:#000; border:5px solid #000;">          
+
+                <!-- Header -->
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                    <img src="/images/FinalIcon.png" alt="Logo" style="height:60px;">
+                    <div style="text-align:center; flex-grow:1; font-size:20pt; font-weight:bold;">
+                        TAX INVOICE
+                    </div>
+                    <div>
+                        <img crossorigin="anonymous"
+                             src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https%3A%2F%2Fpaymanfintech.in%2FPayOut%2FViewInvoice%3Ftxn%3D${invoice.transactionId}%26InvoiceNo%3D${invoice.invoiceNo}"
+                             alt="QR Code" width="120" height="120">
+                    </div>
+                </div>
+
+                <!-- From / To -->
+                <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                    <div style="width:48%; border:1px solid #000; padding:12px;">
+                        <h3 style="margin:0 0 8px 0;">From:</h3>
+                        <strong>${invoice.from.name}</strong><br>
+                        ${invoice.from.address}<br>
+                        GSTIN: ${invoice.from.gstin}
+                    </div>
+                    <div style="width:48%; border:1px solid #000; padding:12px;">
+                        <h3 style="margin:0 0 8px 0;">To:</h3>
+                        <strong>${invoice.to.name}</strong><br>
+                        ${invoice.to.address}
+                    </div>
+                </div>
+
+                <!-- Invoice Info -->
+                <div style="display:flex; justify-content:space-between; border:1px solid #000; padding:12px; margin-bottom:20px; font-size:13pt;">
+                    <div>
+                        <p><strong>Invoice No:</strong> ${invoice.invoiceNo}</p>
+                        <p><strong>Payment Mode:</strong> Credit Card</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <p><strong>Date:</strong>  ${formatISTManually(invoice.date)}</p>
+                        <p><strong>Transaction ID:</strong> ${invoice.transactionId}</p>
+                    </div>
+                </div>
+
+                <!-- Line Items -->
+                <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:13pt;">
+                    <thead style="background:#f5f5f5;">
+                        <tr>
+                            <th style="border:1px solid #000; padding:10px;">S.No.</th>
+                            <th style="border:1px solid #000; padding:10px;">Service</th>
+                            <th style="border:1px solid #000; padding:10px;">HSN/SAC</th>
+                            <th style="border:1px solid #000; padding:10px;">Qty</th>
+                            <th style="border:1px solid #000; padding:10px;">Unit Price</th>
+                            <th style="border:1px solid #000; padding:10px;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${(invoice.lineItems || []).map(li => `
+                            <tr>
+                                <td style="border:1px solid #000; padding:10px; text-align:center;">${li.sNo}</td>
+                                <td style="border:1px solid #000; padding:10px;">${li.service}</td>
+                                <td style="border:1px solid #000; padding:10px; text-align:center;">${li.hsnSac}</td>
+                                <td style="border:1px solid #000; padding:10px; text-align:center;">${li.qty}</td>
+                                <td style="border:1px solid #000; padding:10px; text-align:right;">₹${li.unitPrice}</td>
+                                <td style="border:1px solid #000; padding:10px; text-align:right;">₹${li.amount}</td>
+                            </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+
+                <!-- Totals -->
+                <div style="display:flex; justify-content:flex-end; margin-bottom:30px;">
+                    <div style="width:45%; border:1px solid #000; padding:15px; font-size:14pt;">
+                        <p>CGST (9%): <strong>₹${invoice.cgst.toFixed(2)}</strong></p>
+                        <p>SGST (9%): <strong>₹${invoice.sgst.toFixed(2)}</strong></p>
+                        <p><strong>Total GST:</strong> ₹${(invoice.cgst + invoice.sgst).toFixed(2)}</p>
+                        <hr>
+                        <h2 style="margin-top:10px;">Grand Total: ₹${invoice.total.toFixed(2)}</h2>
+                    </div>
+                </div>
+
+                <!-- Declaration -->
+                <p style="font-size:12pt; margin-bottom:40px;">
+                    <strong>Declaration:</strong> This is a system-generated invoice for the service fee charged towards credit card bill payment.
+                </p>
+
+            </div>
+        `;
+
+
+                // <!-- Footer -->
+                // <div style="margin-top:50px; text-align:right;">
+                //     <p><strong>Authorized Signatory</strong></p>
+                //     <h5>PayMan Fintech Solutions Pvt. Ltd.</h5>
+                // </div>
+
+
+                const container = document.getElementById("invoiceTemplate");
+                container.innerHTML = template;
+                container.style.display = "block"; // show for capture
+
+                html2canvas(container, { scale: 2, useCORS: true }).then((canvas) => {
+                    const imgData = canvas.toDataURL("image/jpeg", 0.6); // compressed JPEG
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF("p", "mm", "a4");
+
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const imgWidth = pageWidth;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                    let position = 0;
+                    //pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+                    //pdf.addImage(imgData, "PNG", 10, 30, 450, 257);
+                            const margin = 5; // mm
+        pdf.addImage(
+          imgData,
+          "JPEG",
+          margin,
+          margin,
+          pageWidth - margin * 2,
+         // 420 - margin * 2,
+          imgHeight
+         // 270
+        );
+
+                    pdf.save(`Invoice_${invoice.invoiceNo}.pdf`);
+                    container.style.display = "none"; // hide again
+                    resolve();
+                });
+            });
+        }
+
+        function formatISTManually(dateStr) {
+            if (!dateStr || dateStr === "NA") return "NA";
+
+            // Example: "2025-07-10T23:57:49Z"
+            // Remove 'Z'
+            const cleanStr = dateStr.endsWith('Z') ? dateStr.slice(0, -1) : dateStr;
+
+            const [datePart, timePart] = cleanStr.split('T');
+            const [year, month, day] = datePart.split('-');
+            let [hours, minutes, seconds] = timePart.split(':');
+
+            hours = parseInt(hours, 10);
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            if (hours === 0) hours = 12;
+            const hoursStr = String(hours).padStart(2, '0');
+
+            return `${day}/${month}/${year} ${hoursStr}:${minutes} ${ampm}`;
+        }
+
+    </script>
+
+
+
+}

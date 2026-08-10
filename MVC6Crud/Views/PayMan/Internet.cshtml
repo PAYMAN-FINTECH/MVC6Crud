@@ -1,0 +1,53 @@
+﻿@model Reacharge
+
+@{
+    ViewData["Title"] = "PayManHome Page";
+}
+<div class="row col-md-12">
+    <div class="col-md-6">
+        <div class="container">
+            <h2>Internet</h2>
+            <br />
+            <div class="row">
+                @using (Html.BeginForm("Internet", "PayMan", FormMethod.Post))
+                {
+                    <label for="Name" class="control-label"><strong>Select Location</strong></label>
+                    @Html.DropDownListFor(model => model.SelectedGetCircleId, new SelectList(Model.GetCircle, "Id", "Name"), "Select Circle", new { @class = "form-control" })
+                    <br />
+                    <label for="Name" class="control-label"><strong>select Operator</strong> </label>
+                    @Html.DropDownListFor(model => model.SelectedGetOperatorId, new SelectList(Model.GetOperator, "Id", "Name"), "Select Operator", new { @class = "form-control", /*onchange = "dropdownChange()"*/ })
+                    <br />
+                    <label for="Name" class="control-label"><strong>Select Amount</strong></label>
+                    @Html.DropDownListFor(model => model.SelectedGetBalanceId, new SelectList(Model.GetBalance, "Id", "Name"), "Select Balance", new { @class = "form-control" })
+                    <br />
+                    <label for="Name" class="control-label"><strong>Mobile Number</strong></label>
+                    @Html.TextBoxFor(model => model.SelectedGetCircleId, new { @class = "form-control" })
+                    <br />
+                    <br />
+                    <input type="submit" value="Submit" class="btn btn-primary" />
+                    <input asp-action="PayManHome" asp-controller="PayMan" type="button" value="Back" class="btn btn-danger">
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function dropdownChange() {
+        var selectedEmployeeId = $("#SelectedGetCircleId").val();
+        if (selectedEmployeeId !== '') {
+            $.ajax({
+                type: 'GET',
+                url: '/PayMan/GetOperator?employeeId=' + selectedEmployeeId,
+                success: function (data) {
+                    // Handle the response data here
+                    console.log(data);
+                },
+                error: function () {
+                    console.log('Error occurred while calling API.');
+                }
+            });
+        }
+    }
+</script>

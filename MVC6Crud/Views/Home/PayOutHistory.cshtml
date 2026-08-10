@@ -1,0 +1,548 @@
+﻿@model MVC6Crud.Models.PaymanWeb.BeneficiaryListModel
+@{
+    ViewData["Title"] = "PayOut History";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Styles -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" rel="stylesheet" />
+
+<style>
+    /* Brand colors */
+    :root {
+        --navy: #0a2540;
+        --cyan: #00b4d8;
+        --navy-light: #1a3b5c;
+        --gray-bg: #f8fafc;
+    }
+
+    body {
+        background-color: #f5f7fa;
+    }
+
+    .page-title {
+        color: var(--navy);
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.02em;
+    }
+
+    /* Filter card */
+    .filter-card {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        border: 1px solid #eef2f6;
+    }
+
+    .filter-label {
+        font-weight: 600;
+        color: var(--navy);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .form-control {
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+
+        .form-control:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(0,180,216,0.2);
+            outline: none;
+        }
+
+    /* Buttons */
+    .btn-navy {
+        background-color: var(--navy);
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .btn-navy:hover {
+            background-color: var(--navy-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(10,37,64,0.3);
+            color: white;
+        }
+
+    .btn-cyan {
+        background-color: var(--cyan);
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .btn-cyan:hover {
+            background-color: #0096b4;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(0,180,216,0.4);
+            color: white;
+        }
+
+    .btn-outline-navy {
+        background-color: transparent;
+        color: var(--navy);
+        border: 2px solid var(--navy);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .btn-outline-navy:hover {
+            background-color: var(--navy);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(10,37,64,0.3);
+        }
+
+    /* Table */
+    .table-container {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        border: 1px solid #eef2f6;
+    }
+
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+
+        .table thead th {
+            background-color: var(--navy);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem;
+            border: none;
+        }
+
+            .table thead th:first-child {
+                border-top-left-radius: 1rem;
+            }
+
+            .table thead th:last-child {
+                border-top-right-radius: 1rem;
+            }
+
+        .table tbody tr {
+            transition: background-color 0.2s;
+        }
+
+            .table tbody tr:hover {
+                background-color: #f1f5f9;
+            }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #eef2f6;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+    /* Status badges */
+    .badge-success {
+        background-color: #d1fae5;
+        color: #065f46;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.85rem;
+    }
+
+    .badge-danger {
+        background-color: #fee2e2;
+        color: #991b1b;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.85rem;
+    }
+
+    
+</style>
+
+<div class="container py-4">
+    <h1 class="page-title">PayOut History</h1>
+
+    <!-- Filter Section -->
+    <div class="filter-card">
+        <div class="row align-items-end g-3">
+            <div class="col-md-3 col-sm-6">
+                <label class="filter-label">Start Date</label>
+                <input type="date" class="form-control" id="startDate" />
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <label class="filter-label">End Date</label>
+                <input type="date" class="form-control" id="endDate" />
+            </div>
+            <div class="col-md-6 col-sm-12 d-flex gap-2 justify-content-md-end">
+                <button id="loadDataBtn" class="btn btn-navy px-4">Load Data</button>
+                <button id="btnDownloadExcel" class="btn btn-cyan px-4">Download Excel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table id="payoutTable" class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Account No</th>
+                        <th>RefId</th>
+                        <th>Phone</th>
+                        <th>Account Holder</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="payoutBody">
+                    <tr><td colspan="7" class="text-center text-muted py-4">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden invoice template container (kept for functionality) -->
+<div id="invoiceTemplate" style="display:none; background:#fff;"></div>
+
+@section Scripts {
+    <!-- Include libraries (unchanged) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.14/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        // Your original JavaScript – unchanged
+        let payoutData = [];
+
+        $(document).ready(function () {
+            const today = new Date().toISOString().split('T')[0];
+            $('#startDate').val(today);
+            $('#endDate').val(today);
+
+            const start = $('#startDate').val();
+            const end = $('#endDate').val();
+
+            loadPayOutData(start, end);
+
+            $('#loadDataBtn').click(function () {
+                const start1 = $('#startDate').val();
+                const end1 = $('#endDate').val();
+                loadPayOutData(start1, end1);
+            });
+
+            $('#btnDownloadExcel').click(function () {
+                exportJsonToExcel(payoutData);
+            });
+        });
+
+        function loadPayOutData(startDate, endDate) {
+            $('#payoutBody').html('<tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+            $.ajax({
+                url: 'https://srredu.in/PayIn/GetPayOutHistory',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    phone: '@Model.Phone',
+                    startDate: startDate,
+                    endDate: endDate
+                }),
+                success: function (res) {
+                    if (!res.success || res.data.length === 0) {
+                        $('#payoutBody').html('<tr><td colspan="7" class="text-center text-muted py-4">No data found</td></tr>');
+                        payoutData = [];
+                        return;
+                    }
+
+                    payoutData = res.data;
+
+                    let rows = '';
+                    res.data.forEach(item => {
+                        rows += `
+                            <tr>
+                                <td>${formatISTManually(item.createdDate)}</td>
+                                <td><strong>₹${item.amount}</strong></td>
+                                <td>${item.accountNo}</td>
+                                <td>${item.refId}</td>
+                                <td>${item.userPhone}</td>
+                                <td>${item.accountHolderName}</td>
+                                <td><span class="badge-${item.result === 'Transaction Successful' || item.result === 'SUCCESS' ? 'success' : 'danger'}">${item.result}</span></td>
+                            </tr>`;
+                    });
+                    $('#payoutBody').html(rows);
+                },
+                error: function () {
+                    $('#payoutBody').html('<tr><td colspan="7" class="text-center text-danger py-4">Error loading data</td></tr>');
+                }
+            });
+        }
+
+        function formatISTManually(dateStr) {
+            if (!dateStr || dateStr === "NA") return "NA";
+            const cleanStr = dateStr.endsWith('Z') ? dateStr.slice(0, -1) : dateStr;
+            const [datePart, timePart] = cleanStr.split('T');
+            const [year, month, day] = datePart.split('-');
+            let [hours, minutes, seconds] = timePart.split(':');
+            hours = parseInt(hours, 10);
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            if (hours === 0) hours = 12;
+            const hoursStr = String(hours).padStart(2, '0');
+            return `${day}/${month}/${year} ${hoursStr}:${minutes} ${ampm}`;
+        }
+
+        function exportJsonToExcel(jsonData) {
+            const worksheet = XLSX.utils.json_to_sheet(jsonData.map(row => ({
+                Date: moment(row.createdDate).format("DD/MM/YYYY hh:mm A"),
+                Amount: row.amount,
+                AccountNo: row.accountNo,
+                RefId: row.refId,
+                Phone: row.userPhone,
+                Email: row.email,
+                AccountHolder: row.accountHolderName,
+                IFSC: row.ifscCode,
+                Commission: row.payoutCommission,
+                Status: row.status,
+                Result: row.result
+            })));
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "PayOut History");
+            XLSX.writeFile(workbook, "PayOutHistory.xlsx");
+        }
+
+        // Invoice functions (unchanged)
+        function processInvoice(txnId) {
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: '/PayOut/GetInvoiceDetailsAgent',
+                    type: 'GET',
+                    data: { txn: txnId },
+                    success: function (invoice) {
+                        renderInvoiceTemplate(invoice).then(resolve).catch(reject);
+                    },
+                    error: function (err) {
+                        reject(err);
+                    }
+                });
+            });
+        }
+
+        function renderInvoiceTemplate(invoice) {
+            return new Promise((resolve) => {
+                const template = `
+            <div style="width:210mm; min-height:297mm; padding:10mm; font-family:Arial; font-size:14pt; position:relative; background:#fff; color:#000; border:5px solid #000;">
+                <div class="watermark" style="position:absolute; top:50%; left:3%; opacity:0.05; font-size:80px; font-weight:bold; transform:rotate(-30deg); white-space:nowrap;">
+                    PAYMAN FINTECH
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                    <img src="/images/FinalIcon.png" alt="Logo" style="height:60px;">
+                    <div style="text-align:center; flex-grow:1; font-size:20pt; font-weight:bold;">
+                        TAX INVOICE
+                    </div>
+                    <div>
+                        <img crossorigin="anonymous"
+                             src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https%3A%2F%2Fpaymanfintech.in%2FPayOut%2FViewInvoice%3Ftxn%3D${invoice.transactionId}%26InvoiceNo%3D${invoice.invoiceNo}"
+                             alt="QR Code" width="120" height="120">
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                    <div style="width:48%; border:1px solid #000; padding:12px;">
+                        <h3 style="margin:0 0 8px 0;">From:</h3>
+                        <strong>${invoice.from.name}</strong><br>
+                        ${invoice.from.address}<br>
+                        GSTIN: ${invoice.from.gstin}
+                    </div>
+                    <div style="width:48%; border:1px solid #000; padding:12px;">
+                        <h3 style="margin:0 0 8px 0;">To:</h3>
+                        <strong>${invoice.to.name}</strong><br>
+                        ${invoice.to.address}
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:space-between; border:1px solid #000; padding:12px; margin-bottom:20px; font-size:13pt;">
+                    <div>
+                        <p><strong>Invoice No:</strong> ${invoice.invoiceNo}</p>
+                        <p><strong>Payment Mode:</strong> Credit Card</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <p><strong>Date:</strong>  ${formatISTManually(invoice.date)}</p>
+                        <p><strong>Transaction ID:</strong> ${invoice.transactionId}</p>
+                    </div>
+                </div>
+                <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:13pt;">
+                    <thead style="background:#f5f5f5;">
+                        <tr>
+                            <th style="border:1px solid #000; padding:10px;">S.No.</th>
+                            <th style="border:1px solid #000; padding:10px;">Service</th>
+                            <th style="border:1px solid #000; padding:10px;">HSN/SAC</th>
+                            <th style="border:1px solid #000; padding:10px;">Qty</th>
+                            <th style="border:1px solid #000; padding:10px;">Charges</th>
+                            <th style="border:1px solid #000; padding:10px;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${(invoice.lineItems || []).map(li => `
+                            <tr>
+                                <td style="border:1px solid #000; padding:10px; text-align:center;">${li.sNo}</td>
+                                <td style="border:1px solid #000; padding:10px;">${li.service}</td>
+                                <td style="border:1px solid #000; padding:10px; text-align:center;">${li.hsnSac}</td>
+                                <td style="border:1px solid #000; padding:10px; text-align:center;">${li.qty}</td>
+                                <td style="border:1px solid #000; padding:10px; text-align:right;">₹${li.unitPrice}</td>
+                                <td style="border:1px solid #000; padding:10px; text-align:right;">₹${li.amount}</td>
+                            </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+                <p style="font-size:12pt; margin-bottom:40px;">
+                    <strong>Declaration:</strong> This is a system-generated invoice for the service fee charged towards credit card bill payment.
+                </p>
+            </div>
+        `;
+
+                const container = document.getElementById("invoiceTemplate");
+                container.innerHTML = template;
+                container.style.display = "block";
+
+                html2canvas(container, { scale: 2, useCORS: true }).then((canvas) => {
+                    const imgData = canvas.toDataURL("image/png");
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF("p", "mm", "a4");
+                    const margin = 5;
+                    pdf.addImage(imgData, "PNG", margin, margin, 420 - margin * 2, canvas.height * (420 - margin * 2) / canvas.width);
+                    pdf.save(`Invoice_${invoice.transactionId}.pdf`);
+                    container.style.display = "none";
+                    resolve();
+                });
+            });
+        }
+
+        // Other invoice helpers (unchanged)
+        function getBase64Image(url) {
+            return new Promise((resolve, reject) => {
+                let img = new Image();
+                img.setAttribute('crossOrigin', 'anonymous');
+                img.onload = function () {
+                    let canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    let ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = () => reject();
+                img.src = url;
+            });
+        }
+
+        function GenerateInvoice(TransactionId, Amount, AccountNo, AccountHolderName, UserId, IfscCode, CreatedDate, Status) {
+            $.ajax({
+                url: 'https://srredu.in/PayIn/GetInvoiceDetails',
+                type: 'GET',
+                data: { txn: 'TXN0987654321' },
+                success: async function (invoice) {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+
+                    const logoUrl = '/images/home1.png';
+                    const qrLink = `https://srredu.in/PayIn/ViewInvoice?txn=${invoice.transactionId}`;
+                    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(qrLink)}`;
+                    const [logoBase64, qrBase64] = await Promise.all([getBase64Image(logoUrl), getBase64Image(qrUrl)]);
+
+                    doc.setFontSize(50);
+                    doc.setTextColor(230, 230, 230);
+                    doc.text("PAYMAN FINTECH", 105, 150, { angle: 45, align: "center" });
+
+                    doc.addImage(logoBase64, 'PNG', 10, 10, 40, 20);
+                    doc.setFontSize(16);
+                    doc.setTextColor(0, 0, 0);
+                    doc.text("TAX INVOICE", 105, 20, { align: "center" });
+                    doc.addImage(qrBase64, 'PNG', 90, 24, 35, 35);
+
+                    doc.rect(10, 60, 90, 34);
+                    doc.rect(110, 60, 90, 34);
+                    doc.setFontSize(10);
+                    doc.text("From:", 12, 66);
+                    doc.text(invoice.from.name, 12, 71);
+                    doc.text(invoice.from.address, 12, 76);
+                    doc.text(`GSTIN: ${invoice.from.gstin}`, 12, 81);
+                    doc.text("To:", 112, 66);
+                    doc.text(invoice.to.name, 112, 71);
+                    doc.text(invoice.to.address, 112, 76);
+                    doc.text(`GSTIN: ${invoice.to.gstin}`, 112, 81);
+
+                    doc.rect(10, 100, 190, 18);
+                    doc.text(`Invoice No: ${invoice.invoiceNo}`, 12, 107);
+                    doc.text(`Date: ${invoice.date}`, 150, 107);
+                    doc.text("Payment Mode: Credit Card", 12, 112);
+                    doc.text(`Transaction ID: ${invoice.transactionId}`, 150, 112);
+
+                    doc.autoTable({
+                        startY: 125,
+                        head: [['S.No.', 'Service', 'HSN/SAC', 'Qty', 'Unit Price', 'Amount']],
+                        body: (invoice.lineItems || []).map(li => [
+                            li.sNo,
+                            li.service,
+                            li.hsnSac,
+                            li.qty,
+                            `₹${li.unitPrice}`,
+                            `₹${li.amount}`
+                        ]),
+                        theme: 'grid',
+                        styles: { fontSize: 10, halign: 'center' },
+                        headStyles: { fillColor: [41, 128, 185], textColor: 255 }
+                    });
+
+                    let finalY = doc.lastAutoTable.finalY + 8;
+                    doc.rect(120, finalY - 6, 80, 36);
+                    doc.setFontSize(10);
+                    doc.text(`CGST (9%): ₹${invoice.cgst}`, 124, finalY);
+                    doc.text(`SGST (9%): ₹${invoice.sgst}`, 124, finalY + 6);
+                    doc.text(`Total GST: ₹${invoice.cgst + invoice.sgst}`, 124, finalY + 12);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`Grand Total: ₹${invoice.total}`, 124, finalY + 24);
+                    doc.setFont(undefined, 'normal');
+
+                    doc.setFontSize(9);
+                    doc.text("Declaration: This is a system-generated invoice for the service fee charged towards credit card bill payment.", 12, finalY + 40, { maxWidth: 186 });
+                    doc.text("Authorized Signatory", 12, finalY + 58);
+                    doc.setFont(undefined, 'bold');
+                    doc.text("XYZ Payment Solutions Pvt. Ltd.", 12, finalY + 63);
+
+                    doc.save("TaxInvoice.pdf");
+                }
+            });
+        }
+    </script>
+}

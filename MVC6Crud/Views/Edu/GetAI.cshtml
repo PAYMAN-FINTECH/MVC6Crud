@@ -1,0 +1,769 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    ViewData["Title"] = "Course Details";
+    Layout = "~/Views/Shared/_EduLayout.cshtml";
+    // ===== NEW: Read session for auto-fill =====
+    var userName = Context.Session.GetString("UserName");
+    var userEmail = Context.Session.GetString("Email");
+    var userPhone = Context.Session.GetString("UserPhone");
+    bool isLoggedIn = !string.IsNullOrEmpty(userName);
+}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+    /* YOUR EXISTING STYLES (UNCHANGED) */
+    .curriculum-section {
+        background: #f0f8ff;
+        padding: 40px;
+        border-radius: 20px;
+        margin-top: 30px;
+    }
+
+    .curriculum-title {
+        background: #0d1b3e;
+        color: #fff;
+        padding: 15px;
+        border-radius: 12px;
+        font-size: 1.8rem;
+        font-weight: bold;
+    }
+
+    .session-info {
+        background: #d6ebff;
+        padding: 15px;
+        border-radius: 12px;
+        margin: 20px 0;
+        font-size: 1rem;
+    }
+
+    .module-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .section-title {
+        background: #0d1b3e;
+        color: #fff;
+        padding: 15px;
+        border-radius: 12px;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .icon-box {
+        text-align: center;
+        padding: 20px;
+    }
+
+        .icon-box i {
+            font-size: 2rem;
+            color: #0d6efd;
+        }
+</style>
+<!-- ===== HERO SECTION (YOUR UI UNCHANGED) ===== -->
+<section style="background-color:#0a2a66; color:white; padding:60px 0;">
+    <div class="container d-flex flex-column flex-md-row align-items-center">
+        <div class="col-md-6">
+            <h6 class="text-warning fw-bold">MICRO DEGREE</h6>
+            <h1 class="fw-bold">@ViewBag.CourseName</h1>
+            <p>Become a professional @ViewBag.CourseName in just 12 weeks!</p>
+            <div class="mb-3 p-2 bg-primary text-white rounded" style="display:inline-block;">
+                Application closes on <strong>@DateTime.Now.AddMonths(1).ToString("dd MMM yyyy")</strong>
+            </div>
+            <div class="d-flex gap-3 mt-3">
+                <a href="#courseSection" class="btn btn-outline-light">KNOW MORE</a>
+                <!-- 👉 MODIFIED: Ask login before enroll -->
+                <a href="#enrollSection"
+                   onclick="checkLoginBeforeEnroll(event)"
+                   class="btn btn-primary">
+                    ENROLL NOW
+                </a>
+            </div>
+            <p class="text-light mt-2">Seats Remaining: <strong>13</strong></p>
+        </div>
+        <div class="col-md-6 text-center">
+            <img src="~/images/edu/genai/md-landing-img.webp"
+                 alt="Course Preview" class="img-fluid">
+        </div>
+    </div>
+</section>
+<!-- ========== YOU PROVIDED THIS ENTIRE BLOCK — KEPT EXACTLY SAME ========== -->
+<section class="container py-5" id="enrollSection">
+    <div class="row">
+        <!-- Left Side Features (UNCHANGED) -->
+        <div class="col-md-7">
+            <h2 class="fw-bold mb-3">What is in it for you?</h2>
+            <p class="text-muted mb-4">Shape the future with @ViewBag.CourseName</p>
+            <div class="row">
+                <div class="col-md-4 text-center mb-4">
+                    <i class="bi bi-broadcast" style="font-size:40px; color:#007bff;"></i>
+                    <h6 class="mt-3 fw-bold"><span class="text-danger">●</span> Live Classes</h6>
+                    <p style="font-size:14px;">Attend 12 weeks of instructor-led live classes at the lowest price ever</p>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <i class="bi bi-folder2-open" style="font-size:40px; color:#007bff;"></i>
+                    <h6 class="mt-3 fw-bold">Projects & Case Studies</h6>
+                    <p style="font-size:14px;">Gain hands-on experience with real-world projects and case studies</p>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <i class="bi bi-award" style="font-size:40px; color:#007bff;"></i>
+                    <h6 class="mt-3 fw-bold">Verified Certificate</h6>
+                    <p style="font-size:14px;">Earn an industry-recognized certificate and kickstart your career</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 text-center mb-4">
+                    <i class="bi bi-camera-video" style="font-size:40px; color:#007bff;"></i>
+                    <h6 class="mt-3 fw-bold">Session Recordings</h6>
+                    <p style="font-size:14px;">Revisit older chapters anytime with recorded sessions</p>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <i class="bi bi-calendar-check" style="font-size:40px; color:#007bff;"></i>
+                    <h6 class="mt-3 fw-bold">Flexible Schedule</h6>
+                    <p style="font-size:14px;">Choose live classes from different cohorts that fit your availability</p>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <i class="bi bi-book" style="font-size:40px; color:#007bff;"></i>
+                    <h6 class="mt-3 fw-bold">Study Materials</h6>
+                    <p style="font-size:14px;">Access comprehensive study materials designed to enhance your learning experience</p>
+                </div>
+            </div>
+            <div class="mt-4 p-3 rounded" style="background: linear-gradient(90deg, #e0f3ff, #f8fcff); border: 1px solid #cce5ff;">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                    <div>
+                        <strong>Grab your slot before the offer expires</strong>
+                        <p class="mb-0" style="font-size:14px;">
+                            Discount applicable for next
+                            <a href="#" class="text-primary fw-bold">10 candidates only</a>.
+                        </p>
+                    </div>
+                    <div class="text-center mt-3 mt-md-0">
+                        <span class="badge bg-danger me-2">limited time offer</span>
+                        <span class="badge bg-success">90% OFF</span>
+                        <div class="mt-2">
+                            <del class="text-muted">₹@ViewBag.CourseFee</del>
+                            <span class="fw-bold text-dark" style="font-size:24px;">₹@ViewBag.DiscountedAmount</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ===== RIGHT SIDE FORM (ONLY AUTO-FILL ADDED) ===== -->
+        <div class="col-md-5">
+            <div class="p-4 bg-white shadow rounded">
+                <h5 class="fw-bold mb-3">Reserve your spot today!</h5>
+                <div class="d-flex align-items-center mb-4">
+                    <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center"
+                         style="width:30px; height:30px;">
+                        1
+                    </div>
+                    <div class="flex-fill border-top border-primary mx-2"></div>
+                    <div class="rounded-circle border border-primary text-primary d-flex justify-content-center align-items-center"
+                         style="width:30px; height:30px;">
+                        2
+                    </div>
+                </div>
+                <div class="bg-light border rounded p-2 text-center mb-3">
+                    <span>Application closes on: <strong class="text-primary">@DateTime.Now.AddMonths(1).ToString("dd MMM yyyy")</strong></span>
+                    <p class="mb-0" style="font-size:13px;">Get instant access to pre-course material!</p>
+                </div>
+                <form id="userForm">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text"
+                               id="fullName"
+                               name="FullName"
+                               class="form-control"
+                               value="@userName"
+                               placeholder="Your full name"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email *</label>
+                        <input type="email"
+                               id="email"
+                               name="Email"
+                               class="form-control"
+                               value="@userEmail"
+                               placeholder="abc@gmail.com"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">WhatsApp Number *</label>
+                        <input type="text"
+                               id="whatsapp"
+                               name="WhatsAppNumber"
+                               class="form-control"
+                               value="@userPhone"
+                               placeholder="Enter your number"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Payment Gateway *</label>
+                        <select id="gateway" class="form-control" required>
+                            <option value="">-- Select Gateway --</option>
+                            <option value="JioPay">JioPay</option> 
+                            <option value="cashfree">Cashfree</option>
+                            <option value="paytm">Paytm</option>
+                            <option value="razorPay">Razor Pay</option>
+                        </select>
+                    </div>
+                    <!-- 👉 MODIFIED: Next checks login -->
+                    <button type="button" class="btn btn-primary w-100" id="nextBtn">
+                        Next
+                    </button>
+                </form>
+                <div id="courseSummary" style="display:none;">
+                    <div class="card p-3">
+                        <h5>Total Course Fee</h5>
+                        <p>Course Fee: ₹@ViewBag.CourseFee</p>
+                        <p>Discount: ₹@ViewBag.DiscountedAmount</p>
+                        <h4>Total: ₹@ViewBag.FinalAmount</h4>
+                        <button class="btn btn-success w-100" id="payBtn">
+                            Proceed to Pay
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="container my-5" id="courseSection">
+    <div class="row g-4">
+        <!-- Curriculum Section -->
+        <div class="col-lg-6">
+            <div class="container curriculum-section" id="curriculum">
+                <div class="curriculum-title">Curriculum</div>
+                <p class="text-muted mt-2">A Curriculum designed for your success</p>
+                <!-- Live Session Info -->
+                <div class="session-info">
+                    <p><i class="bi bi-calendar-week"></i> Sat - Sun (Weekends Only)</p>
+                    <p><i class="bi bi-clock"></i> Timing: 7:00 PM - 9:30 PM</p>
+                </div>
+                <!-- Modules -->
+                <div>
+                    <div class="module-card">
+                        <strong>Introduction to Business Analytics</strong>
+                        <span>Module 1</span>
+                        <small>Topics Covered: Business Analytics, Data-Driven Decision Making, ETL Overview</small>
+                    </div>
+                    <div class="module-card">
+                        <strong>Mastering Excel for Data Analytics</strong>
+                        <span>Module 2</span>
+                        <small>Topics Covered: Advanced Excel Features, Data Analysis Functions</small>
+                    </div>
+                    <div class="module-card">
+                        <strong>Power Query for Data Transformation</strong>
+                        <span>Module 3</span>
+                        <small>Topics Covered: ETL Processes, Data Cleaning, Power Query Basics</small>
+                    </div>
+                    <!-- Repeat for all modules -->
+                </div>
+            </div>
+        </div>
+        <!-- Instructor Section -->
+        <div class="col-lg-6">
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-person-badge"></i> Your Instructors</h5>
+                    <div class="d-flex mb-3">
+                        <i class="bi bi-person-circle display-6 text-primary me-3"></i>
+                        <div>
+                            <strong>Jone S</strong>
+                            <p class="mb-0">10+ Years, Sr Analyst<br>Manager, Tiger Analytics</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <i class="bi bi-person-circle display-6 text-primary me-3"></i>
+                        <div>
+                            <strong>Ram K</strong>
+                            <p class="mb-0">18+ Years, Sr. Manager<br>Deloitte</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Tools Covered -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-tools"></i> Tools Covered</h5>
+                    <p><i class="bi bi-bar-chart"></i> Tableau, Power BI, Excel, SQL, Python</p>
+                </div>
+            </div>
+            <!-- Course Includes -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-check2-circle"></i> Course Includes</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-camera-video-fill text-primary"></i> LIVE Interactive Sessions</li>
+                        <li><i class="bi bi-journal-check text-success"></i> Quizzes, Assignments & Projects</li>
+                        <li><i class="bi bi-file-earmark-text text-warning"></i> Study Materials & Recordings</li>
+                        <li><i class="bi bi-award text-info"></i> Certificate</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Pre-requisites -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-lightbulb"></i> Course Pre-requisites</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-dot"></i> Basic computer knowledge is required</li>
+                        <li><i class="bi bi-dot"></i> Beginners friendly</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Course Includes -->
+    <div class="row text-center mt-5">
+        <div class="section-title mb-3">Course Includes</div>
+        <div class="col-md-3 icon-box">
+            <i class="bi bi-laptop"></i>
+            <p>LIVE Interactive Sessions</p>
+        </div>
+        <div class="col-md-3 icon-box">
+            <i class="bi bi-check2-square"></i>
+            <p>Quizzes & Assignments</p>
+        </div>
+        <div class="col-md-3 icon-box">
+            <i class="bi bi-journal-text"></i>
+            <p>Study Materials</p>
+        </div>
+        <div class="col-md-3 icon-box">
+            <i class="bi bi-award"></i>
+            <p>Certificate</p>
+        </div>
+    </div>
+    <!-- Course Pre-requisites -->
+    <div class="mt-4">
+        <div class="section-title mb-3">Course Pre-requisites</div>
+        <ul>
+            <li>Basic computer knowledge is required</li>
+            <li>No prior coding experience needed</li>
+        </ul>
+    </div>
+</section>
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-4">Don't just take our words</h2>
+        <p class="text-center mb-5">Trust our students</p>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="p-3 bg-white shadow rounded">
+                            <strong>Sunidhi</strong>
+                            <p>"Edyoda is very helpful platform..."</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="p-3 bg-white shadow rounded">
+                            <strong>Sourav Sheel</strong>
+                            <p>"Delighted to share that I achieved my certificate..."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="p-3 bg-white shadow rounded">
+                    <img src="/images/video-thumbnail.jpg" class="img-fluid rounded">
+                    <p class="mt-2">Journey to success starts here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<hr class="my-4" />
+
+<div class="text-center text-muted small">
+    <p>© 2026 Payman Fintech Private Limited. All rights reserved.</p>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://secure.paytmpayments.com/merchantpgpui/checkoutjs/merchants/TvEYNH13757085326682.js"></script>
+
+<script>
+    // 👉 NEW: Ask login before Enroll
+    function checkLoginBeforeEnroll(e) {
+        var isLoggedIn = '@isLoggedIn' === 'True';
+
+        if (!isLoggedIn) {
+            e.preventDefault();
+            $('#loginModal').modal('show'); // your existing modal
+        }
+    }
+
+    // 👉 NEW: Next button checks login
+    $('#nextBtn').click(function () {
+
+        var isLoggedIn = '@isLoggedIn' === 'True';
+
+        if (!isLoggedIn) {
+            $('#loginModal').modal('show');
+            return;
+        }
+
+        var gateway = $('#gateway').val();
+
+    if (!gateway) {
+        alert("Please select a payment gateway");
+        return;
+    }
+
+        if ($('#userForm')[0].checkValidity()) {
+            $('#userForm').hide();
+            $('#courseSummary').show();
+        } else {
+            $('#userForm')[0].reportValidity();
+        }
+    });
+
+  
+
+
+    $("#payBtn").click(function () {
+        $('#Loader1').show();
+
+        var amount = parseInt('@Math.Round(Convert.ToDecimal(ViewBag.FinalAmount))');
+        var enterCustomerNumber = 11919;
+        var shgdmobile = $('#whatsapp').val();
+
+
+          var pphoneJio ='9849800697';
+
+             var gateway = $('#gateway').val();
+             var name = $('#fullName').val();
+             var email = $('#email').val();
+             var phone = $('#whatsapp').val();
+             
+             const amoushhsnt = parseFloat(amount);
+
+             if (gateway === "JioPay") {
+                       $.ajax({
+                 url: "https://edu.paymanfintech.in/JioPay/CreateOrder",
+             type: "POST",
+    data: { amount: amoushhsnt, userPhone:pphoneJio , cName: 'janardhan', cMobile:'9849800697', cCard:'edu', cemail: 'jurra@gmail.com', divice: 'web',loadGateways:'JioPay' },
+             success: function (response) {
+
+                 if (response.success) {
+                     window.location.href = response.redirectUrl;
+                 } else {
+                     alert("Error: " + response.message);
+                 }
+             },
+             error: function () {
+                 alert("Something went wrong.");
+             }
+         });
+
+    }else if (gateway === "razorPay"){
+
+    $.ajax({
+    type: 'POST',
+    dataType: 'JSON',
+    url: 'https://paymanfintech.in/PayMan/IntiatePayment',
+    data: { amount: amoushhsnt, cardnumber: "411111111111111" },
+
+    success: function (recData) {
+    $('#Loader1').hide();
+    if (recData.orderId != null) {
+
+    const options = {
+    key: 'rzp_test_lGsdswJA3Wc7jY',
+    name: 'PAYMAN',
+    description: 'Pro Membership',
+    order_id: recData.orderId,
+
+    handler: (response) => {
+
+    window.location.href = "https://edu.paymanfintech.in/";
+    },
+
+    // 👉 NEW: Razorpay auto-fill from your form
+    prefill: {
+    name: name,
+    email: email,
+    contact: phone
+    },
+
+    theme: { color: '#2222d6' }
+    };
+
+    const rzp1 = new window.Razorpay(options);
+    rzp1.open();
+    }
+    }
+    });
+
+
+
+    }
+             else if (gateway === "cashfree"){
+                 const d = new Date();
+                    let orderid = 'PAYMAN' + d.getTime();
+                    let custId = 'Cust' + d.getTime();
+                    var userphone = '9849800697';
+                    var device = 'Web';
+
+                    var orderData = {
+                        order_id: orderid,
+                        order_amount: amoushhsnt,
+                        order_currency: "INR",
+                        order_note: "Order Id:"+ orderid,
+                        order_meta: {
+                            return_url: `https://edu.paymanfintech.in/Edu/Return?order_id=${encodeURIComponent(orderid)}&loginmobile=${encodeURIComponent(userphone)}&email=${encodeURIComponent(email)}&cardnum=${encodeURIComponent(enterCustomerNumber)}&holderphone=${encodeURIComponent(phone)}&holdername=${encodeURIComponent(name)}&device=${encodeURIComponent(device)}`,
+                            notify_url: "https://edu.paymanfintech.in/Edu/Notify"
+                        },
+                        customer_details: {
+                            customer_id: custId,
+                            customer_name: name,
+                            customer_email: email,
+                            customer_phone: phone
+                        }
+                    };
+                    debugger;
+
+                    $.ajax({
+                        url: 'https://edu.paymanfintech.in/Edu/CreateOrder',
+                        type: 'POST',
+                        data: JSON.stringify(orderData),
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        success: function (res) {
+                            if (res.paymentSessionId) {
+                                window.location.href = `https://edu.paymanfintech.in/Edu/StartCheckout?sessionId=${res.paymentSessionId}`;
+                            } else {
+                                alert("Failed to get session ID.");
+                            }
+                        },
+                        error: function (xhr) {
+                            console.error(xhr.responseText);
+                            alert("Error creating order: " + xhr.responseText);
+                        }
+                    });
+             }else if(gateway === "paytm"){
+                        const d = new Date();
+    let orderid = 'PAYMAN' + d.getTime();
+
+    $.ajax({
+        url: 'https://edu.payman.in/Paytm/CreateOrder',
+        type: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({
+            orderId: orderid,
+            amount: amoushhsnt,
+                userphone: '9849800697',
+                    cName: name,
+                             cMobile: phone,
+                             cCard: '411111111111111111111',
+                             cemail: email,
+                             divice: 'web'
+        }),
+        success: function (res) {
+
+            console.log("PAYTM RESPONSE:", res);
+
+            // 🔥 IMPORTANT: token is inside body
+            const txnToken = res.body.txnToken;
+
+            if (!txnToken) {
+                alert("Token not received");
+                return;
+            }
+
+            // 🔥 Check script loaded
+            if (!window.Paytm || !window.Paytm.CheckoutJS) {
+                alert("Paytm SDK not loaded");
+                return;
+            }
+
+            var config = {
+                root: "",
+                flow: "DEFAULT",
+                data: {
+                    mid: "xlmtpp73588911306296",   // ✅ YOUR MID
+                    orderId: orderid,
+                    token: txnToken,
+                    tokenType: "TXN_TOKEN",
+                    amount: amoushhsnt
+                },
+                handler: {
+                    notifyMerchant: function (eventName, data) {
+                        console.log("EVENT:", eventName, data);
+
+                        // ✅ SUCCESS / FAILURE HANDLING
+                        if (eventName === "PAYMENT_SUCCESS") {
+                            alert("Payment Success");
+                            console.log("SUCCESS DATA:", data);
+                        }
+
+                        if (eventName === "PAYMENT_FAILURE") {
+                            alert("Payment Failed");
+                            console.log("FAIL DATA:", data);
+                        }
+                    }
+                }
+            };
+
+            // 🔥 INIT + INVOKE IMMEDIATELY
+            window.Paytm.CheckoutJS.init(config)
+                .then(function () {
+                    console.log("Checkout Init Success");
+                    window.Paytm.CheckoutJS.invoke();
+                })
+                .catch(function (err) {
+                    console.log("Checkout Init Error:", err);
+                });
+        },
+        error: function (err) {
+            console.error("API ERROR:", err);
+            alert("Error creating Paytm order");
+        }
+    });
+
+             }
+                           
+
+       //  payUIntegration();
+
+        // $.ajax({
+        //     type: 'POST',
+        //     dataType: 'JSON',
+        //     url: 'https://paymanfintech.in/PayMan/IntiatePayment',
+        //     data: { amount: amount, cardnumber: enterCustomerNumber },
+
+        //     success: function (recData) {
+        //         $('#Loader1').hide();
+        //         if (recData.orderId != null) {
+
+        //             const options = {
+        //                 key: 'rzp_test_lGsdswJA3Wc7jY',
+        //                 name: 'PAYMAN',
+        //                 description: 'Pro Membership',
+        //                 order_id: recData.orderId,
+
+        //                 handler: (response) => {
+
+        //                     var url =
+        //                       "https://paymanfintech.in/PayMan/ConfirmPayment?" +
+        //                       "razorpay_payment_id=" + response.razorpay_payment_id +
+        //                       "&razorpay_order_id=" + response.razorpay_order_id +
+        //                       "&razorpay_signature=" + response.razorpay_signature +
+        //                       "&amount=" + amount +
+        //                       "&enterCustomerNumber=" + shgdmobile;
+
+        //                     $.ajax({
+        //                         url: url,
+        //                         type: 'GET',
+        //                         success: function () {
+        //                             window.location.href = "/Edu/PaymentStatus";
+        //                         }
+        //                     });
+        //                 },
+
+        //                 // 👉 NEW: Razorpay auto-fill from your form
+        //                 prefill: {
+        //                     name: $('#fullName').val(),
+        //                     email: $('#email').val(),
+        //                     contact: $('#whatsapp').val()
+        //                 },
+
+        //                 theme: { color: '#2222d6' }
+        //             };
+
+        //             const rzp1 = new window.Razorpay(options);
+        //             rzp1.open();
+        //         }
+        //     }
+        // });
+   
+    });
+ 
+        function payUIntegration() {
+
+        const firstName = "Janardhan";
+        const amount = "10";
+        const productInfo = "test";
+        const email = "jurrajanardhan@gmail.com";
+        const phone = "9849800697";
+
+        const surl = "https://localhost:44384/PayMan/Return";
+        const furl = "https://localhost:44384/PayMan/Return";
+
+        const key = "46yIgi";
+        const salt = "LVppnjLWrPGK67pOt2T2oOBw2oqDyshm";   // your salt
+
+        const txnid = generateTxnid();
+
+        // 🔹 EXACT HASH FORMAT FOR secure.payu.in
+        const hashString =
+            key + "|" +
+            txnid + "|" +
+            amount + "|" +
+            productInfo + "|" +
+            firstName + "|" +
+            email + "|||||||||||" +   // 10 empty udf fields
+            salt;
+
+        const hash = generateHash512(hashString);
+
+        console.log("Hash String:", hashString);
+        console.log("Hash:", hash);
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://secure.payu.in/_payment';
+
+        addInput(form, 'key', key);
+        addInput(form, 'txnid', txnid);
+        addInput(form, 'amount', amount);
+        addInput(form, 'productinfo', productInfo);
+        addInput(form, 'firstname', firstName);
+        addInput(form, 'phone', phone);
+        addInput(form, 'email', email);
+        addInput(form, 'surl', surl);
+        addInput(form, 'furl', furl);
+        addInput(form, 'service_provider', 'payu_paisa');
+        addInput(form, 'hash', hash);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+     function addInput(form, name, value) {
+         const input = document.createElement('input');
+         input.type = 'hidden';
+         input.name = name;
+         input.value = value;
+         form.appendChild(input);
+     }
+
+
+     function generateTxnid() {
+         const randomStr = `${Math.random()}${Date.now()}`;
+         console.log("randomStr: " + randomStr);
+         debugger;
+         const hash = generateHash512(randomStr);
+         console.log("hash: " + hash);
+         debugger;
+         return hash.substring(0, 20);
+     }
+
+     function generateHash512(text) {
+         console.log("text: " + text);
+         debugger;
+         const encoder = new TextEncoder();
+         const data = encoder.encode(text);
+         const hashBuffer = crypto.subtle.digest('SHA-512', data);
+         const hashArray = Array.from(new Uint8Array(hashBuffer));
+         const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+         return hashHex;
+     }
+
+
+</script>

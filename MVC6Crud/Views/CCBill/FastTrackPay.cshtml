@@ -1,0 +1,269 @@
+﻿@{
+    ViewData["Title"] = "Credit Card";
+}
+
+<h2>Credit Card</h2>
+
+<div class="input-group mb-3">
+    <input type="text" id="searchInput" class="form-control" placeholder="Search">
+    <button class="btn btn-outline-secondary" id="searchButton">
+        <i class="bi bi-search"></i> Search
+    </button>
+</div>
+
+<div class="row" id="billerCardsContainer">
+    <!-- Cards will be injected here -->
+</div>
+
+<div id="billerError" class="text-danger mt-2"></div>
+
+<!-- Offcanvas Sidebar -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="creditCardSidebar" aria-labelledby="creditCardSidebarLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title fw-bold text-primary" id="creditCardSidebarLabel">Fastag Bill</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="text-center mb-3">
+            <img id="sidebarIcon" src="" alt="Biller Logo" style="height: 40px;" />
+            <h6 id="sidebarBillerName" class="mt-2 fw-bold"></h6>
+        </div>
+
+        <!-- Inputs -->
+        <input type="hidden" id="selectedBillerId" />
+        <div class="mb-3">
+            <input type="text" id="creditCardNumber" class="form-control" placeholder="Vehicle Number" />
+        </div>
+        <div class="mb-3">
+            <input type="text" id="cardHolderMobile" class="form-control" placeholder="Mobile Number" />
+        </div>
+       @*  <div class="mb-3" style="display:none">
+            <input type="text" id="customerMobile" class="form-control" placeholder="Customer Mobile" />
+        </div> *@
+
+        <!-- Dynamic fields after Fetch -->
+        <div class="mb-3 d-none" id="amountInputDiv">
+            <label class="form-label">Enter Amount</label>
+            <input type="text" id="amount" class="form-control" />
+        </div>
+
+        <div class="p-3 bg-light rounded shadow-sm d-none" id="billDetailsBox">
+            <h6 class="text-success fw-bold">Bill Details</h6>
+            <p class="mb-1"><strong>Due Amount:</strong> <span id="dueAmount"></span></p>
+            <p class="mb-1"><strong>Due Date:</strong> <span id="dueDate"></span></p>
+            <p class="mb-0"><strong>Customer Name:</strong> <span id="customerName"></span></p>
+        </div>
+
+        <!-- Buttons -->
+        <button class="btn btn-primary w-100 mt-3" id="fetchBtn" onclick="fetchBill()">Fetch Bill</button>
+        <button class="btn btn-success w-100 mt-3 d-none" id="proceedBtn">Pay</button>
+        <div id="paymentMessage" class="mt-2 fw-bold"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            loadBillers();
+
+            $('#searchButton').click(function () {
+                const term = $('#searchInput').val();
+                loadBillers(term);
+            });
+        });
+
+        function loadBillers(searchTerm = '') {
+            $('#billerError').text('');
+            $('#billerCardsContainer').html('<p>Loading billers...</p>');
+
+            $.ajax({
+                url: 'https://paymanfintech.in/CCBill/CreditCardBillers',
+                method: 'GET',
+                data: { searchTerm: searchTerm },
+                success: function (res) {
+                    const billers = res.billers || res.Billers || [];
+
+                    if (billers.length === 0) {
+                        $('#billerCardsContainer').html('<p>No billers found.</p>');
+                        return;
+                    }
+
+                    let html = '';
+                    billers.forEach(biller => {
+                        html += `
+                            <div class="col-md-4">
+                                <div class="card mb-3 shadow-sm">
+                                    <img src="${biller.iconUrl}" class="card-img-top" alt="${biller.billerName}"
+                                        style="height: 80px; object-fit: contain; cursor: pointer;"
+                                        onclick="openSidebar('${biller.billerName}', '${biller.iconUrl}', '${biller.billerId}')"
+                                        data-bs-toggle="offcanvas" data-bs-target="#creditCardSidebar">
+                                    <div class="card-body text-center">
+                                        <p class="card-text fw-semibold">${biller.billerName}</p>
+                                    </div>
+                                </div>
+                            </div>`;
+                    });
+
+                    $('#billerCardsContainer').html(html);
+                },
+                error: function () {
+                    $('#billerError').text("Failed to load billers. Please try again.");
+                    $('#billerCardsContainer').html('');
+                }
+            });
+        }
+
+        function openSidebar(name, iconUrl, billerId) {
+            $('#sidebarBillerName').text(name);
+            $('#sidebarIcon').attr('src', iconUrl);
+            $('#selectedBillerId').val(billerId);
+
+            // Reset fields
+            $('#creditCardNumber').val('');
+            $('#cardHolderMobile').val('');
+            $('#customerMobile').val('');
+            $('#amount').val('');
+            $('#amountInputDiv, #billDetailsBox, #proceedBtn').addClass('d-none');
+            $('#fetchBtn').removeClass('d-none');
+        }
+
+        function fetchBill() {
+            const billerId = $('#selectedBillerId').val();
+            const last4 = $('#creditCardNumber').val();
+            const holderMobile = $('#cardHolderMobile').val();
+          //  const customerMobile = $('#customerMobile').val('984980697');
+
+            if (!last4 || !holderMobile ) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+          $.ajax({
+            url: '/CCBill/FetchBill',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                billerId: billerId,
+                last4Digits: last4,
+                cardHolderMobile: holderMobile,
+                customerMobile: "9849800697"
+            }),
+            success: function (res) {
+                $('#amount').val(res.amount);
+                $('#dueAmount').text(res.amount);
+                $('#dueDate').text(res.dueDate);
+                $('#customerName').text(res.customerName);
+
+                $('#amountInputDiv, #billDetailsBox, #proceedBtn').removeClass('d-none');
+                $('#fetchBtn').addClass('d-none');
+            },
+            error: function () {
+                alert("Failed to fetch bill.");
+            }
+        });
+
+        }
+
+        $('#proceedBtn').click(function () {
+            const billerId = selectedBillerId;
+           const amount = parseInt($('#amount').val());
+            const mobile = $('#customerMobile').val();
+            debugger;
+
+             if (1 == 1) {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'JSON',
+                    url: '/PayMan/IntiatePayment',
+                    data: { amount: amount, cardnumber: mobile },
+                    success: function (recData) {
+                        if (recData.orderId != null) {
+                            const options = {
+                                key: `rzp_live_2EIqs9bxOALurg`,
+                                // amount: amount,
+                                name: 'PAYMAN',
+                                description: 'Pro Membership',
+                                image: '',
+                                order_id: recData.orderId,
+                                handler: (response) => {
+                                    const requestBody = {
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_signature: response.razorpay_signature
+                                    };
+                                    var url = "/PayMan/ConfirmPayment?" +
+                                        "razorpay_payment_id=" + response.razorpay_payment_id +
+                                        "&razorpay_order_id=" + response.razorpay_order_id +
+                                        "&razorpay_signature=" + response.razorpay_signature +
+                                        "&amount=" + amount +
+                                        "&enterCustomerNumber=" + mobile;
+
+                                    $.ajax({
+                                        url: url,
+                                        type: 'GET', // or 'POST' if your server-side expects a POST request
+                                        success: function (data) {
+                                            $('#Loader').hide();
+                                            if (data.success == true) {
+                                                 alert("Payment processed successfully!");
+                                                //$('#paymentMessage').html(`<span class="text-success">Sucess</span>`);
+                                            } else {
+                                                 alert("Payment failed. Please try again.");
+                                               //$('#paymentMessage').html(`<span class="text-success">Failed</span>`);
+                                            }
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error('Error:', error);
+                                            // Handle errors here
+                                        }
+                                    });
+                                    $('#Loader').hide();
+
+                                },
+                                prefill: {
+                                    // name: username,
+                                    email: "jurrajanardhan@gmail.com",
+                                },
+                                theme: {
+                                    color: '#2222d6'
+                                },
+                                method: {
+                                    "card": true, // Allow card payments only
+                                    "netbanking": false,
+                                    "upi": false,
+                                    "wallet": false
+                                }
+                            };
+                            const rzp1 = new window.Razorpay(options);
+                            rzp1.open();
+                        }
+                        $('#Loader').show();
+                    },
+                    error: function () { alert('A error'); }
+                });
+            }
+
+            // $.ajax({
+            //     url: '/CCBill/MakePayment',
+            //     method: 'POST',
+            //     contentType: 'application/json',
+            //     data: JSON.stringify({
+            //         billerId: billerId,
+            //         amount: amount,
+            //         mobile: mobile
+            //     }),
+            //     success: function (res) {
+            //         if (res.success) {
+            //             $('#paymentMessage').html(`<span class="text-success">${res.message}</span>`);
+            //         } else {
+            //             $('#paymentMessage').html(`<span class="text-danger">${res.message}</span>`);
+            //         }
+            //     },
+            //     error: function () {
+            //         $('#paymentMessage').html(`<span class="text-danger">Something went wrong.</span>`);
+            //     }
+            // });
+        });
+    </script>
+}

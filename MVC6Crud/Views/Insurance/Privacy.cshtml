@@ -1,0 +1,626 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Insurence.cshtml";
+}
+
+@{
+    ViewData["Title"] = "Insurance List - Payman Insurance";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Insurance Premium Payments by Payman</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --light-bg: #f8f9fa;
+            --dark-color: #343a40;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            padding-top: 76px; /* Account for fixed navbar */
+            background-color: #f9f9f9;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 60px 0 40px;
+            margin-bottom: 40px;
+        }
+
+            .page-header h1 {
+                font-size: 2.8rem;
+                margin-bottom: 10px;
+            }
+
+            .page-header .subtitle {
+                font-size: 1.2rem;
+                opacity: 0.9;
+                font-weight: 300;
+            }
+
+        .privacy-content {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            padding: 40px;
+            margin-bottom: 50px;
+        }
+
+        .effective-date {
+            background: #e8f4ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+
+        .policy-section {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+            .policy-section:last-child {
+                border-bottom: none;
+            }
+
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 3px solid var(--primary-color);
+        }
+
+            .info-box h5 {
+                color: var(--dark-color);
+                margin-bottom: 10px;
+            }
+
+        .data-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+            .data-list li {
+                padding: 8px 0;
+                padding-left: 25px;
+                position: relative;
+            }
+
+                .data-list li:before {
+                    content: '•';
+                    position: absolute;
+                    left: 10px;
+                    color: var(--primary-color);
+                    font-size: 1.2rem;
+                }
+
+        .purpose-list {
+            list-style-type: decimal;
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+
+            .purpose-list li {
+                padding: 8px 0;
+            }
+
+        .contact-info {
+            background: #f0f7ff;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .contact-icon {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-right: 15px;
+            min-width: 24px;
+        }
+
+        .highlight-box {
+            background: #fff8e1;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .update-note {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 30px;
+            color: #155724;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: none;
+        }
+
+            .back-to-top:hover {
+                background: #0056b3;
+                transform: translateY(-3px);
+                color: white;
+            }
+
+        .table-of-contents {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #eaeaea;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+            .toc-list li {
+                padding: 8px 0;
+                border-bottom: 1px solid #eee;
+            }
+
+                .toc-list li:last-child {
+                    border-bottom: none;
+                }
+
+            .toc-list a {
+                color: #333;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+                .toc-list a:hover {
+                    color: var(--primary-color);
+                }
+
+       
+
+                .page-header h1 {
+                    font-size: 2.2rem;
+                }
+
+            .privacy-content {
+                padding: 20px;
+            }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+   
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1>Privacy Policy</h1>
+            <p class="subtitle">How we protect and handle your personal information</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Effective Date -->
+        <div class="effective-date">
+            <h4 class="mb-1"><i class="fas fa-calendar-alt me-2"></i>Effective Date: 1st January 2024</h4>
+            <p class="mb-0">Last Updated: 1st January 2024</p>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="table-of-contents">
+            <h4 class="mb-3"><i class="fas fa-list me-2"></i>Table of Contents</h4>
+            <ul class="toc-list">
+                <li><a href="#section1">1. Introduction</a></li>
+                <li><a href="#section2">2. Information We Collect</a></li>
+                <li><a href="#section3">3. How We Use Your Information</a></li>
+                <li><a href="#section4">4. Sharing of Your Information</a></li>
+                <li><a href="#section5">5. Data Security</a></li>
+                <li><a href="#section6">6. Data Retention</a></li>
+                <li><a href="#section7">7. Your Rights</a></li>
+                <li><a href="#section8">8. Cookies and Tracking Technologies</a></li>
+                <li><a href="#section9">9. Third-Party Links</a></li>
+                <li><a href="#section10">10. Children's Privacy</a></li>
+                <li><a href="#section11">11. Changes to This Policy</a></li>
+                <li><a href="#section12">12. Contact Us</a></li>
+            </ul>
+        </div>
+
+        <!-- Privacy Policy Content -->
+        <div class="privacy-content">
+            <!-- Section 1: Introduction -->
+            <div class="policy-section" id="section1">
+                <h2 class="section-title">1. Introduction</h2>
+                <p>Insurance by Payman, operated by Payman Fintech Solutions Private Limited ("we", "us", or "our"), is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services (collectively, the "Service").</p>
+                <div class="info-box">
+                    <p><strong>Important:</strong> By using the Service, you agree to the terms of this Privacy Policy. If you do not agree with the terms, please do not use the Service.</p>
+                </div>
+            </div>
+
+            <!-- Section 2: Information We Collect -->
+            <div class="policy-section" id="section2">
+                <h2 class="section-title">2. Information We Collect</h2>
+
+                <h4>Personal Information</h4>
+                <p>We may collect personally identifiable information that you voluntarily provide to us when you:</p>
+                <ul class="data-list">
+                    <li>Register on the Service</li>
+                    <li>Make a payment for an insurance premium</li>
+                    <li>Contact us with inquiries or for support</li>
+                    <li>Subscribe to our newsletters or updates</li>
+                </ul>
+
+                <div class="info-box">
+                    <h5>Personal Information We Collect May Include:</h5>
+                    <ul class="data-list">
+                        <li><strong>Name</strong> - For identification and verification purposes</li>
+                        <li><strong>Email address</strong> - For communication and notifications</li>
+                        <li><strong>Phone number</strong> - For authentication and alerts</li>
+                        <li><strong>Insurance policy details</strong> (policy number, insurance company, premium amount) - For processing payments</li>
+                        <li><strong>Payment information</strong> (processed securely by our payment partners, we do not store full card details)</li>
+                    </ul>
+                </div>
+
+                <h4 class="mt-4">Non-Personal Information</h4>
+                <p>We may automatically collect certain non-personal information when you visit our Service, including:</p>
+                <ul class="data-list">
+                    <li>IP address and device information</li>
+                    <li>Browser type and version</li>
+                    <li>Pages visited on our site and time spent on pages</li>
+                    <li>Time and date of visit</li>
+                    <li>Other diagnostic data for service improvement</li>
+                </ul>
+            </div>
+
+            <!-- Section 3: How We Use Your Information -->
+            <div class="policy-section" id="section3">
+                <h2 class="section-title">3. How We Use Your Information</h2>
+                <p>We use the information we collect for various legitimate business purposes, including:</p>
+                <ol class="purpose-list">
+                    <li>To provide and maintain the Service, including processing insurance premium payments</li>
+                    <li>To notify you about changes to our Service or important updates</li>
+                    <li>To allow you to participate in interactive features of our Service when you choose to do so</li>
+                    <li>To provide customer support and respond to your inquiries</li>
+                    <li>To gather analysis or valuable information to improve our Service and user experience</li>
+                    <li>To monitor the usage of our Service and detect technical issues</li>
+                    <li>To send you updates, promotions, and marketing materials (only if you have explicitly opted in)</li>
+                    <li>To comply with legal obligations and regulatory requirements</li>
+                </ol>
+            </div>
+
+            <!-- Section 4: Sharing of Your Information -->
+            <div class="policy-section" id="section4">
+                <h2 class="section-title">4. Sharing of Your Information</h2>
+                <p>We may share your information in the following situations:</p>
+
+                <div class="info-box">
+                    <h5>With Service Partners</h5>
+                    <p>We share information with <strong>payment gateways and BBPS (Bharat Bill Payment System)</strong> to process your premium payments, and with <strong>insurance companies</strong> for updating your premium payment status.</p>
+                </div>
+
+                <div class="info-box">
+                    <h5>With Service Providers</h5>
+                    <p>We may employ third-party companies and individuals to facilitate our Service ("Service Providers"), provide the Service on our behalf, perform Service-related services, or assist us in analyzing how our Service is used.</p>
+                </div>
+
+                <div class="info-box">
+                    <h5>For Legal Compliance</h5>
+                    <p>We may disclose your information to <strong>law enforcement or regulatory authorities</strong> if required by law or to protect our rights, your safety, or the safety of others.</p>
+                </div>
+
+                <div class="highlight-box">
+                    <h5><i class="fas fa-exclamation-triangle me-2"></i>Important</h5>
+                    <p class="mb-0"><strong>We do not sell your personal information to third parties.</strong> Your data is only shared as necessary to provide the services you request or as required by law.</p>
+                </div>
+            </div>
+
+            <!-- Section 5: Data Security -->
+            <div class="policy-section" id="section5">
+                <h2 class="section-title">5. Data Security</h2>
+                <p>The security of your data is important to us. We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
+
+                <div class="info-box">
+                    <h5>Our Security Measures Include:</h5>
+                    <ul class="data-list">
+                        <li>SSL encryption for data transmission</li>
+                        <li>Secure access controls and authentication</li>
+                        <li>Regular security assessments and updates</li>
+                        <li>Limited access to personal information within our organization</li>
+                    </ul>
+                </div>
+
+                <p><strong>Important:</strong> While we strive to use commercially acceptable means to protect your personal information, no method of transmission over the Internet or method of electronic storage is 100% secure. We cannot guarantee absolute security.</p>
+            </div>
+
+            <!-- Section 6: Data Retention -->
+            <div class="policy-section" id="section6">
+                <h2 class="section-title">6. Data Retention</h2>
+                <p>We retain your personal information only for as long as necessary to:</p>
+                <ul class="data-list">
+                    <li>Fulfill the purposes outlined in this Privacy Policy</li>
+                    <li>Comply with our legal obligations (such as tax, accounting, or regulatory requirements)</li>
+                    <li>Resolve disputes and enforce our agreements</li>
+                    <li>Maintain business continuity and records</li>
+                </ul>
+                <p>When we no longer need to retain your personal information, we will securely delete or anonymize it.</p>
+            </div>
+
+            <!-- Section 7: Your Rights -->
+            <div class="policy-section" id="section7">
+                <h2 class="section-title">7. Your Rights</h2>
+                <p>Depending on your location and applicable laws, you may have certain rights regarding your personal information, such as:</p>
+
+                <div class="info-box">
+                    <h5>Your Data Rights May Include:</h5>
+                    <ul class="data-list">
+                        <li><strong>Right to Access</strong> - You can request copies of your personal information</li>
+                        <li><strong>Right to Rectification</strong> - You can request correction of inaccurate or incomplete information</li>
+                        <li><strong>Right to Erasure</strong> - You can request deletion of your personal information under certain circumstances</li>
+                        <li><strong>Right to Restrict Processing</strong> - You can request restriction of processing your personal information</li>
+                        <li><strong>Right to Object</strong> - You can object to our processing of your personal information</li>
+                        <li><strong>Right to Data Portability</strong> - You can request transfer of your data to another organization</li>
+                        <li><strong>Right to Withdraw Consent</strong> - Where we rely on consent, you can withdraw it at any time</li>
+                    </ul>
+                </div>
+
+                <p>To exercise any of these rights, please contact us using the contact details provided in Section 12. We may need to verify your identity before processing your request.</p>
+            </div>
+
+            <!-- Section 8: Cookies and Tracking Technologies -->
+            <div class="policy-section" id="section8">
+                <h2 class="section-title">8. Cookies and Tracking Technologies</h2>
+                <p>We use cookies and similar tracking technologies to track activity on our Service and hold certain information. Cookies are files with small amount of data which may include an anonymous unique identifier.</p>
+
+                <div class="info-box">
+                    <h5>Types of Cookies We Use:</h5>
+                    <ul class="data-list">
+                        <li><strong>Essential Cookies</strong> - Necessary for the website to function properly</li>
+                        <li><strong>Analytics Cookies</strong> - Help us understand how visitors interact with our website</li>
+                        <li><strong>Preference Cookies</strong> - Remember your preferences and settings</li>
+                    </ul>
+                </div>
+
+                <p>You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our Service.</p>
+            </div>
+
+            <!-- Section 9: Third-Party Links -->
+            <div class="policy-section" id="section9">
+                <h2 class="section-title">9. Third-Party Links</h2>
+                <p>Our Service may contain links to third-party websites (e.g., insurance company websites, payment gateway pages). We are not responsible for the privacy practices, content, or security of these third-party sites.</p>
+                <p>We encourage you to read the privacy policies of every website you visit, especially when you leave our Service via these links.</p>
+            </div>
+
+            <!-- Section 10: Children's Privacy -->
+            <div class="policy-section" id="section10">
+                <h2 class="section-title">10. Children's Privacy</h2>
+                <p>Our Service is not intended for individuals under the age of 18 ("Children"). We do not knowingly collect personal information from children under 18.</p>
+                <p>If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact us. If we become aware that we have collected personal information from children without verification of parental consent, we take steps to remove that information from our servers.</p>
+            </div>
+
+            <!-- Section 11: Changes to This Policy -->
+            <div class="policy-section" id="section11">
+                <h2 class="section-title">11. Changes to This Privacy Policy</h2>
+                <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Effective Date" at the top.</p>
+
+                <div class="update-note">
+                    <h5><i class="fas fa-bell me-2"></i>Update Notification</h5>
+                    <p class="mb-0">For material changes to this Privacy Policy, we may also notify you through email or a prominent notice on our Service prior to the change becoming effective.</p>
+                </div>
+
+                <p>You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.</p>
+            </div>
+
+            <!-- Section 12: Contact Us -->
+            <div class="policy-section" id="section12">
+                <h2 class="section-title">12. Contact Us</h2>
+                <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
+
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-envelope contact-icon"></i>
+                        <div>
+                            <h5>Email</h5>
+                            <p><a href="mailto:support@paymanfintech.in">support@paymanfintech.in</a></p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <i class="fas fa-phone contact-icon"></i>
+                        <div>
+                            <h5>Phone</h5>
+                            <p>+91 9652724937</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <i class="fas fa-globe contact-icon"></i>
+                        <div>
+                            <h5>Website</h5>
+                            <p><a href="https://insurance.bank-pay.in/contact.html">https://insurance.bank-pay.in/contact.html</a></p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt contact-icon"></i>
+                        <div>
+                            <h5>Registered Address</h5>
+                            <p class="mb-0">PAYMAN FINTECH SOLUTIONS PVT LTD</p>
+                            <p class="mb-0">9-12 HMT NAGAR STNUMBER 1,</p>
+                            <p class="mb-0">NACHARAM, HYDERABAD, Telangana, 500076</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to Top Button -->
+        <a href="#" class="back-to-top" id="backToTop">
+            <i class="fas fa-chevron-up"></i>
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Insurance by Payman</h5>
+                    <p>Secure insurance premium payment facilitation platform.</p>
+                    <p class="mb-0 small">Your privacy is important to us. We are committed to protecting your personal information.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1">&copy; 2026 Swacpay Solutions Private Limited. All rights reserved.</p>
+                    <p class="mb-0">Operated under RBI guidelines and regulations.</p>
+                    <div class="mt-3">
+                        <a asp-controller="Insurance" asp-action="Terms" class="text-white me-3">Terms & Conditions</a>
+                        <a asp-controller="Insurance" asp-action="Privacy" class="text-white me-3">Privacy Policy</a>
+                        <a asp-controller="Insurance" asp-action="RefundPolcy" class="text-white me-3">Refund Policy</a>
+                        <a asp-controller="Insurance" asp-action="ContactUs" class="text-white">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Script -->
+    <script>
+        // Update navbar for logged in state
+        // function updateNavbarForLoggedIn() {
+        //     const navbar = document.querySelector('#navbarNav .navbar-nav');
+        //     if (navbar) {
+        //         // Remove login/signup buttons
+        //         const loginBtn = navbar.querySelector('button[data-bs-target="#loginModal"]');
+        //         const signupLink = navbar.querySelector('a[data-bs-target="#signupModal"]');
+        //         const privacyItem = navbar.querySelector('.nav-item .nav-link[href="/privacy-policy.html"]').parentElement;
+
+        //         if (loginBtn) loginBtn.parentElement.remove();
+        //         if (signupLink) signupLink.parentElement.remove();
+        //         if (privacyItem) privacyItem.remove();
+
+        //         // Add user info
+        //         const userLi = document.createElement('li');
+        //         userLi.className = 'nav-item ms-2';
+        //         userLi.innerHTML = `
+        //             <div class="d-flex align-items-center">
+        //                 <i class="fas fa-user-circle me-2 text-primary"></i>
+        //                 <span class="fw-bold">Ajay Ajay</span>
+        //             </div>
+        //         `;
+        //         navbar.appendChild(userLi);
+        //     }
+        // }
+
+        // Back to Top Button
+        const backToTopButton = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopButton.style.display = 'flex';
+            } else {
+                backToTopButton.style.display = 'none';
+            }
+        });
+
+        backToTopButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Smooth scrolling for table of contents links
+        document.querySelectorAll('.toc-list a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Initialize tooltips (if any)
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>

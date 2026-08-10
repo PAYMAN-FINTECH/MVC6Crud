@@ -1,0 +1,57 @@
+﻿@model TransectionHistoryDTO
+
+<div class="row col-md-12">
+    <div class="col-md-8">
+        <div class="container">
+            <h2>
+                Transection History
+            </h2>
+            <br />
+            <div class="row">
+                <form role="form" asp-action="TransectionHistory" asp-controller="PayMan" method="get">
+                    <div class="row">
+                        <div class="form-group col-6">
+                            <input type="text" name="EnterDate" autocomplete="off" asp-for="EnterDate" class="form-control input-sm" placeholder="DD/MM/YYYY">
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="Email"></label>
+                            <input type="submit" value="Search" class="btn btn-primary">
+                            <input asp-action="PayManHome" asp-controller="PayMan" type="submit" value="Back" method="get" class="btn btn-secondary">
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+            <br />
+            <div>
+                <table class="table table-sm table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            
+                            <th>UserName</th>
+                            <th>PayIn</th>
+                            <th>PayOut</th>
+                            <th>Avl Balance</th>
+                            <th>PayIn Comm</th>
+                            <th>PayOut Comm</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in Model.transectionHistories)
+                        {
+                            <tr>
+                                
+                                <td>@product.UserName</td>
+                                <td>@product.PayInAmount</td>
+                                <td>@product.PayOutAmount</td>
+                                <td>@product.AvaliableBalance</td>
+                                <td>@product.PayInCommision</td>
+                                <td>@product.PayOutCommision</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

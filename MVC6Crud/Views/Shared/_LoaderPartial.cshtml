@@ -1,0 +1,39 @@
+﻿<div id="Loader" class="shader" style="display: none;">
+    <div class="custom_Loader"></div>
+</div>
+
+
+<div id="Loader1" style="display: none;">
+    <!-- _LoaderPartial.cshtml -->
+    <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50"
+         style="z-index: 2000;">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+
+</div>
+
+
+
+<!-- Loader (hidden by default) -->
+@* <div id="loginLoader"
+     class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50"
+     style="display: none; z-index: 2000;">
+    <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<!-- Redundant safety: hide loader after DOM is ready -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var loader = document.getElementById("loginLoader");
+        if (loader) {
+            loader.style.display = "none";
+        }
+    });
+</script> *@
+
+

@@ -1,0 +1,124 @@
+﻿@model MVC6Crud.Models.PaymanWeb.MultiLayOut
+
+
+@{
+    ViewData["Title"] = "FASTag";
+    Layout = Model.IsfastTag ? "~/Views/Shared/_FasTag.cshtml" : "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-5">
+
+    <!-- Hero Banner -->
+    <div class="position-relative mb-5 text-center">
+        <img src="~/images/fastbanner.webp"
+             alt="FASTag Banner"
+             class="img-fluid w-100 rounded-3 shadow" />
+
+       @*  <div class="position-absolute top-50 start-50 translate-middle text-white text-shadow">
+            <h3 class="fw-bold display-5">Drive Through Tolls Smartly with FASTag</h3>
+            <p class="lead">Quick, cashless, and seamless toll payments nationwide</p>
+        </div> *@
+    </div>
+
+
+    <!-- Intro Section -->
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6 mb-4 mb-md-0">
+            <img src="~/images/fastaghome1.webp" alt="What is FASTag" class="img-fluid rounded-4 shadow-sm" />
+        </div>
+        <div class="col-md-6">
+            <h2 class="fw-bold text-primary mb-3">What is FASTag?</h2>
+            <p class="text-muted">
+                FASTag is an RFID-based passive tag that enables toll payments directly from your linked bank account or wallet.
+                Once affixed to your vehicle’s windscreen, you can pass through toll plazas without stopping, saving time, fuel, and money.
+            </p>
+            <ul class="list-unstyled">
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> No need to carry cash or change</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Works nationwide at all NETC toll plazas</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Recharge anytime via UPI, NetBanking, Cards</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-dark">All About FASTag</h2>
+        <p class="text-muted">A nationwide interoperable solution developed by NPCI</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card border-0 shadow h-100 text-center p-4 rounded-4">
+                <div class="mb-3">
+                    <i class="bi bi-globe-americas fs-1 text-primary"></i>
+                </div>
+                <h5 class="fw-bold">Nationwide Solution</h5>
+                <p class="text-muted">Seamless toll payments across India with clearing and settlement powered by NPCI’s NETC program.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow h-100 text-center p-4 rounded-4">
+                <div class="mb-3">
+                    <i class="bi bi-credit-card fs-1 text-success"></i>
+                </div>
+                <h5 class="fw-bold">Seamless Toll Payment</h5>
+                <p class="text-muted">Automatic toll deduction while driving, thanks to RFID technology on your vehicle’s windscreen.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow h-100 text-center p-4 rounded-4">
+                <div class="mb-3">
+                    <i class="bi bi-cash-coin fs-1 text-warning"></i>
+                </div>
+                <h5 class="fw-bold">Convenience & Savings</h5>
+                <p class="text-muted">Save time, fuel, and money while enjoying a hassle-free, cashless travel experience.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="mb-5">
+        <h2 class="fw-bold text-center mb-4">Benefits of FASTag</h2>
+
+        <div class="row align-items-center mb-5">
+            <div class="col-md-6">
+                <img src="~/images/benefit1.webp" alt="Saves Fuel & Time" class="img-fluid rounded-4 shadow-sm" />
+            </div>
+            <div class="col-md-6">
+                <h3 class="fw-bold text-primary">Saves Fuel & Time</h3>
+                <p class="text-muted">Skip long queues at tolls. FASTag ensures smoother driving, reduced congestion, better mileage, and eco-friendly travel.</p>
+            </div>
+        </div>
+
+        <div class="row align-items-center mb-5 flex-md-row-reverse">
+            <div class="col-md-6">
+                <img src="~/images/benefit2.webp" alt="Pay While in Motion" class="img-fluid rounded-4 shadow-sm" />
+            </div>
+            <div class="col-md-6">
+                <h3 class="fw-bold text-primary">Pay While in Motion</h3>
+                <p class="text-muted">No more handing over cash at tolls. Enjoy touch-free payments, added safety, and convenience during travel.</p>
+            </div>
+        </div>
+
+        <div class="row align-items-center mb-5">
+            <div class="col-md-6">
+                <img src="~/images/benefit3.webp" alt="Cashless Convenience" class="img-fluid rounded-4 shadow-sm" />
+            </div>
+            <div class="col-md-6">
+                <h3 class="fw-bold text-primary">Cashless Convenience</h3>
+                <p class="text-muted">The toll amount is deducted automatically. Recharge anytime via UPI, debit/credit card, or net banking.</p>
+            </div>
+        </div>
+
+        <div class="row align-items-center flex-md-row-reverse">
+            <div class="col-md-6">
+                <img src="~/images/benefit4.webp" alt="Real-Time Alerts" class="img-fluid rounded-4 shadow-sm" />
+            </div>
+            <div class="col-md-6">
+                <h3 class="fw-bold text-primary">Real-Time Alerts & Statements</h3>
+                <p class="text-muted">Stay in control with instant SMS alerts and detailed statements via the My FASTag app or issuing bank portal.</p>
+            </div>
+        </div>
+    </div>
+</div>
+

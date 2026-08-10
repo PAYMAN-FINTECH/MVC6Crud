@@ -1,0 +1,340 @@
+﻿
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/languages/jquery.validationEngine-en.min.js"></script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+@model AdharVerification
+
+<div class="container mt-4">
+    <strong style="color: red">NOTE:</strong> <label>Please upload a file with a size of less than 300 KB</label>
+    <div class="card">
+        @if (TempData["FileSize"] != null)
+        {
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                @TempData["FileSize"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        <div class="card-header">
+            <strong>KYC Verification</strong>
+        </div>
+        <div class="card-body">
+            <div class="subheader p-1">
+                <p><strong>What is Aadhaar Paperless Offline e-KYC?</strong></p>
+                <p>Aadhaar Paperless Offline e-KYC is a secure sharable document which can be used by any Aadhaar number holder for offline verification of identification.</p>
+            </div>
+            <div class="row col-md-12">
+                <div class="row col-md-6">
+                    <div class="col-12">
+                        <form role="form" asp-action="SubmitAdharDetails" asp-controller="PayMan" method="post" enctype="multipart/form-data">
+                            @if (Model.AdharNumber != null && Model.AdharNumber != "")
+                            {
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group d-flex">
+                                            <div class="col-md-8 p-1">
+                                                <input type="number" name="AdharNumber" id="AdharNumber" asp-for="AdharNumber" readonly autocomplete="off" class="form-control input-sm" placeholder="Adhar Number">
+                                            </div>
+                                            <div class="col-md-4 p-1">
+                                                <input id="btnAdharNumberVerify" type="button" value="Send OTP" disabled="disabled" class="btn btn-primary ml-2">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group d-flex">
+                                            <div class="col-md-8 p-1">
+                                                <input type="number" name="AdharNumber" id="AdharNumber" asp-for="AdharNumber" autocomplete="off" class="form-control input-sm" placeholder="Adhar Number">
+                                            </div>
+                                            <div class="col-md-4 p-1">
+                                                <input id="btnAdharNumberVerify" type="button" value="Send OTP" class="btn btn-primary ml-3">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            @if (Model.AdharNumber != null && Model.AdharNumber != "")
+                            {
+                                @if (Model.AdharOtp != 0)
+                                {
+                                    <div class="row">
+                                        <div class="col-md-12" id="divOtp">
+                                            <div class="form-group d-flex">
+                                                <div class="col-md-8 p-1">
+                                                    <input type="number" name="Otp" id="otp" asp-for="AdharOtp" autocomplete="off" readonly class="form-control input-sm" placeholder="Enter OTP">
+                                                </div>
+                                                <div class="col-md-8 p-1">
+                                                    <input id="btnOtpVerify" type="button" value="Verify" disabled="disabled" class="btn btn-primary ml-2">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row p-1">
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label><strong>Aadhaar Card (Front Photo)</strong></label>
+                                                <input asp-for="FrontImageFile" type="file" required class="form-control" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="row p-1">
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label><strong>Aadhaar Card (Back Photo)</strong></label>
+                                                <input asp-for="BackImageFile" type="file" required class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row p-1">
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label><strong>Enter PAN Number</strong></label>
+                                                <input type="text" name="PanNumber" id="PanNumber" asp-for="PanNumber" maxlength="10" min="10" max="10" oninput="this.value = this.value.toUpperCase()" required autocomplete="off" class="form-control input-sm" placeholder="PAN Number">
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row p-1">
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label><strong>Pan Card Photo</strong></label>
+                                                <input asp-for="PANImageFile" type="file" required class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-1">
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="row">
+                                        <div class="col-md-12" id="divOtp">
+                                            <div class="form-group d-flex">
+                                                <div class="col-md-8 p-1">
+                                                    <input type="number" name="Otp" id="otp" autocomplete="off" re class="form-control input-sm" placeholder="Enter OTP">
+                                                </div>
+                                                <div class="col-md-4 p-1">
+                                                    <input id="btnOtpVerify" type="button" value="Verify" class="btn btn-primary ml-2">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+
+
+
+                                @*  <div class="row">
+                            <div class="col-md-4" id="divOtp">
+                            <div class="form-group d-flex">
+                            <input type="number" name="Otp" id="otp" autocomplete="off" class="form-control input-sm" placeholder="Enter OTP">
+                            <input id="btnOtpVerify" type="button" value="Verify" class="btn btn-primary ml-2">
+                            </div>
+                            </div>
+                            </div> *@
+                            }
+                        </form>
+                    </div>
+                </div>
+                <div class="row col-md-6">
+                    <div class="img-responsive">
+                        <img src="~/images/adharpan2.jpg" style="width:100%" />
+
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        //$("#divOtp").hide();
+        $("#btnAdharNumberVerify").click(function () {
+            debugger;
+            $('#Loader').show();
+            var adharnumber = $("#AdharNumber").val();
+            if (adharnumber == null || adharnumber == "" || adharnumber == undefined) {
+                alert("Please enter Adhar number.");
+                $('#Loader').hide();
+                return false;
+            }
+            if (adharnumber.length < 12) {
+                alert("Please enter Adhar number.");
+                $('#Loader').hide();
+                return false;
+            }
+            console.log(adharnumber);
+            $.ajax({
+                type: 'POST',
+                dataType: 'JSON',
+                url: '/PayMan/AdharNumberVerify1',
+                data: { AdharNumber: adharnumber }, // Convert the object to JSON
+                success: function (data) {
+                    debugger;
+                    $('#Loader').show();
+                    if (data.sucess == true) {
+                        alert("Send otp to your mobile number !");
+                        debugger;
+                        if (data.result.ref_id != null) {
+                            debugger;
+                            $("#AdharNumber").prop("readonly", true);
+                            $('#btnAdharNumberVerify').prop('disabled', true);
+                            // $("#divOtp").show();
+
+                            var model = {
+                                AdharNumber: adharnumber,
+                                refid: data.result.ref_id
+                                // Add other properties as needed
+                            };
+
+                            var queryString = Object.keys(model)
+                                .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(model[key]))
+                                .join('&');
+
+                            window.location.href = "@Url.Action("AdharNumberVerify", "PayMan")" + "?" + queryString;
+
+
+                            // $.ajax({
+                            //     type: 'GET',
+                            //     dataType: 'JSON',
+                            //     url: '/PayMan/AdharNumberVerify',
+                            //     data: { AdharNumber: adharnumber, refid: data.result.ref_id }, // Convert the object to JSON
+                            //     success: function (data) {
+                            //         debugger;
+                            //         alert("test");
+                            //     },
+                            //     error: function (error) {
+                            //         // Handle errors, if any
+                            //         console.error(error);
+                            //     }
+                            // });
+                        }
+                    } else if (data.result.message == "Failed") {
+                        $('#Loader').hide();
+                        $("#AdharNumber").prop("readonly", false);
+                        $('#btnAdharNumberVerify').prop('disabled', false);
+                        alert("This Aadhaar is already verified!");
+                        $.ajax({
+                            type: 'GET',
+                            dataType: 'JSON',
+                            url: '/PayMan/AdharNumberVerify',
+                            data: { AdharNumber: adharnumber }, // Convert the object to JSON
+                            success: function (data) {
+                                debugger;
+                                alert("test");
+                            },
+                            error: function (error) {
+                                // Handle errors, if any
+                                console.error(error);
+                            }
+                        });
+                    } else {
+                        $('#Loader').hide();
+                        // $("#divOtp").hide();
+                        $("#AdharNumber").prop("readonly", false);
+                        $("#btnAdharNumberVerify").prop("readonly", false);
+                        alert("Failed to send otp to mobile number !");
+                        $.ajax({
+                            type: 'GET',
+                            dataType: 'JSON',
+                            url: '/PayMan/AdharNumberVerify',
+                            data: { AdharNumber: adharnumber, refid: data.result.ref_id }, // Convert the object to JSON
+                            success: function (data) {
+                                debugger;
+                                alert("test");
+                            },
+                            error: function (error) {
+                                // Handle errors, if any
+                                console.error(error);
+                            }
+                        });
+                    }
+                    $('#Loader').hide();
+                },
+                error: function (error) {
+                    // Handle errors, if any
+                    console.error(error);
+                }
+            });
+        });
+
+        $("#btnOtpVerify").click(function () {
+            $('#Loader').show();
+            debugger;
+            var otp = $("#otp").val();
+            var adharnumber1 = $("#AdharNumber").val();
+            debugger;
+            if (otp == null || otp == "" || otp == undefined) {
+                alert("Please enter OTP.");
+                $('#Loader').hide();
+                return false;
+            }
+
+            if (otp.length < 6) {
+                alert("Please enter valid OTP.");
+                $('#Loader').hide();
+                return false;
+            }
+
+            // var model = { adharnumber1: adharnumber1, otp: otp }
+            // var url = "@Url.Action("VerifyAdharOTP", "PayMan")";
+            //         $.post(url, model, function (res) {
+            //         });
+
+            $.ajax({
+                type: 'POST',
+                dataType: 'JSON',
+                url: '/PayMan/VerifyAdharOTP',
+                data: { adharnumber1: adharnumber1, otp: otp }, // Convert the object to JSON
+                success: function (data) {
+                    debugger;
+                    $('#Loader').show();
+                    if (data.sucess == true) {
+                        $('#Loader').hide();
+                        alert("OTP verification completed successfully");
+
+                        var model = {
+                            AdharNumber: adharnumber1,
+                            refid: null,
+                            otp: otp
+                            // Add other properties as needed
+                        };
+
+                        var queryString = Object.keys(model)
+                            .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(model[key]))
+                            .join('&');
+
+                        window.location.href = "@Url.Action("AdharNumberVerify", "PayMan")" + "?" + queryString;
+
+                        // window.location.href = "@Url.Action("PayManHome", "PayMan")";
+                    } else {
+                        $('#Loader').hide();
+                        alert("OTP verification completed failed");
+                        window.location.href = "@Url.Action("AdharNumberVerify", "PayMan")";
+                    }
+                    $('#Loader').hide();
+                },
+                error: function (error) {
+                    // Handle errors, if any
+                    console.error(error);
+                }
+            });
+        });
+    });
+</script>

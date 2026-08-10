@@ -1,0 +1,43 @@
+﻿@model LoginViewModel
+@{
+    ViewData["Title"] = "LogIn Page";
+}
+
+        <div class="row col-md-12">
+            <div class="col-md-6">
+        <div class="container">
+            <h2 >LogIn</h2>
+            <br />
+            <div class="row">
+                
+                    <div class="jumbotron">
+                        <form role="form" asp-action="LogIn" asp-controller="LogIn" method="post">
+                        
+                            <label class="text-danger">@ViewBag.message</label>
+                            <div class="form-group col-8">
+                            <label for="Email"><i class="fa fa-user p-2"></i><strong>User Name</strong></label>
+                                <input type="text" name="Email" asp-for="Email" required autocomplete="off" class="form-control input-sm" placeholder="Email Address">
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <br />
+                            <div class="form-group col-8">
+                            <label for="Password"><i class="fa-regular fa-eye p-2"></i><strong>Password</strong></label>
+                                <input type="password" name="Password" asp-for="Password" required autocomplete="off" class="form-control input-sm" placeholder="Password">
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                            <br />
+                            <input type="submit" value="Login" class="btn btn-primary">
+                        </form>
+                    </div>
+                z
+
+            </div>
+                </div>
+                
+            </div>
+    <div class="col-md-6">
+        <div class="img-responsive"><img src="~/images/loginlogo.jpeg" style="width:100%" />
+     
+      </div>
+            </div>
+        </div>

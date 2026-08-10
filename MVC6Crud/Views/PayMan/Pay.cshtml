@@ -1,0 +1,779 @@
+﻿
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/languages/jquery.validationEngine-en.min.js"></script>
+
+<style>
+    .modal {
+        display: none; /* Always hidden by default */
+        position: fixed;
+        z-index: 1050; /* Higher z-index to overlay on page */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+        justify-content: center;
+        align-items: center;
+    }
+
+        .modal.show {
+            display: flex !important; /* Only show when adding 'show' class */
+        }
+
+
+</style>
+
+@model PayPayment
+
+<div class="row col-md-12">
+    <div class="col-md-6">
+        <div class="container">
+            <h2>Pay Payment</h2>
+            <br />
+            <div class="row">
+
+                <div class="jumbotron">
+                    <form role="form" id="form1">
+
+                        <label class="text-danger">@ViewBag.message</label>
+                        <div class="form-group col-8">
+                            <label for="EnterCustomerNumber"><i class="fa fa-user-o p-2" aria-hidden="true"></i><strong>Enter Card Number</strong></label>
+                            <input type="number" id="enterCustomerNumber" required name="EnterCustomerNumber" asp-for="EnterCustomerNumber" autocomplete="off" class="form-control input-sm" placeholder="Enter Card Number">
+                            <span asp-validation-for="EnterCustomerNumber" class="text-danger"></span>
+                        </div>
+                        <br />
+                        <div class="form-group col-8">
+                            <label for="Amount"><i class="fa fa-inr p-2"></i><strong>Amount</strong></label>
+                            <input type="number" id="amount" name="Amount" asp-for="Amount" required autocomplete="off" class="form-control input-sm" placeholder="Amount">
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+                        <br />
+                        <div class="form-group col-8">
+                            <label for="SelectPaymentGateWay"><i class="fa fa-address-card-o p-2" aria-hidden="true"></i><strong>Select Payment GateWay</strong></label>
+                            <select id="drpEmpList" class="form-control" asp-for="SelectPaymentGateWay">
+                                <option value="">--Select--</option>
+                                @* <option value="2">Normal Cards</option>
+ *@
+                                @* @if (Model.IsSrrEnable == true)
+                                {
+                                    <option value="6">Normal /Master Cards</option>
+                                    <option value="8">Normal /Master Cards</option>
+                                } *@
+                                @* <option value="3">Bussiness/Commercial Cards</option> *@
+                                @* <option value="7">AirPay</option> *@
+                                @*  <option value="4">PayU</option> *@
+                                @* <option value="5">PineLab(UAT)</option> *@
+
+                                @if (Model.EaseBuzzEnable == true)
+                                {
+                                    <option value="9">Ease buzz</option>
+                                }
+                                else
+                                {
+                                <option value="8">Ease buzz</option>
+                                }
+
+
+                            </select>
+                        </div>
+                        <br />
+                        <input type="hidden" id="userName" name="UserName" asp-for="UserName" />
+                        <input type="hidden" id="email" name="Email" asp-for="Email" />
+                        <input type="hidden" id="phone" name="Phone" asp-for="phone" />
+
+                        <input type="button" id="btnPayment" value="Pay" class="btn btn-primary">
+                        <input asp-action="PayManHome" asp-controller="PayMan" type="button" value="Back" class="btn btn-danger">
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6">
+        <div class="img-responsive">
+            <img src="~/images/cardpayimage.jpg" style="width:100%" />
+
+        </div>
+    </div>
+</div>
+<div id="paymentSuccessModal1" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="text-center">
+            <i class="fa fa-check-circle" style="font-size: 48px; color: blue;"></i>
+            <h3>PayIn Payment Successful!</h3>
+            <hr>
+            <p><strong>Amount: </strong><span id="amount11"></span></p>
+            <p><strong>Card No: </strong><span id="cardnumber"></span></p>
+            <p><strong>Payment Time: </strong><span id="transactionTime"></span></p>
+            <p><strong>Payment ID: </strong><span id="transactionId"></span></p>
+            @*  <p><strong>Order ID: </strong><span id="orderId"></span></p>
+            <p><strong>Merchant ID: </strong><span id="merchantId"></span></p> *@
+            <button id="okButton" class="btn btn-success">OK</button>
+        </div>
+    </div>
+</div>
+<div id="paymentSuccessModal2" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="text-center">
+            <i class="fa fa-check-circle" style="font-size: 48px; color: orangered;"></i>
+            <h3>PayIn Payment Failed!</h3>
+            <hr>
+            <p><strong>Amount: </strong><span id="amount11"></span></p>
+            <p><strong>Card No: </strong><span id="cardnumber"></span></p>
+            <p><strong>Payment Time: </strong><span id="transactionTime"></span></p>
+            <p><strong>Payment ID: </strong><span id="transactionId"></span></p>
+            @*  <p><strong>Order ID: </strong><span id="orderId"></span></p>
+            <p><strong>Merchant ID: </strong><span id="merchantId"></span></p> *@
+            <button id="okButton" class="btn btn-danger">OK</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('#Loader').show
+        var formattedDateISTI = formatDateInIST();
+        var LyraPayInSucess = '@TempData["LyraPayInSucess"]';
+        var LyraPayInAmount = '@TempData["LyraPayInAmount"]';
+        var LyraPayInCardNumber = '@TempData["LyraPayInCardNumber"]';
+        var LyraPayInPaymentId = '@TempData["LyraPayInPaymentId"]';
+
+        if (LyraPayInSucess == 1) {
+            $('#amount11').text(LyraPayInAmount);
+            $('#cardnumber').text(LyraPayInCardNumber);
+            $('#transactionTime').text(formattedDateISTI);
+            $('#transactionId').text(LyraPayInPaymentId);
+            $('#paymentSuccessModal1').show();
+        }
+        if (LyraPayInSucess == 2) {
+            $('#amount11').text(LyraPayInAmount);
+            $('#cardnumber').text(LyraPayInCardNumber);
+            $('#transactionTime').text(formattedDateISTI);
+            $('#transactionId').text(LyraPayInPaymentId);
+            $('#paymentSuccessModal2').show();
+        }
+
+        $('#okButton').on('click', function () {
+            $('#paymentSuccessModal1').hide();
+            $('#paymentSuccessModal2').hide();
+            window.location.href = "@Url.Action("PayManHome", "PayMan")";
+        });
+        window.addEventListener('beforeunload', function (e) {
+            $('#paymentSuccessModal1').hide();
+            window.location.href = "@Url.Action("PayManHome", "PayMan")";
+        });
+
+        $("#btnPayment").click(function () {
+            debugger;
+            var intervalId; // Declare the intervalId variable to control the intervals
+            //var amount = $("#amount").val();
+            $('#Loader').show();
+
+            $('#btnPayment').text('Processing Payment...');
+
+            const d = new Date();
+            let ms = d.toISOString();
+            //let transid = 'PAYMAN2024123591123765';//'PAYMAN'+ms;
+            let transid = 'PAYMAN' + ms;
+            var vfb = $('#amount').val();
+            let amount = parseInt($('#amount').val());
+            var enterCustomerNumber = $("#enterCustomerNumber").val();
+            var username = $("#userName").val();
+            var email = $("#email").val();
+            var phone = $("#phone").val();
+
+            var selectedgateway = $("#drpEmpList").val();
+            if ($('#amount').val() == '' || $('#amount').val() == null || enterCustomerNumber == null || enterCustomerNumber == '') {
+                alert("Please enter CustomerNumber and Amount!");
+                $('#Loader').hide();
+                return false;
+            };
+            if (enterCustomerNumber.length != 16) {
+                alert("Please enter valid card!!");
+                $('#Loader').hide();
+                return false;
+            }
+            if (amount > 99999) {
+                alert("Please enter less then 99999 amount!");
+                $('#Loader').hide();
+                return false;
+            }
+            if (selectedgateway == '' || selectedgateway == null) {
+                alert("Please select gateway!");
+                $('#Loader').hide();
+                return false;
+            }
+            if (selectedgateway == "2") {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'JSON',
+                    url: '/PayMan/IntiatePayment',
+                    data: { amount: amount, cardnumber: enterCustomerNumber },
+                    success: function (recData) {
+                        if (recData.orderId != null) {
+                            const options = {
+                                key: `rzp_live_2EIqs9bxOALurg`,
+                                // amount: amount,
+                                name: 'PAYMAN',
+                                description: 'Pro Membership',
+                                image: '',
+                                order_id: recData.orderId,
+                                handler: (response) => {
+                                    const requestBody = {
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_signature: response.razorpay_signature
+                                    };
+                                    var url = "/PayMan/ConfirmPayment?" +
+                                        "razorpay_payment_id=" + response.razorpay_payment_id +
+                                        "&razorpay_order_id=" + response.razorpay_order_id +
+                                        "&razorpay_signature=" + response.razorpay_signature +
+                                        "&amount=" + amount +
+                                        "&enterCustomerNumber=" + enterCustomerNumber;
+
+                                    $.ajax({
+                                        url: url,
+                                        type: 'GET', // or 'POST' if your server-side expects a POST request
+                                        success: function (data) {
+                                            $('#Loader').hide();
+                                            var formattedDateIST = formatDateInIST();
+                                            $('#amount11').text(amount);
+                                            $('#cardnumber').text(enterCustomerNumber);
+                                            $('#transactionTime').text(formattedDateIST);
+                                            $('#transactionId').text(data.paymentid);
+                                            if (data.success == true) {
+                                                // Show the payment success modal
+                                                $('#paymentSuccessModal1').show();
+                                            } else {
+                                                $('#paymentSuccessModal2').show();
+                                            }
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error('Error:', error);
+                                            // Handle errors here
+                                        }
+                                    });
+                                    $('#Loader').hide();
+
+                                },
+                                prefill: {
+                                    // name: username,
+                                    email: email,
+                                },
+                                theme: {
+                                    color: '#2222d6'
+                                },
+                                method: {
+                                    "card": true, // Allow card payments only
+                                    "netbanking": false,
+                                    "upi": false,
+                                    "wallet": false
+                                }
+                            };
+                            const rzp1 = new window.Razorpay(options);
+                            rzp1.open();
+                        }
+                        $('#Loader').show();
+                    },
+                    error: function () { alert('A error'); }
+                });
+            }
+            else if (selectedgateway == "6") {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'JSON',
+                    url: 'https://srredu.in/Home/IntiatePayment',
+                    data: { amount: amount, cardnumber: enterCustomerNumber },
+                    success: function (recData) {
+                        debugger;
+                        if (recData.orderId != null) {
+                            const options = {
+                                key: 'rzp_live_vFGMDy7p89ud40',
+                                // amount: amount,
+                                name: 'SRR EDU',
+                                description: 'Pro Membership',
+                                image: '',
+                                order_id: recData.orderId,
+                                handler: (response) => {
+                                    debugger;
+                                    const requestBody = {
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_signature: response.razorpay_signature
+                                    };
+                                    var url = "https://srredu.in/Home/ConfirmPayment?" +
+                                        "razorpay_payment_id=" + response.razorpay_payment_id +
+                                        "&razorpay_order_id=" + response.razorpay_order_id +
+                                        "&razorpay_signature=" + response.razorpay_signature +
+                                        "&amount=" + amount +
+                                        "&enterCustomerNumber=" + enterCustomerNumber +
+                                        "&selectedgateway=" + selectedgateway;
+
+                                    $.ajax({
+                                        url: url,
+                                        type: 'GET', // or 'POST' if your server-side expects a POST request
+                                        success: function (data) {
+                                            debugger;
+                                            srrcall(data);
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error('Error:', error);
+                                            // Handle errors here
+                                        }
+                                    });
+                                    $('#Loader').hide();
+
+                                },
+                                prefill: {
+                                    // name: username,
+                                    email: email,
+                                },
+                                theme: {
+                                    color: '#2222d6'
+                                },
+                                method: {
+                                    "card": true, // Allow card payments only
+                                    "netbanking": false,
+                                    "upi": false,
+                                    "wallet": false
+                                }
+                            };
+                            const rzp1 = new window.Razorpay(options);
+                            rzp1.open();
+                        }
+                        $('#Loader').show();
+                    },
+                    error: function () { alert('A error'); }
+                });
+            } else if (selectedgateway == "8") {
+                    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        url: 'https://srredu.in/Home/EbuzzIntiatePayment',
+        data: {
+            amount: amount,
+            cardnumber: email,
+            selectedgateway: username,
+            phone: phone
+        },
+        beforeSend: function () {
+            $('#Loader').show();
+        },
+        success: function (recData) {
+            console.log(recData);
+            if (recData.success) {
+                if (recData.paymenturl && recData.paymenturl.trim() !== "") {
+                    window.location.replace(recData.paymenturl);
+                } else {
+                    alert("Payment link not generated.");
+                }
+            } else {
+                alert("Payment link not generated.");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error occurred:', status, error);
+            alert("An error occurred while initiating the payment.");
+        },
+        complete: function () {
+            $('#Loader').hide();
+        }
+    });
+
+            }else if (selectedgateway == "9") {
+                    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        url: 'https://srredu.in/Home/EbuzzIntiatePayment1',
+        data: {
+            amount: amount,
+            cardnumber: email,
+            selectedgateway: username,
+            phone: phone
+        },
+        beforeSend: function () {
+            $('#Loader').show(); // Show loader before request
+        },
+        success: function (recData) {
+            console.log(recData);
+            if (recData.success) {
+                if (recData.paymenturl && recData.paymenturl.trim() !== "") {
+                    window.location.replace(recData.paymenturl);
+                } else {
+                    alert("Payment link not generated.");
+                }
+            } else {
+                alert("Payment link not generated.");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("AJAX Error:", status, error);
+            alert("An error occurred while initiating the payment.");
+        },
+        complete: function () {
+            $('#Loader').hide(); // Always hide loader when request finishes
+        }
+    });
+
+            }
+            else if (selectedgateway == "3") {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'JSON',
+                    url: '/PayMan/LayraIntiatePayment',
+                    data: { amount: amount, enterCustomerNumber: enterCustomerNumber },
+                    success: function (recData) {
+                        console.log(recData);
+                        debugger;
+                        $('#Loader').show();
+                        if (recData.success) {
+                            if (recData.phonepeResponse.paymentLink != null || recData.phonepeResponse.paymentLink != "") {
+                                $('#Loader').hide();
+                                window.location.replace(recData.phonepeResponse.paymentLink);
+                            } else {
+                                alert("Payment link not genrated.");
+                            }
+                        } else {
+                            alert("Payment link not genrated.");
+                        }
+                        $('#Loader').hide();
+                    },
+                    error: function () { alert('A error'); }
+                });
+            }
+            else if (selectedgateway == "4") {
+                payUIntegration();
+            } else if (selectedgateway == "5") {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'JSON',
+                    url: '/PayMan/Create',
+                    data: { amount: amount },
+                    success: function (recData) {
+                        console.log(recData);
+                        debugger;
+                        $('#Loader').show();
+                        if (recData.success) {
+                            if (recData.phonepeResponse.url != null || recData.phonepeResponse.url != "") {
+                                $('#Loader').hide();
+                                window.location.replace(recData.phonepeResponse.url);
+                            } else {
+                                alert("Payment link not genrated.");
+                            }
+                        } else {
+                            alert("Payment link not genrated.");
+                        }
+                        $('#Loader').hide();
+                    },
+                    error: function () { alert('A error'); }
+                });
+            }
+            else if (selectedgateway == "7") {
+                $.ajax({
+                     type: 'POST',
+                     url: '/PayMan/InitiatePayment',
+                     data: { amount: amount, cardnumber: enterCustomerNumber },
+                     success: function (recData) {
+                         if (recData.orderId) {
+                         $('#Loader').show();
+                         // Redirect to SubmitToAirPay action
+                         window.location.href = "@Url.Action("SubmitToAirPay", "PayMan")";
+                        // window.location.href = '/PayMan/SubmitToAirPay?orderId=' + recData.orderId;
+
+                       }
+                  },
+                 error: function () {
+                alert('An error occurred while initiating payment.');
+                  }
+              });
+            }
+            else {
+                //let payload = {
+                //    "merchantId": `PGTESTPAYUAT`,
+                //    "merchantTransactionId": transid,
+                //    "merchantUserId": "MUIEP01",
+                //    "amount": amount+"00",
+                //    "redirectUrl": 'https://localhost:7256/PayMan/Pay1?transid=' + transid,
+                //    "redirectMode": "POST",
+                //    "callbackUrl": 'https://localhost:7256/PayMan/Pay1?transid=' + transid,
+                //    "mobileNumber": enterCustomerNumber,
+                //    "paymentInstrument": {
+                //        "type": "PAY_PAGE"
+                //    }
+                //}
+                let payload = {
+                    "merchantId": `M22MZ1VGJ41EU`,
+                    "merchantTransactionId": transid,
+                    "merchantUserId": "MUIEP01",
+                    "amount": amount * 100,
+                    //"redirectUrl": 'https://localhost:44384/PayMan/Pay1?transid=' + transid,
+                    "redirectUrl": 'https://paymanfintech.in/PayMan/Pay1?transid=' + transid + '&userId=' + username + '&phone=' + enterCustomerNumber,
+                    "redirectMode": "POST",
+                    //"callbackUrl": 'https://localhost:44384/PayMan/Pay1?transid=' + transid,
+                    "callbackUrl": 'https://paymanfintech.in/PayMan/Pay1?transid=' + transid,
+                    "mobileNumber": enterCustomerNumber,
+                    "paymentInstrument": {
+                        "type": "PAY_PAGE"
+                    }
+                }
+
+                const base64 = btoa(JSON.stringify(payload)); // Encode payload to base64
+                //const sign = base64 + `/pg/v1/pay099eb0cd-02cf-4e2a-8aca-3e6c6aff0399`;
+                const sign = base64 + `/pg/v1/pay2f49de74-4932-46e3-9460-819b9009cb57`; // Modify this accordingly based on your API
+                let X_VERIFY = signRequest(sign) + "###1";
+
+                // Create an object to send in the request body
+                const requestBody = {
+                    X_VERIFY: X_VERIFY,
+                    base64: base64,
+                    MERCHANTID: null,
+                    TransactionId: transid,
+                    CustomerNo: enterCustomerNumber,
+                    SelectedGateWay: selectedgateway
+                    // Other data you want to send in the request body
+                };
+
+
+                $.ajax({
+                    url: "/PayMan/GeneratePaymentLink", // Replace with your controller and action names
+                    type: "POST", // Change to POST to send data in the request body
+                    dataType: "json",
+                    data: JSON.stringify(requestBody), // Convert the object to JSON
+                    contentType: "application/json; charset=utf-8", // Set the content type
+                    success: function (data) {
+                        let phonepeResponse = JSON.parse(data.phonepeResponse);
+                        var url = phonepeResponse.data.instrumentResponse.redirectInfo.url;
+                        // window.open(url);
+                        $('#Loader').hide();
+                        window.location.replace(url);
+                        // scheduleStatusChecks(transid);
+                        // Handle the data received from the server
+                    },
+                    error: function (error) {
+                        // Handle errors, if any
+                        console.error(error);
+                    }
+                });
+            }
+        });
+
+        function srrcall(data) {
+            debugger;
+            var url = "/PayMan/SrrConfirmPayment?" +
+                "paymentid=" + data.paymentid +
+                "&orderdd=" + data.orderdd +
+                "&paymentstatus=" + data.paymentstatus +
+                "&issuerbank=" + data.issuerbank +
+                "&issuecard=" + data.issuecard +
+                "&selectedgat=" + data.selectedgat +
+                "&amount=" + data.aamount +
+                "&enterCustomerNumber=" + data.eenterCustomerNumber +
+                "&cardtype=" + data.cardtype;
+
+            $.ajax({
+                url: url,
+                type: 'GET', // or 'POST' if your server-side expects a POST request
+                success: function (data) {
+                    $('#Loader').hide();
+                    var formattedDateIST = formatDateInIST();
+                    $('#amount11').text(data.enteredamount);
+                    $('#cardnumber').text(data.cardnumber);
+                    $('#transactionTime').text(formattedDateIST);
+                    $('#transactionId').text(data.Paymentid);
+                    if (data.success == true) {
+                        // Show the payment success modal
+                        $('#paymentSuccessModal1').show();
+                    } else {
+                        $('#paymentSuccessModal2').show();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    // Handle errors here
+                }
+            });
+            $('#Loader').hide();
+        }
+
+        function scheduleStatusChecks(TransactionId) {
+            // Initial check after 20-25 seconds
+            setTimeout(function () {
+                $('#btnPayment').text('Checking Payment Status...');
+                var intervalCount = 0;
+                checkPhonePeStatus(TransactionId, intervalCount);
+
+                // Schedule checks "Every 3 seconds once for the next 30 seconds"
+
+                intervalId = setInterval(function () {
+                    checkPhonePeStatus(TransactionId, intervalCount);
+                    intervalCount++;
+
+                    if (intervalCount >= 10) {
+                        clearInterval(intervalId); // Stop after 30 seconds (10 intervals)
+                    }
+                }, 3000);
+            }, 20000 + Math.random() * 5000); // Random delay within the specified range
+        }
+
+        function checkPhonePeStatus(TransactionId, intervalCount) {
+            debugger;
+            const sign_status = `/pg/v1/status/PGTESTPAYUAT/AO129901099eb0cd-02cf-4e2a-8aca-3e6c6aff0399`; // Modify this accordingly based on your API
+            let X_VERIFY_STATUS = signRequest(sign_status) + "###1";
+
+            // Create an object to send in the request body
+            const requestBody = {
+                X_VERIFY: X_VERIFY_STATUS,
+                TransactionId: TransactionId,
+                MERCHANTID: 'PGTESTPAYUAT'
+                // Other data you want to send in the request body
+            };
+
+            $.ajax({
+                url: "/PayMan/CheckPaymentStatus", // Replace with your controller and action names
+                type: "POST", // Change to POST to send data in the request body
+                dataType: "json",
+                data: JSON.stringify(requestBody), // Convert the object to JSON
+                contentType: "application/json", // Set the content type
+                success: function (res) {
+                    let phonepestatus = JSON.parse(res.phonepeResponse);
+
+                    if (phonepestatus.code == 'PAYMENT_SUCCESS') {
+                        clearInterval(intervalCount);
+                        $('#btnPayment').text('PAYMENT SUCCESS');
+                        if (intervalCount >= 10) {
+                            alert('PAYMENT SUCCESS');
+                        }
+                    }
+                    else if (phonepestatus.code == 'PAYMENT_ERROR') {
+                        alert('PAYMENT ERROR');
+                    }
+
+
+                },
+                error: function (error) {
+                    // Handle errors, if any
+                    console.error(error);
+                }
+            });
+        }
+    });
+
+    $(window).on('load', function () {
+        $('#Loader').fadeOut('slow'); // Use fadeOut for smooth disappearance
+    });
+
+    function signRequest(payload) {
+        // Assuming you are using CryptoJS for hashing
+        const hashedPayload = CryptoJS.SHA256(payload).toString(CryptoJS.enc.Hex);
+        return hashedPayload;
+    }
+
+    function payUIntegration() {
+        debugger;
+        const firstName = "Janardhan";
+        const amount = "10";
+        const productInfo = "test";
+        const email = "jurrajanardhan@gmail.com";
+        const phone = "9849800697";
+        // const surl = "http://paymanfintech.in/PayMan/Return";
+        // const furl = "http://paymanfintech.in/PayMan/Return";
+        const surl = "https://localhost:44384/PayMan/Return";
+        const furl = "https://localhost:44384/PayMan/Return";
+        // const key = "46yIgi";
+        const key = "DydFIh";
+        // const salt = "ZPtfCmR0O8PoB7E0t6BqyFvmxDD6MKUq";
+        const salt = "";
+
+        const txnid = generateTxnid();
+        // const hashString = `${key}|${txnid}|${amount}|${productInfo}|${firstName}|${email}||||||||||||`;
+        const hashString = `${key}|${txnid}|${amount}|${productInfo}|${firstName}|${email}|||||||||||${salt}`;
+        const hash = generateHash512(hashString);
+        debugger;
+        console.log(hashString);
+        console.log(hash);
+        const form = document.createElement('form');
+        debugger;
+        form.method = 'POST';
+        form.action = 'https://test.payu.in/_payment';
+        //form.action = 'https://secure.payu.in/_payment';
+
+        addInput(form, 'key', key);
+        addInput(form, 'txnid', txnid);
+        addInput(form, 'amount', amount);
+        addInput(form, 'productinfo', productInfo);
+        addInput(form, 'firstname', firstName);
+        addInput(form, 'phone', phone);
+        addInput(form, 'email', email);
+        addInput(form, 'surl', surl);
+        addInput(form, 'furl', furl);
+        addInput(form, 'service_provider', 'payu_paisa');
+        addInput(form, 'hash', hash);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function addInput(form, name, value) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+    }
+
+
+    function generateTxnid() {
+        const randomStr = `${Math.random()}${Date.now()}`;
+        console.log("randomStr: " + randomStr);
+        debugger;
+        const hash = generateHash512(randomStr);
+        console.log("hash: " + hash);
+        debugger;
+        return hash.substring(0, 20);
+    }
+
+    function generateHash512(text) {
+        console.log("text: " + text);
+        debugger;
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = crypto.subtle.digest('SHA-512', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
+    }
+
+    function formatDateInIST() {
+        // Create a new Date object and convert it to IST
+        let currentdate = new Date();
+
+        // Calculate the time offset for IST (UTC+5:30)
+        let offset = 5.5 * 60; // 5 hours 30 minutes in minutes
+        let ISTTime = new Date(currentdate.getTime() + (offset * 60 * 1000));
+
+        // Extract the required date and time components
+        let month = (ISTTime.getMonth() + 1).toString().padStart(2, '0');
+        let day = ISTTime.getDate().toString().padStart(2, '0');
+        let year = ISTTime.getFullYear();
+
+        let hours = ISTTime.getHours();
+        let minutes = ISTTime.getMinutes().toString().padStart(2, '0');
+        let seconds = ISTTime.getSeconds().toString().padStart(2, '0');
+
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        hours = hours.toString().padStart(2, '0');
+
+        // Return the formatted date and time string
+        return `${month}/${day}/${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+    }
+
+</script>

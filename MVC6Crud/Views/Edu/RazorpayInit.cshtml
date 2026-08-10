@@ -1,0 +1,107 @@
+﻿@using MVC6Crud.Models.PaymanWeb
+@model RazorpaySessionModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Razorpay Init</title>
+
+    <!-- ✅ LOAD JQUERY FIRST -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+    <div id="Loader1" style="display:none">Processing...</div>
+
+    <script>
+        // ✅ GLOBAL VARIABLE
+        var amount = 0;
+
+        $(document).ready(function () {
+
+            amount = parseFloat('@Model.Amount'.replace(',', '.'));
+
+            $.ajax({
+                type: 'POST',
+                url: '/Edu/CreateRazorpayOrder',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    Amount: amount,
+                    merchent: 'Utility'
+                }),
+                success: function (recData) {
+
+                    const options = {
+                        key: recData.key,
+                        order_id: recData.orderId,
+                        name: 'PAYMAN',
+                        description: 'Education Fee',
+
+                        prefill: {
+                            contact: '@Model.Mobile',
+                            email: '@Model.Email'
+                        },
+
+                        handler: function (response) {
+                            verifyPayment(response);
+                        },
+
+                        modal: {
+                            ondismiss: function () {
+                                redirectFailed("USER_CANCELLED");
+                            }
+                        }
+                    };
+
+                    new Razorpay(options).open();
+                },
+                error: function (err) {
+                    console.error("Create order failed", err);
+                }
+            });
+        });
+
+        function verifyPayment(response) {
+
+
+            $.ajax({
+                type: 'POST',
+                url: '/Edu/VerifyRazorPayPayment',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify({
+                    RazorpayPaymentId: response.razorpay_payment_id,
+                    RazorpayOrderId: response.razorpay_order_id,
+                    RazorpaySignature: response.razorpay_signature,
+                    Amount: amount,
+                    CustomerMobile: '@Model.Mobile',
+                    CardNum: '@Model.Card',
+                    CardHoderName: '@Model.Name',
+                    Phone: '@Model.logonphone',
+                    Merchent: 'Utility'
+                }),
+                success: function (res) {
+                    if(res.success){
+                           window.location.href = `https://paymanfintech.in/PayMan/PayStatus?IsSuccess=${encodeURIComponent(true)}&Amount=${encodeURIComponent(amount)}&TransactionId=${encodeURIComponent(res.transactionId)}`;
+                    }else{
+                        var inv1 ="Failed";
+                        window.location.href = `https://paymanfintech.in/PayMan/PayStatus?IsSuccess=${encodeURIComponent(false)}&Amount=${encodeURIComponent(amount)}&TransactionId=${encodeURIComponent(inv1)}`;
+                    }
+                    
+
+                },
+                error: function (err) {
+                    var inv ="Failed";
+                    window.location.href = `https://paymanfintech.in/PayMan/PayStatus?IsSuccess=${encodeURIComponent(false)}&Amount=${encodeURIComponent(amount)}&TransactionId=${encodeURIComponent(inv)}`;
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

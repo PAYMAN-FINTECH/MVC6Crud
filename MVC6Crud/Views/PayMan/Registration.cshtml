@@ -1,0 +1,164 @@
+﻿<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/languages/jquery.validationEngine-en.min.js"></script>
+
+
+@model Registartion
+
+<div class="row col-md-12">
+    <div class="col-md-6">
+        <div class="container">
+            <h2>Register</h2>
+            <br />
+            <div class="row">
+
+                <div class="jumbotron">
+                    <form role="form" asp-action="Registration" asp-controller="PayMan" method="post">
+
+                        <label class="text-danger">@ViewBag.message</label>
+                        <input type="hidden" asp-for="Id" />
+                        <div class="form-group col-8">
+                            <label for="Email"><i class="fa fa-user p-2"></i><strong>User Name</strong></label>
+                            <input type="userName" name="UserName" asp-for="UserName" autocomplete="off" required class="form-control input-sm" placeholder="UserName">
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-8">
+                            <label for="Email"><i class="fa fa-envelope p-2" aria-hidden="true"></i><strong>Email</strong></label>
+                            <input type="email" name="Email" asp-for="Email" autocomplete="off" required class="form-control input-sm" placeholder="Email Address">
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        @* <div class="form-group col-8">
+                            <label for="Password"><i class="fa-regular fa-eye p-2"></i><strong>Password</strong></label>
+                            <input type="text" name="Password" asp-for="Password" autocomplete="off" class="form-control input-sm" placeholder="Password">
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div> *@
+                        <div class="form-group col-8">
+                            <label for="PhoneNumber"><i class="fa fa-phone p-2" aria-hidden="true"></i><strong>Phone Number</strong></label>
+                            <input type="phoneNumber" name="PhoneNumber" asp-for="PhoneNumber" required autocomplete="off" class="form-control input-sm" placeholder="Phone Number">
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                       
+                        <div class="form-group col-8">
+                            <label for="CustomerType"><i class="fa fa-address-card-o p-2" aria-hidden="true"></i><strong>Customer Type</strong></label>
+                            <select class="form-control" name="CustomerType" asp-for="CustomerType" required>
+                                <option value="">--Select CustomerType--</option>
+                                @if (Model.MariginAccess == "Ajju" || Model.MariginAccess == "Jurra")
+                                {
+                                    <option value="1">Distributor</option>
+                                }
+                                <option value="2">Retailer</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-8">
+                            <label for="Margin"><i class="fa fa-user p-2"></i><strong>Margin</strong></label>
+                            <select class="form-control" name="Margin" asp-for="Margin" required>
+                                <option value="">--Select Margin--</option>
+                                <option value="1.30">1.30</option>
+                                <option value="1.35">1.35</option>
+                                <option value="1.40">1.40</option>
+                                <option value="1.42">1.42</option>
+                                <option value="1.45">1.45</option>
+                                <option value="1.50">1.50</option>
+                                <option value="1.55">1.55</option>
+                            </select>
+                        </div>
+                        @if (Model.MasterMarginEnable == true)
+                        {
+                            <div class="form-group col-8">
+                                <label for="MasterMargin"><i class="fa fa-user p-2"></i><strong>Master Margin</strong></label>
+                                <select class="form-control" name="MasterMargin" asp-for="MasterMargin" required>
+                                    <option value="">--Select Margin--</option>
+                                    <option value="1.75">1.75</option>
+                                    <option value="1.80">1.80</option>
+                                    <option value="1.85">1.85</option>
+                                    <option value="1.90">1.90</option>
+                                    <option value="1.95">1.95</option>
+                                    @* <option value="2.00">2.00</option>
+                                    <option value="2.05">2.05</option>
+                                    <option value="2.10">2.10</option>
+                                    <option value="2.15">2.15</option>
+                                    <option value="2.20">2.20</option>
+                                     <option value="2.25">2.25</option>
+                                     <option value="2.30">2.30</option> *@
+                                </select>
+                            </div>
+                        }
+                       
+                        @if (Model.MariginAccess == "Ajju" || Model.MariginAccess == "Jurra")
+                        {
+                            <div class="form-group col-8">
+                                <label for="DMTAccessable"><i class="fa fa-user p-2"></i><strong>DMT Accessable</strong></label>
+                                <input type="checkbox" name="DMTAccessable" asp-for="DMTAccessable" placeholder="Is Active">
+                                <span asp-validation-for="DMTAccessable" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-8">
+                                <label for="BalanceTopUp"><i class="fa fa-user p-2"></i><strong>Balance TopUp</strong></label>
+                                <input type="checkbox" name="BalanceTopUp" asp-for="BalanceTopUp" placeholder="Balance TopUp">
+                                <span asp-validation-for="BalanceTopUp" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-8">
+                                <label for="SrrEnable"><i class="fa fa-user p-2"></i><strong>Srr Enable</strong></label>
+                                <input type="checkbox" name="SrrEnable" asp-for="SrrEnable" placeholder="Srr Enable">
+                                <span asp-validation-for="SrrEnable" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-8">
+                                <label for="IsActive"><i class="fa fa-user p-2"></i><strong>Is Active</strong></label>
+                                <input type="checkbox" name="IsActive" asp-for="IsActive" placeholder="Is Active">
+                                <span asp-validation-for="IsActive" class="text-danger"></span>
+                            </div>
+                        }
+
+                        <br />
+                        <input type="submit" value="Register" class="btn btn-primary">
+                        <input asp-action="PayManHome" asp-controller="PayMan" type="submit" value="Back" class="btn btn-danger">
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6">
+        <div class="img-responsive">
+            <img src="~/images/rrrrrrr.jpeg" style="width:100%" />
+
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#btnAdharNumberVerify").click(function () {
+            debugger;
+            var adharnumber = $("#AdharNumber").val();
+            console.log(adharnumber);
+            $.ajax({
+                type: 'POST',
+                dataType: 'JSON',
+                url: '/PayMan/AdharNumberVerify',
+                data: { AdharNumber: adharnumber }, // Convert the object to JSON
+                success: function (data) {
+                    debugger;
+                    $('#Loader').show();
+                    if (data.sucess == true) {
+                        if (data.result.RefId != null){
+
+                        }
+                        window.location.reload();
+                    } else {
+                        $('#Loader').hide();
+                        alert("verification falied");
+                        window.location.reload();
+                    }
+                    $('#Loader').hide();
+                },
+                error: function (error) {
+                    // Handle errors, if any
+                    console.error(error);
+                }
+            });
+        });
+    })
+</script>
+

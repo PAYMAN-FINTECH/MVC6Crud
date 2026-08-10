@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/payman/databases/PayMan",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:MVC6CrudConnetionString",
+      "dynamicId": null
+    }
+  }
+}

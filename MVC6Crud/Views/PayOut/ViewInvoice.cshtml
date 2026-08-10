@@ -1,0 +1,97 @@
+﻿@model MVC6Crud.Models.PaymanWeb.InvoiceViewModel
+
+<div style="width:210mm; min-height:297mm; padding:10mm; font-family:Arial; font-size:14pt; position:relative; background:#fff; color:#000; border:5px solid #000;">
+
+    <!-- Watermark -->
+   @*  <div style="position:absolute; top:50%; left:3%; opacity:0.05; font-size:80px; font-weight:bold; transform:rotate(-30deg); white-space:nowrap;">
+        PAYMAN FINTECH
+    </div> *@
+
+    <!-- Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <img src="~/images/FinalIcon.png" alt="Logo" style="height:60px;">
+        <div style="text-align:center; flex-grow:1; font-size:20pt; font-weight:bold;">
+            TAX INVOICE
+        </div>
+        <div>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https%3A%2F%2Fpaymanfintech.in%2FPayOut%2FViewInvoice%3Ftxn%3D@Model.TransactionId%26InvoiceNo%3D@Model.InvoiceNo"
+                 alt="QR Code" width="120" height="120" />
+        </div>
+    </div>
+
+    <!-- From / To -->
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+        <div style="width:48%; border:1px solid #000; padding:12px;">
+            <h3 style="margin:0 0 8px 0;">From:</h3>
+            <strong>@Model.From.Name</strong><br />
+            @Model.From.Address<br />
+            GSTIN: @Model.From.Gstin
+        </div>
+        <div style="width:48%; border:1px solid #000; padding:12px;">
+            <h3 style="margin:0 0 8px 0;">To:</h3>
+            <strong>@Model.To.Name</strong><br />
+            @Model.To.Address
+        </div>
+    </div>
+
+    <!-- Invoice Info -->
+    <div style="display:flex; justify-content:space-between; border:1px solid #000; padding:12px; margin-bottom:20px; font-size:13pt;">
+        <div>
+            <p><strong>Invoice No:</strong> @Model.InvoiceNo</p>
+            <p><strong>Payment Mode:</strong> Credit Card</p>
+        </div>
+        <div style="text-align:right;">
+            <p><strong>Date:</strong> @Model.Date</p>
+            <p><strong>Transaction ID:</strong> @Model.TransactionId</p>
+        </div>
+    </div>
+
+    <!-- Line Items -->
+    <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:13pt;">
+        <thead style="background:#f5f5f5;">
+            <tr>
+                <th style="border:1px solid #000; padding:10px;">S.No.</th>
+                <th style="border:1px solid #000; padding:10px;">Service</th>
+                <th style="border:1px solid #000; padding:10px;">HSN/SAC</th>
+                <th style="border:1px solid #000; padding:10px;">Qty</th>
+                <th style="border:1px solid #000; padding:10px;">Unit Price</th>
+                <th style="border:1px solid #000; padding:10px;">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var li in Model.LineItems)
+            {
+                <tr>
+                    <td style="border:1px solid #000; padding:10px; text-align:center;">@li.SNo</td>
+                    <td style="border:1px solid #000; padding:10px;">@li.Service</td>
+                    <td style="border:1px solid #000; padding:10px; text-align:center;">@li.HsnSac</td>
+                    <td style="border:1px solid #000; padding:10px; text-align:center;">@li.Qty</td>
+                    <td style="border:1px solid #000; padding:10px; text-align:right;">₹@li.UnitPrice</td>
+                    <td style="border:1px solid #000; padding:10px; text-align:right;">₹@li.Amount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div style="display:flex; justify-content:flex-end; margin-bottom:30px;">
+        <div style="width:45%; border:1px solid #000; padding:15px; font-size:14pt;">
+            <p>CGST (9%): <strong>₹@Model.Cgst.ToString("0.00")</strong></p>
+            <p>SGST (9%): <strong>₹@Model.Sgst.ToString("0.00")</strong></p>
+            <p><strong>Total GST:</strong> ₹@(Model.Cgst + Model.Sgst).ToString("0.00")</p>
+            <hr />
+            <h2 style="margin-top:10px;">Grand Total: ₹@Model.Total.ToString("0.00")</h2>
+        </div>
+    </div>
+
+    <!-- Declaration -->
+    <p style="font-size:12pt; margin-bottom:40px;">
+        <strong>Declaration:</strong> This is a system-generated invoice for the service fee charged towards credit card bill payment.
+    </p>
+
+    <!-- Footer -->
+    <div style="margin-top:50px; text-align:right;">
+        <p><strong>Authorized Signatory</strong></p>
+        <h5>PayMan Fintech Solutions Pvt. Ltd.</h5>
+    </div>
+</div>

@@ -1,0 +1,64 @@
+﻿@using MVC6Crud.Controllers
+@model JiopaySessionModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Razorpay Init</title>
+
+    <!-- ✅ LOAD JQUERY FIRST -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+    <div id="Loader1" style="display:none">Processing...</div>
+
+    <script>
+        // ✅ GLOBAL VARIABLE
+        var amount = 0;
+        var url = "";
+
+        $(document).ready(function () {
+
+            amount = parseFloat('@Model.Amount'.replace(',', '.'));
+
+            if('@Model.gateway' != 'JioPay'){
+                url = "https://fastag.payman.in/JioPay/CreateOrder"
+            }else{
+                url = "https://edu.paymanfintech.in/JioPay/CreateOrder";
+            }
+
+             $.ajax({
+                     url: url,
+                     type: "POST",
+                     data: {
+                         amount: amount,
+                         userPhone: '@Model.userPhone',
+                         cName: '@Model.CName',
+                         cMobile: '@Model.CMobile',
+                         cCard: '@Model.CCard',
+                         cemail: '@Model.Cemail',
+                         divice: 'web',
+                         loadGateways: '@Model.gateway' 
+                     },
+                     success: function(response) {
+                         if (response.success) window.location.href = response.redirectUrl;
+                         else alert("Error: " + response.message);
+                     },
+                     error: function() {
+                         $('#Loader1').hide();
+                         alert("Something went wrong.");
+                     }
+                 });
+        });
+
+      
+                        </script>
+
+</body>
+</html>

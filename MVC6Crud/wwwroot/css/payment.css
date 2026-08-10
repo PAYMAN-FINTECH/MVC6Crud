@@ -1,0 +1,228 @@
+﻿/* Container */
+.beneficiary-container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 10px;
+}
+
+/* Header */
+.beneficiary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+    .beneficiary-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+.add-beneficiary-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px; /* Reduced padding */
+    font-size: 14px; /* Smaller text */
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+    .add-beneficiary-btn:hover {
+        background-color: #0056b3;
+    }
+
+/* Search */
+.search-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 40px 10px 40px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #888;
+}
+
+/* Beneficiary Card */
+.beneficiary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.beneficiary-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 16px;
+    background: #f9f9f9;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.beneficiary-info {
+    flex: 1;
+    min-width: 240px;
+}
+
+.beneficiary-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+}
+
+.verified-badge {
+    background-color: #28a745;
+    color: #fff;
+    padding: 2px 6px;
+    font-size: 12px;
+    border-radius: 4px;
+}
+
+.beneficiary-detail {
+    color: #555;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon {
+    font-size: 16px;
+    color: #333;
+}
+
+.ifsc-label {
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+/* Amount Section */
+.amount-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    min-width: 140px;
+}
+
+.amount-input {
+    width: 140px;
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #aaa;
+}
+
+.pay-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+    .pay-btn:hover {
+        background-color: #218838;
+    }
+
+/* Modal */
+.add-beneficiary-modal {
+    padding: 20px;
+}
+
+.modal-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+    .form-group label {
+        font-weight: 600;
+    }
+
+.save-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+    .save-btn:hover {
+        background-color: #0056b3;
+    }
+
+/* Charges Section */
+.charges-section {
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #eef2f5;
+    border-radius: 8px;
+}
+
+.charge-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .beneficiary-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .beneficiary-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .amount-section {
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .amount-input {
+        width: 100%;
+    }
+
+    .modal-dialog {
+        max-width: 95%;
+        margin: auto;
+    }
+
+    .add-beneficiary-btn {
+        width: 100%;
+        text-align: center;
+    }
+}

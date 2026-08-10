@@ -1,0 +1,197 @@
+﻿@{
+    ViewData["Title"] = "About Us";
+    Layout = "~/Views/Shared/_EduLayout.cshtml";
+}
+
+
+
+
+<!-- Bootstrap 5 CSS & JS (Required for Modal to Work) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/languages/jquery.validationEngine-en.min.js"></script>
+
+
+<style>
+    .btn-theme {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+    }
+
+        .btn-theme:hover {
+            background-color: #0056b3;
+        }
+
+    .bg-theme {
+        background-color: #f8f9fa;
+    }
+
+    .details-card, .details-card2 {
+        background: #222;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 10px;
+        text-align: center;
+    }
+</style>
+
+<section class="inner-banner" style="background: #000; color: white;">
+    <div class="layer"></div>
+    <div class="container py-5 px-md-5">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="tag mt-2"><span class="bullet"></span> Python Course In Telugu</div>
+                <h1 class="fw-bold mt-4">Full Stack Python Programming</h1>
+                <p class="mt-3 mb-4">
+                    Become a Python Developer by learning from <strong>Basic</strong> to <strong>Advanced Level</strong>. If you want to learn Python programming from scratch in a short amount of time, this master's level course is for you!<br>
+                </p>
+                <div class="highlight mt-3">
+                    <span>Note: <b>Recorded Content</b></span>
+                </div>
+                <div class="mt-5 text-center">
+                    <input type="button" id="btnPayment" value="Enroll Course" class="btn btn-primary">
+                    @* <a href="https://pages.razorpay.com/pl_CygrjSAIVhZdcX/view" class="btn btn-theme rounded-pill px-4" target="_blank">Enroll Course</a> *@
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="video_wrapper video_wrapper_full">
+                    <iframe class="videoIframe" src="https://www.youtube.com/embed/gz8xMwEnG-o?autoplay=0&mute=1" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="subnav">
+    <span class="navitem"><a href="#Details">Course Details</a></span>
+    <span class="navitem"><a href="#Syllabus">Course Syllabus</a></span>
+    <span class="navitem"><a href="#Projects">Projects</a></span>
+    <span class="navitem"><a href="#Tools">Tools Covered</a></span>
+    <span class="navitem"><a href="#WWP">What We Provide</a></span>
+    <span class="navitem"><a href="#Faqs">Faqs</a></span>
+</section>
+
+<section class="courses-page-sec my-5" id="Details">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="h1 fw-bold text-white text-center mb-2">Course Details</div>
+                <div class="theme-divider"></div>
+            </div>
+        </div>
+        <div class="d-flex my-3 flex-wrap">
+            <div class="details-card">
+                <div class="h2 fw-bold mt-2">Community Support</div>
+                <div class="h5 mt-4">24/7</div>
+            </div>
+            <div class="details-card">
+                <div class="h2 fw-bold mt-2">Telugu</div>
+                <div class="h5 mt-4">Teaching Language</div>
+            </div>
+            <div class="details-card">
+                <div class="h2 fw-bold mt-2">200+ Hours</div>
+                <h4>Recorded Content</h4>
+            </div>
+            <div class="details-card">
+                <div class="h2 fw-bold mt-2">Lifetime</div>
+                <div class="h5 mt-4">Recording Content Access</div>
+            </div>
+        </div>
+        <div class="d-flex my-3 flex-wrap justify-content-center">
+            <div class="details-card2">
+                <div class="h3 fw-bold mt-2 mx-2 rounded-3 py-2" style="color: red;">
+                    Fee Structure
+                </div>
+                <div class="h1 display-1 mt-4 fw-bold" id="stnamount">₹59,999</div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    $(document).ready(function () {
+        $("#btnPayment").click(function () {
+            var amount=59999;
+            var enterCustomerNumber=11919;
+            var selectedgateway=1;
+            var vfb = $('#stnamount').val();
+            $.ajax({
+                    type: 'POST',
+                    dataType: 'JSON',
+                    url: 'https://srredu.in/Home/IntiatePayment',
+                    data: { amount: amount, cardnumber: enterCustomerNumber },
+                    success: function (recData) {
+                        debugger;
+                        if (recData.orderId != null) {
+                            const options = {
+                                key: 'rzp_test_lGsdswJA3Wc7jY',
+                                // amount: amount,
+                                name: 'SRR EDU',
+                                description: 'Pro Membership',
+                                image: '',
+                                order_id: recData.orderId,
+                                handler: (response) => {
+                                    debugger;
+
+                                    const requestBody = {
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_signature: response.razorpay_signature
+                                    };
+                                    var url = "https://srredu.in/Home/ConfirmPayment?" +
+                                        "razorpay_payment_id=" + response.razorpay_payment_id +
+                                        "&razorpay_order_id=" + response.razorpay_order_id +
+                                        "&razorpay_signature=" + response.razorpay_signature +
+                                        "&amount=" + amount +
+                                        "&enterCustomerNumber=" + enterCustomerNumber +
+                                        "&selectedgateway=" + selectedgateway;
+
+                                    $.ajax({
+                                        url: url,
+                                        type: 'GET', // or 'POST' if your server-side expects a POST request
+                                        success: function (data) {
+                                            debugger;
+                                            alert("Confirmation and course details have been sent to your email address. Please check your inbox.");
+                                           // srrcall(data);
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error('Error:', error);
+                                            // Handle errors here
+                                        }
+                                    });
+                                    $('#Loader').hide();
+
+                                },
+                                prefill: {
+                                    // name: username,
+                                    email: 'jurrajanardhan@gmail.com',
+                                },
+                                theme: {
+                                    color: '#2222d6'
+                                },
+                                method: {
+                                    "card": true, // Allow card payments only
+                                    "netbanking": false,
+                                    "upi": false,
+                                    "wallet": false
+                                }
+                            };
+                            const rzp1 = new window.Razorpay(options);
+                            rzp1.open();
+                        }
+                        $('#Loader').show();
+                    },
+                    error: function () { alert('A error'); }
+                });
+        });
+
+
+    });
+</script>
+

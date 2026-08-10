@@ -1,0 +1,163 @@
+﻿
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/languages/jquery.validationEngine-en.min.js"></script>
+
+@model BankViewModel
+
+<div class="row col-md-12">
+    <div class="col-md-6">
+        <div class="container">
+            <h3>Credit card payment</h3>
+            <br />
+            <div class="row">
+
+                <div class="jumbotron">
+                    <form role="form">
+
+                        <label class="text-danger">@ViewBag.message</label>
+                        <div class="form-group col-8">
+                            <label for="CardNumber"><strong>Credit card number</strong></label>
+                            <input type="number" id="cardNumber" name="CardNumber" asp-for="CardNumber" required autocomplete="off" class="form-control input-sm" placeholder="0000 0000 0000 0000">
+                            <span asp-validation-for="CardNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-8">
+                            <label for="BillAmount"><strong>Bill Amount</strong></label>
+                            <input type="number" id="billAmount" name="BillAmount" asp-for="BillAmount" required autocomplete="off" class="form-control input-sm" placeholder="Bill Amount">
+                            <span asp-validation-for="BillAmount" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-8">
+                            <label for="AccountHolderName"><strong>Card Holder Name</strong></label>
+                            <input type="text" id="accountHolderName" name="AccountHolderName" asp-for="AccountHolderName" required autocomplete="off" class="form-control input-sm" placeholder="Card Holder Name">
+                            <span asp-validation-for="AccountHolderName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-8">
+                            <label for="PhoneNumber"><strong>Card Holder Mobile Number</strong></label>
+                            <input type="number" id="phoneNumber" name="PhoneNumber" asp-for="PhoneNumber" required autocomplete="off" class="form-control input-sm" placeholder="Card Holder Mobile Number">
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-8">
+                            <label for="SelectPaymentGateWay"><strong>Select Bank</strong></label>
+                            <select id="dropdown" class="form-control" asp-for="SelectedOption" required asp-items="Model.Options"></select>
+                        </div>
+                        <br />
+
+                        @*  <div class="form-group col-8">
+                        <label for="IfscCard"><i class="fa fa-inr p-2"></i><strong>Ifsc Code</strong></label>
+                        <input type="text" id="ifscCard" name="IfscCard" asp-for="IfscCard" readonly autocomplete="off" class="form-control input-sm" placeholder="Ifsc Card">
+                        <span asp-validation-for="IfscCard" class="text-danger"></span>
+                        </div>
+                        <br /> *@
+                        @* <input type="hidden" id="userName" name="UserName" asp-for="UserName" />
+                        <input type="hidden" id="email" name="Email" asp-for="Email" /> *@
+                        @* <input type="hidden" id="ifscCard" name="IfscCard" asp-for="IfscCard" readonly autocomplete="off" class="form-control input-sm" placeholder="Ifsc Card">
+                        *@
+                        <input type="hidden" id="avaliableAmount" name="AvaliableAmount" asp-for="AvaliableAmount" />
+                        <input type="hidden" id="payOutAmount" name="PayOutAmount" asp-for="PayOutAmount" />
+                        <input type="button" value="Pay" id="btnPayment" class="btn btn-primary">
+                        <input asp-action="PayManHome" asp-controller="PayMan" type="button" value="Back" class="btn btn-danger">
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6">
+        <div class="img-responsive">
+            <img src="~/images/cardpayimage.jpg" style="width:100%" />
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#btnPayment").click(function () {
+            $('#Loader').show();
+            var cardnumber = $("#cardNumber").val();
+            var name = $("#accountHolderName").val();
+            var phonenumber = $("#phoneNumber").val();
+            var selectedId = $("#dropdown").val();
+            var billamount = $("#billAmount").val();
+            var avaliableAmount = $("#avaliableAmount").val();
+            var payOutAmount = $("#payOutAmount").val();
+            if (cardnumber.length != 16) {
+                alert("Please enter valid card");
+                $('#Loader').hide();
+                return false;
+            }
+            if (parseInt(billamount) > 300000) {
+                alert("Please enter less then 300000 amount.");
+                $('#Loader').hide();
+                return false;
+            }
+            if (billamount < 100) {
+                alert("Please enter grater then 100 amount.");
+                $('#Loader').hide();
+                return false;
+            }
+            if (parseInt(billamount) > parseInt(avaliableAmount)) {
+                alert("Insufficient Funds!");
+                $('#Loader').hide();
+                return false;
+            }
+            if (parseInt(billamount) > parseInt(payOutAmount)) {
+                alert("Service is temporarily unavailable");
+                $('#Loader').hide();
+                return false;
+            }
+            var minbal = parseInt(avaliableAmount) - parseInt(billamount);
+            if (avaliableAmount <= 100 || minbal <= 100) {
+                alert("Minimum balance not available.");
+                $('#Loader').hide();
+                return false;
+            }
+
+            if (billamount == null || billamount == "") {
+                alert("Please enter amount");
+                $('#Loader').hide();
+                return false;
+            }
+            if (confirm("Are you sure?" + cardnumber)) {
+                $.ajax({
+                    url: '@Url.Action("CreditCardPayment", "PayMan")',
+                    type: 'POST',
+                    data: { CardNumber: cardnumber, SelectedOption: selectedId, AccountHolderName: name, PhoneNumber: phonenumber, IfscCard: null, BillAmount: billamount },
+                    success: function (data) {
+                        if (data.success == true) {
+                            $('#Loader').hide();
+                            alert("amount Transeferd, Please find the order ref no" + data.objRoot.orderrefNo);
+                            window.location.href = "@Url.Action("PayManHome", "PayMan")";
+                            // var url = "@Url.Action("PayManHome", "PayMan")";
+                            // $.get(url, function (res) {
+                            // });
+
+                        } else {
+                            $('#Loader').hide();
+                            alert("failed!");
+                            var url = "@Url.Action("CreditCardPayment", "PayMan")";
+                            $.get(url, function (res) {
+                            });
+                        }
+                    }
+                });
+            }
+            
+        });
+        // $('#dropdown').change(function () {
+        //     var selectedId = $(this).val();
+        //     $.ajax({
+        //         url: '@Url.Action("GetBankDescription", "PayMan")',
+        //         type: 'GET',
+        //         data: { id: selectedId },
+        //         success: function (data) {
+        //             $('#ifscCard').val(data.description);
+        //         }
+        //     });
+        // });
+    });
+
+</script>

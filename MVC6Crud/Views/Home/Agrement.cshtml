@@ -1,0 +1,105 @@
+﻿
+<div class="container py-4">
+    <div class="mx-auto" style="max-width: 900px;">
+
+        <!-- HEADER CARD -->
+        <div class="card shadow-lg border-0 rounded-4 mb-4">
+            <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <h2 class="fw-bold mb-1 text-primary">PAYMAN Agreement</h2>
+                    <p class="text-muted mb-0">Digital Declaration & Indemnity | eSign Enabled</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- KYC INFORMATION SECTION -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <h5 class="fw-bold">KYC Information</h5>
+                <p class="text-muted small">Details auto-filled from your verified KYC records.</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="text-muted small fw-semibold">Full Name</label>
+                        <div class="border rounded-3 px-3 py-2 bg-light">Jurra</div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="text-muted small fw-semibold">Age</label>
+                        <div class="border rounded-3 px-3 py-2 bg-light">20</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="text-muted small fw-semibold">PAN Number</label>
+                        <div class="border rounded-3 px-3 py-2 bg-light">KJHJJKJJ</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small fw-semibold">Aadhaar Number</label>
+                        <div class="border rounded-3 px-3 py-2 bg-light">HHJGHJG</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small fw-semibold">Registered Address</label>
+                        <div class="border rounded-3 px-3 py-2 bg-light">HJHHK</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AGREEMENT CONTENT SECTION -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-3 text-primary">Agreement Summary</h4>
+                <p class="text-muted">This Agreement outlines your responsibilities when using services provided by PAYMAN FINTECH SOLUTIONS PVT LTD. By continuing, you acknowledge that all transactions conducted under your account are valid, authorised, and compliant with legal standards.</p>
+
+                <h5 class="fw-semibold mt-4">1. Usage of Wallet & Settlement Services</h5>
+                <ul class="text-muted">
+                    <li>Wallet top-up and settlement services are strictly for genuine business use only.</li>
+                    <li>Funds transferred to your bank account are your sole responsibility.</li>
+                </ul>
+
+                <h5 class="fw-semibold mt-4">2. Fraudulent or Suspicious Transactions</h5>
+                <ul class="text-muted">
+                    <li>PAYMAN may block or deduct funds if suspicious activity is detected.</li>
+                    <li>You are liable for any fraud-related recovery if your wallet balance is insufficient.</li>
+                </ul>
+
+                <h5 class="fw-semibold mt-4">3. Compliance Responsibility</h5>
+                <p class="text-muted">You must comply with legal requirements set by regulatory authorities. PAYMAN is not responsible for penalties arising from your business practices.</p>
+
+                <h5 class="fw-semibold mt-4">4. Acceptance of Payments</h5>
+                <p class="text-muted">You are fully responsible for transactions received via NEFT, RTGS, UPI, QR, IMPS, or any settlement mode.</p>
+
+                <h5 class="fw-semibold mt-4">5. Indemnity</h5>
+                <p class="text-muted">You indemnify PAYMAN from any legal or financial liabilities arising due to misuse, negligence, or fraudulent activities performed using your account.</p>
+
+                <h5 class="fw-semibold mt-4">6. Duration</h5>
+                <p class="text-muted">This Agreement remains valid for <strong>7 years</strong> from the date of eSign execution.</p>
+            </div>
+        </div>
+
+        <!-- ESIGN SECTION -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4 text-center">
+                <h4 class="fw-bold text-primary mb-3">Digital eSign Authorization</h4>
+                <p class="text-muted">Your eSign will be securely captured through DigiLocker. Click the button below to continue.</p>
+
+                <a asp-controller="DigiLocker"
+                   asp-action="Index"
+                   class="btn btn-primary px-5 py-2 rounded-pill fw-semibold shadow-sm">
+                    Proceed with DigiLocker eSign
+                </a>
+
+                <div class="form-check mt-4">
+                    <input  class="form-check-input" type="checkbox" required />
+                    <label class="form-check-label">I confirm that I have read and agree to the terms of this Agreement</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER BUTTONS -->
+        <div class="d-flex justify-content-end gap-3 mt-3">
+            <a href="/" class="btn btn-outline-secondary px-4 py-2 rounded-pill">Cancel</a>
+            <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">Submit Agreement</button>
+        </div>
+
+    </div>
+</div>

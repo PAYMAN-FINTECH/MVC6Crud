@@ -1,0 +1,588 @@
+﻿@model BillerViewModel
+
+@{
+    ViewData["Title"] = "Credit Card Billers";
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/languages/jquery.validationEngine-en.min.js"></script>
+<style>
+    .input-group-custom {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        /* Label styling */
+        .input-group-custom label {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            background: white;
+            padding: 0 5px;
+            font-size: 16px;
+            color: #999;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+
+    /* Input field styling */
+    .input-custom {
+        width: 100%;
+        padding: 12px 10px;
+        font-size: 16px;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        outline: none;
+        transition: 0.3s;
+        background-color: white;
+    }
+
+        /* Move label when input is focused or has content */
+        .input-custom:focus + label,
+        .input-custom:not(:placeholder-shown) + label {
+            top: 0;
+            left: 10px;
+            font-size: 14px;
+            color: blue;
+        }
+
+        /* Error styling */
+        .input-custom.is-invalid {
+            border-color: red;
+        }
+
+    .text-danger {
+        font-weight: bold;
+        display: none; /* Hidden by default */
+    }
+
+    /* Fetch Bill button */
+    .btn-primary {
+        background-color: #0047ab;
+        border: none;
+        padding: 12px;
+        font-size: 18px;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+        .btn-primary:hover {
+            background-color: #003693;
+        }
+
+
+
+
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .feature-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100px;
+        height: 100px;
+        text-align: center;
+        border-radius: 10px;
+        border: 2px solid transparent;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background: white;
+        padding: 10px;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .feature-box:hover {
+            border: 2px solid #007bff;
+            transform: scale(1.05);
+        }
+
+    .feature-icon {
+        font-size: 30px;
+        color: #007bff;
+        transition: color 0.3s ease-in-out;
+    }
+
+    /* .feature-box:hover .feature-icon {
+                color: white;
+            } */
+
+    .feature-title {
+        margin-top: 10px;
+        font-size: 10px;
+        color: #333;
+        font-weight: bold;
+        transition: color 0.3s ease-in-out;
+    }
+
+    .feature-box:hover .feature-title {
+        color: #007bff;
+    }
+
+</style>
+
+<h2>Fast Tag</h2>
+
+<div class="input-group mb-3">
+    <input type="text" id="searchInput" class="form-control" placeholder="Search" value="@Model.SearchTerm">
+    <button class="btn btn-outline-secondary" id="searchButton">
+        <i class="fas fa-search"></i>
+    </button>
+</div>
+
+<div class="row">
+    @foreach (var biller in Model.Billers)
+    {
+
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <img src="@biller.IconUrl" class="card-img-top" alt="@biller.BillerName" data-biller-id="@biller.BillerId" style="height: 80px; object-fit: contain;" data-bs-toggle="offcanvas" data-bs-target="#creditCardSidebar">
+                <div class="card-body text-center">
+                    <p class="card-text">@biller.BillerName</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="creditCardSidebar">
+    <div class="offcanvas-header">
+        <h5 class="fw-bold text-primary">FastTag</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="text-center mb-3">
+            <img id="creditCardLogo" src="https://via.placeholder.com/50" alt="Selected Card Logo" style="height: 50px;">
+           @*  <h6 id="creditCardName" class="fw-bold">Select a Card</h6> *@
+        </div>
+
+        <input type="hidden" id="billerId1">
+        <input type="hidden" id="walletmode">
+        <input type="hidden" id="ExRefId">
+        <input type="hidden" id="avlAmount" value="@Model.AvlAmount">
+        <input type="hidden" id="InstanPaYAvlBal" value="@Model.InstanPaYAvlBal">
+        <input type="hidden" id="param1">
+        <input type="hidden" id="param2">
+
+        <form id="creditCardForm">
+            <!-- Last 4 Digits -->
+            <div class="input-group-custom">
+                <input type="text" id="creditCardNumber" class="form-control input-custom" placeholder=" " required maxlength="4">
+                <label for="creditCardNumber">Please enter Vehicle Number</label>
+                <div class="text-danger">Please enter Vehicle Number</div>
+            </div>
+
+            <!-- Mobile Number -->
+            <div class="input-group-custom">
+                <input type="number" id="mobileNumber" class="form-control input-custom" placeholder=" " required maxlength="10">
+                <label for="mobileNumber">Vehicle Holder Mobile Number</label>
+                <div class="text-danger">Vehicle Holder Number Field</div>
+            </div>
+
+            <!-- Customer Mobile -->
+            <div class="input-group-custom">
+                <input type="number" id="customerMobile" class="form-control input-custom" placeholder=" " required maxlength="10">
+                <label for="customerMobile">Customer Mobile</label>
+                <div class="text-danger">Customer Mobile Field</div>
+            </div>
+
+            <button type="submit" id="btnFetchBill" class="btn btn-primary fw-bold">Fetch Bill</button>
+
+            <!-- Amount input (Initially Hidden and Not Required) -->
+            <div id="amountContainer" class="input-group-custom mt-3" style="display: none;">
+                <input type="number" id="amount" name="amount" class="form-control input-custom" placeholder=" ">
+                <label for="amount">Enter Amount</label>
+                <div class="text-danger">Amount is required</div>
+            </div>
+
+
+            <div id="billDetails" class="mt-3"></div>
+
+            <!-- Proceed Button (Initially Hidden) -->
+            <button type="submit" id="btnProceed" class="btn btn-primary fw-bold mt-2" style="display: none;">Proceed</button>
+        </form>
+
+
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#searchButton").click(function () {
+            var searchValue = $("#searchInput").val();
+            window.location.href = "/PayMan/CreditCardBillPay?searchTerm=" + encodeURIComponent(searchValue);
+        });
+
+        $("#searchInput").keypress(function (e) {
+            if (e.which == 13) {
+                $("#searchButton").click();
+            }
+        });
+
+
+         $(".card-img-top").click(function () {
+             ClearFilelds();
+            var logoSrc = $(this).attr("src");  // Get the clicked image source
+            var billerName = $(this).attr("alt");  // Get the biller name
+            var billerId = $(this).data("biller-id"); // Get the biller name
+
+            // Update offcanvas logo & name
+            $("#creditCardLogo").attr("src", logoSrc);
+            $("#creditCardName").text(billerName);
+            $("#billerId1").val(billerId);
+
+        });
+
+
+           $(".input-custom").on("focus", function () {
+            $(this).next("label").addClass("active");
+        });
+
+        $(".input-custom").on("blur", function () {
+            if ($(this).val().trim() === "") {
+                $(this).addClass("is-invalid");
+                $(this).siblings(".text-danger").show(); // Show "Required Field" message
+            } else {
+                $(this).removeClass("is-invalid");
+                $(this).siblings(".text-danger").hide();
+            }
+        });
+
+    $("#creditCardForm").submit(function (event) {
+        event.preventDefault();
+
+        let isValid = true;
+
+        // Validate all visible input fields
+        $(".input-custom:visible").each(function () {
+            let $this = $(this);
+            if ($this.val().trim() === "") {
+                $this.addClass("is-invalid").siblings(".text-danger").show();
+                isValid = false;
+            } else {
+                $this.removeClass("is-invalid").siblings(".text-danger").hide();
+            }
+        });
+
+        if (!isValid) return;
+
+        // Prepare request data
+        let requestData = {
+            LastFourDigits: $("#creditCardNumber").val(),
+            Mobile: $("#mobileNumber").val(),
+            CustomerMobile: $("#customerMobile").val(),
+            BillerId: $("#billerId1").val(),
+            Amount: $("#amountContainer").is(":visible") ? $("#amount").val() : undefined
+        };
+
+        $("#ExRefId").val("1234");
+                    $("#btnFetchBill").hide();
+                     $("#creditCardNumber").prop("disabled", true);
+                      $("#mobileNumber").prop("disabled", true);
+                       $("#customerMobile").prop("disabled", true);
+
+                    $("#billDetails").html(`
+                        <div class='card p-3 mt-2' style="background-color: lavender;">
+                            <h6 class='fw-bold text-success'>Bill Details</h6>
+                            <p><strong>Due Amount:</strong> 1001</p>
+                            <p><strong>Due Date:</strong> 23/07/2025</p>
+                            <p><strong>Customer Name:</strong> Ajay Kusa</p>
+                        </div>
+                    `);
+                      $('#Loader').hide();
+
+                    $("#amountContainer").show();
+                    $("#amount").val("1001").prop("required", true);
+                    $("#param1").val("param1").prop("required", false);
+                    $("#param2").val("param2").prop("required", false);
+                    $("#walletmode").val("payout").prop("required", false);
+                    $("#btnProceed").show();
+                    $('#Loader').hide();
+
+        // $.ajax({
+        //     type: "POST",
+        //     url: "/PayMan/FetchBill",
+        //     contentType: "application/json",
+        //     data: JSON.stringify(requestData),
+        //     beforeSend: function () {
+        //         $("#billDetails").html("<p class='text-info'>Fetching bill details...</p>");
+        //     },
+        //     success: function (response) {
+        //         if (response.success) {
+        //             $("#ExRefId").val(response.enquiryReferenceId);
+        //             $("#btnFetchBill").hide();
+        //              $("#creditCardNumber").prop("disabled", true);
+        //               $("#mobileNumber").prop("disabled", true);
+        //                $("#customerMobile").prop("disabled", true);
+
+        //             $("#billDetails").html(`
+        //                 <div class='card p-3 mt-2' style="background-color: lavender;">
+        //                     <h6 class='fw-bold text-success'>Bill Details</h6>
+        //                     <p><strong>Due Amount:</strong> ${response.dueAmount}</p>
+        //                     <p><strong>Due Date:</strong> ${response.dueDate}</p>
+        //                     <p><strong>Customer Name:</strong> ${response.customerName}</p>
+        //                 </div>
+        //             `);
+
+        //             $("#amountContainer").show();
+        //             $("#amount").val(response.dueAmount).prop("required", true);
+        //             $("#param1").val(response.param1).prop("required", false);
+        //             $("#param2").val(response.param2).prop("required", false);
+        //             $("#walletmode").val(response.wallet).prop("required", false);
+        //             $("#btnProceed").show();
+        //             $('#Loader').hide();
+        //         } else {
+        //             // Show insufficient balance message
+        //            $("#creditCardSidebar .offcanvas-body").html(`
+        //              <div class="text-center">
+        //              <img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="Error Icon" class="mb-3" style="width: 100px;">
+        //              <p style="color: red;">${response.status}</p>
+        //             <div class="d-flex justify-content-center gap-3 mt-3">
+        //      <button id="homeBtn" class="btn btn-info btn-sm">🏠 Home</button>
+        //      <button id="creditCardBtn" class="btn btn-secondary btn-sm">💳 Credit Card</button>
+        //  </div>
+        //             </div>
+        //             `);
+        //             $('#Loader').hide();
+        //         }
+        //     },
+        //     error: function () {
+        //         $("#creditCardSidebar .offcanvas-body").html(`
+        //              <div class="text-center">
+        //              <img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="Error Icon" class="mb-3" style="width: 100px;">
+        //             <p style="color: red;">${response.status}</p>
+
+        //            <div class="d-flex justify-content-center gap-3 mt-3">
+        //      <button id="homeBtn" class="btn btn-info btn-sm">🏠 Home</button>
+        //      <button id="creditCardBtn" class="btn btn-secondary btn-sm">💳 Credit Card</button>
+        //  </div>
+        //             </div>
+        //             `);
+        //             $('#Loader').hide();
+        //     }
+        // });
+    });
+
+
+
+        // Use event delegation to handle dynamically added buttons
+    $(document).on("click", "#homeBtn", function () {
+        window.location.href = "/PayMan/PayManHome";  // Change to your actual controller and action
+    });
+
+    $(document).on("click", "#creditCardBtn", function () {
+        window.location.href = "/PayMan/CreditCardBillPay";  // Change to your actual controller and action
+    });
+
+
+    // Enable Proceed button only when a valid amount is entered
+    $("#amount").on("input", function () {
+        if ($(this).val().trim() !== "" && parseFloat($(this).val()) > 0) {
+            $("#amount").removeClass("is-invalid");
+            $("#amount").siblings(".text-danger").hide();
+            $("#btnProceed").prop("disabled", false);
+        } else {
+            $("#amount").addClass("is-invalid");
+            $("#amount").siblings(".text-danger").show();
+            $("#btnProceed").prop("disabled", true);
+        }
+    });
+
+    // Proceed button click - Submit form only when amount is valid
+    $("#btnProceed").click(function (event) {
+        event.preventDefault();
+           var avlAmount = parseFloat($("#avlAmount").val());  // Ensure numeric values
+          var enteredAmount = parseFloat($("#amount").val());
+          var InstanPaYAvlBal = parseFloat($("#InstanPaYAvlBal").val());
+          var param1 = $("#param1").val();
+          var param2 = $("#param1").val();
+          var walletmode = $("#walletmode").val();
+
+    if (enteredAmount <= 100) { // Fix condition
+        $('#Loader').hide();
+        $("#creditCardForm").hide();
+        $("#creditCardSidebar .offcanvas-body").html(`
+         <div class="text-center">
+                     <img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="Error Icon" class="mb-3" style="width: 100px;">
+                    <p style="color: red;">Please enter an amount greater than 100 rupees.</p>
+
+                    <div class="d-flex justify-content-center gap-3 mt-3">
+             <button id="homeBtn" class="btn btn-info btn-sm">🏠 Home</button>
+             <button id="creditCardBtn" class="btn btn-secondary btn-sm">💳 Credit Card</button>
+         </div>
+                    </div>
+        `);
+        return false; // Stop further execution
+    }
+
+     if (enteredAmount > InstanPaYAvlBal) { // Fix condition
+         $('#Loader').hide();
+        $("#creditCardForm").hide();
+        $("#creditCardSidebar .offcanvas-body").html(`
+         <div class="text-center">
+                     <img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="Error Icon" class="mb-3" style="width: 100px;">
+                    <p style="color: red;">Service temporarily unavailable!</p>
+
+                    <div class="d-flex justify-content-center gap-3 mt-3">
+             <button id="homeBtn" class="btn btn-info btn-sm">🏠 Home</button>
+             <button id="creditCardBtn" class="btn btn-secondary btn-sm">💳 Credit Card</button>
+         </div>
+                    </div>
+        `);
+        return false; // Stop further execution
+    }
+
+    if (enteredAmount > avlAmount) { // Fix condition
+        $('#Loader').hide();
+        $("#creditCardForm").hide();
+        $("#creditCardSidebar .offcanvas-body").html(`
+         <div class="text-center">
+                     <img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="Error Icon" class="mb-3" style="width: 100px;">
+                    <p style="color: red;">Insufficient Wallet Balance !</p>
+
+                   <div class="d-flex justify-content-center gap-3 mt-3">
+             <button id="homeBtn" class="btn btn-info btn-sm">🏠 Home</button>
+             <button id="creditCardBtn" class="btn btn-secondary btn-sm">💳 Credit Card</button>
+         </div>
+                    </div>
+        `);
+        return false; // Stop further execution
+    }
+
+
+
+
+        debugger;
+
+        // Validate Amount Field
+        if ($("#amount").val().trim() === "" || parseFloat($("#amount").val()) <= 0) {
+            $("#amount").addClass("is-invalid");
+            $("#amount").siblings(".text-danger").show();
+            return false;
+        }
+
+        // Prepare request data
+        var requestData = {
+            LastFourDigits: $("#creditCardNumber").val(),
+            Mobile: $("#mobileNumber").val(),
+            CustomerMobile: $("#customerMobile").val(),
+            BillerId: $("#billerId1").val(),
+            Amount: parseFloat($("#amount").val()),
+            EnquiryReferenceId: $("#ExRefId").val(),
+            Param1: $("#param1").val(),
+            Param2: $("#param2").val(),
+            Wallet: $("#walletmode").val()
+        };
+
+        console.log("Request Data:", requestData); // Debugging
+
+        // AJAX Request to ASP.NET Core API
+        $.ajax({
+                    type: 'POST',
+                    dataType: 'JSON',
+                    url: '/PayMan/IntiatePayment',
+                    data: { amount: "104", cardnumber: "41111111111111111" },
+                    success: function (recData) {
+                        if (recData.orderId != null) {
+                            const options = {
+                                key: `rzp_live_2EIqs9bxOALurg`,
+                                // amount: amount,
+                                name: 'PAYMAN',
+                                description: 'Pro Membership',
+                                image: '',
+                                order_id: recData.orderId,
+                                handler: (response) => {
+                                    const requestBody = {
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_signature: response.razorpay_signature
+                                    };
+                                    var url = "/PayMan/ConfirmPayment?" +
+                                        "razorpay_payment_id=" + response.razorpay_payment_id +
+                                        "&razorpay_order_id=" + response.razorpay_order_id +
+                                        "&razorpay_signature=" + response.razorpay_signature +
+                                        "&amount=" + amount +
+                                        "&enterCustomerNumber=" + enterCustomerNumber;
+
+                                    $.ajax({
+                                        url: url,
+                                        type: 'GET', // or 'POST' if your server-side expects a POST request
+                                        success: function (data) {
+                                            $('#Loader').hide();
+                                            var formattedDateIST = formatDateInIST();
+                                            $('#amount11').text(amount);
+                                            $('#cardnumber').text(enterCustomerNumber);
+                                            $('#transactionTime').text(formattedDateIST);
+                                            $('#transactionId').text(data.paymentid);
+                                            if (data.success == true) {
+                                                // Show the payment success modal
+                                                $('#paymentSuccessModal1').show();
+                                            } else {
+                                                $('#paymentSuccessModal2').show();
+                                            }
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error('Error:', error);
+                                            // Handle errors here
+                                        }
+                                    });
+                                    $('#Loader').hide();
+
+                                },
+                                prefill: {
+                                    // name: username,
+                                    email: 'jurrajanardhan@gmail.com',
+                                },
+                                theme: {
+                                    color: '#2222d6'
+                                },
+                                method: {
+                                    "card": true, // Allow card payments only
+                                    "netbanking": false,
+                                    "upi": false,
+                                    "wallet": false
+                                }
+                            };
+                            const rzp1 = new window.Razorpay(options);
+                            rzp1.open();
+                        }
+                        $('#Loader').show();
+                    },
+                    error: function () { alert('A error'); }
+                });
+    });
+
+        function ClearFilelds(){
+            $("#billDetails").html('');
+            $("#btnFetchBill").show();
+            $("#creditCardNumber").val('');
+            $("#mobileNumber").val('');
+            $("#customerMobile").val('');
+            $("#billerId1").val('');
+            $("#amountContainer").hide();
+            $("#btnProceed").hide();
+            $("#creditCardNumber").prop("disabled", false);
+            $("#mobileNumber").prop("disabled", false);
+            $("#customerMobile").prop("disabled", false);
+            $("#amount").val('').prop("required", false);
+        }
+
+        // Remove validation error on input change
+        $(".input-custom").on("input", function () {
+            $(this).removeClass("is-invalid");
+            $(this).siblings(".text-danger").hide();
+        });
+    });
+</script>
+
+<style>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+</style>

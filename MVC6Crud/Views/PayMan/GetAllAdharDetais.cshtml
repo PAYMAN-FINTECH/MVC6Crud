@@ -1,0 +1,71 @@
+﻿@model IEnumerable<AdharVerification>
+
+<style>
+    .product-item {
+        margin-bottom: 20px;
+    }
+
+        .product-item img {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            width: 150px;
+            height: auto;
+        }
+</style>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+             <th>Adhar Number</th>
+            <th>Pan Number</th>
+            <th>Front Image</th>
+             <th>Back Image</th>
+            <th>Pan Image</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.AdharName</td>
+                <td>@product.AdharNumber</td>
+                <td>@product.PanNumber</td>
+                <td>
+                    @if (product.FrontImage != null)
+                    {
+                        <img src="@Url.Action("GetImage", "PayMan", new { id = product.Id })" alt="Product Image" style="width: 100px; height: auto;" />
+                    }
+                    else
+                    {
+                        <span>No image available</span>
+                    }
+                </td>
+                <td>
+                    @if (product.BackImage != null)
+                    {
+                        <img src="@Url.Action("BackGetImage", "PayMan", new { id = product.Id })" alt="Product Image" style="width: 100px; height: auto;" />
+                    }
+                    else
+                    {
+                        <span>No image available</span>
+                    }
+                </td>
+                <td>
+                    @if (product.PanImage != null)
+                    {
+                        <img src="@Url.Action("PanGetImage", "PayMan", new { id = product.Id })" alt="Product Image" style="width: 100px; height: auto;" />
+                    }
+                    else
+                    {
+                        <span>No image available</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+

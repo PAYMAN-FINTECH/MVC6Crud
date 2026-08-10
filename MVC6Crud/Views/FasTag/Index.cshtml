@@ -1,0 +1,910 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_FasTag.cshtml";
+}
+
+@model MVC6Crud.Models.PaymanApp.FastTagRechargeModel
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, #4facfe, #00f2fe);
+    }</style>
+<!-- Hero Section -->
+<section class="text-center my-5">
+    <h2 class="fw-bold text-primary">FASTag Recharge Made Easy 🚗💨</h2>
+    <p class="text-muted fs-5">
+        Recharge your FASTag instantly with Payman.
+        Secure payments, instant updates, and hassle-free transactions.
+    </p>
+</section>
+
+<!-- ✅ FASTag Recharge Section -->
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center py-3">
+                    <h3 class="mb-0 fw-bold">
+                        <i class="bi bi-lightning-charge me-2"></i> FASTag Recharge
+                    </h3>
+                    @if(Model.Phone != null){
+                        <!-- History Icon -->
+                        <button type="button" class="btn btn-light btn-sm rounded-circle" id="openHistoryBtn" title="View History">
+                            <i class="bi bi-clock-history text-primary"></i>
+                        </button>
+                    }
+                    
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- Hidden fields -->
+                    <input type="hidden" id="phoneHidden" value="@Model.Phone" />
+
+                    <!-- Row 1 -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="fastTagProvider" class="form-label fw-semibold">FASTag Provider</label>
+                            <select id="fastTagProvider" class="form-select shadow-sm">
+                                <option value="">-- Select Provider --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="vehicleNumber" class="form-label fw-semibold">Vehicle Number</label>
+                            <input asp-for="VehicleNumber" id="vehicleNumber" class="form-control shadow-sm" placeholder="Enter vehicle number" />
+                        </div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="mobileNumber" class="form-label fw-semibold">Mobile Number</label>
+                            <input asp-for="MobileNumber" id="mobileNumber" class="form-control shadow-sm" placeholder="Enter mobile number" />
+                        </div>
+                        <div class="col-md-6" id="amountDiv" style="display:none;">
+                            <label for="amount" class="form-label fw-semibold">Recharge Amount</label>
+                            <input asp-for="Amount" id="amount" type="number" class="form-control shadow-sm" />
+                        </div>
+                    </div>
+
+                    <!-- Customer Details -->
+                    <div class="card border-0 bg-light shadow-sm mt-4" id="customerDetails" style="display:none;">
+                        <div class="card-body">
+                            <h5 class="text-primary mb-3"><i class="bi bi-person-badge"></i> Customer Details</h5>
+                            <div class="row text-muted">
+                                <div class="col-md-4"><b>Name:</b> <span id="custName"></span></div>
+                                <div class="col-md-4"><b>FASTag Balance:</b> ₹<span id="dueAmount"></span></div>
+                                <div class="col-md-4"><b>Max Recharge:</b> ₹<span id="dueDate"></span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="button" id="fetchBillBtn" class="btn btn-outline-primary me-2 px-4">
+                            <i class="bi bi-search"></i> Fetch Bill
+                        </button>
+                        <button type="button" id="processPayBtn" class="btn btn-success px-4" style="display:none;">
+                            <i class="bi bi-currency-rupee"></i> Proceed to Pay
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info Cards -->
+<div class="container my-5">
+    <div class="row text-center g-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 p-3">
+                <i class="bi bi-lightning-charge-fill text-primary fs-1"></i>
+                <h5 class="fw-bold mt-3">Instant Recharge</h5>
+                <p class="text-muted">Recharge your FASTag in just a few clicks with real-time confirmation.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 p-3">
+                <i class="bi bi-shield-lock-fill text-success fs-1"></i>
+                <h5 class="fw-bold mt-3">100% Secure Payments</h5>
+                <p class="text-muted">Your transactions are protected with bank-grade security and encryption.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 p-3">
+                <i class="bi bi-clock-history text-warning fs-1"></i>
+                <h5 class="fw-bold mt-3">24/7 Availability</h5>
+                <p class="text-muted">Recharge anytime, anywhere – no waiting, no queues, no delays.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works -->
+<section class="my-5">
+    <h3 class="text-center fw-bold">How FASTag Recharge Works?</h3>
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-3 text-center">
+            <i class="bi bi-car-front-fill fs-1 text-primary"></i>
+            <h6 class="mt-2">Step 1: Enter Vehicle & Mobile</h6>
+        </div>
+        <div class="col-md-3 text-center">
+            <i class="bi bi-credit-card-2-front-fill fs-1 text-success"></i>
+            <h6 class="mt-2">Step 2: Enter Amount</h6>
+        </div>
+        <div class="col-md-3 text-center">
+            <i class="bi bi-check-circle-fill fs-1 text-warning"></i>
+            <h6 class="mt-2">Step 3: Pay Securely & Recharge</h6>
+        </div>
+    </div>
+</section>
+
+<!-- Trust Section -->
+<section class="my-5 text-center">
+    <h5 class="fw-bold">We support major FASTag providers</h5>
+    <div class="d-flex justify-content-center flex-wrap gap-4 mt-3">
+        <img src="https://static.instantpay.in/assets/logo/products/HDFC00000NAT5K.svg" height="40" />
+        <img src="https://static.instantpay.in/assets/logo/products/TOLL00000NAT72.svg" height="40" />
+        <img src="https://static.instantpay.in/assets/logo/products/AXIS00000NAT31.svg" height="40" />
+        <img src="https://static.instantpay.in/assets/logo/products/PAYT00000NATTQ.svg" height="40" />
+    </div>
+    <p class="text-muted mt-3">Payman is RBI compliant and ensures secure FASTag recharges.</p>
+</section>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ✅ Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="loginModalLabel">Login Required</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm1">
+                    <div class="mb-3">
+                        <label for="loginMobile" class="form-label">Mobile Number</label>
+                        <input type="text" class="form-control" id="loginMobile" name="loginMobile" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="loginPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="loginPassword" name="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+                <!-- 🔹 Extra options -->
+                <div class="text-center mt-3">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Create Account</a> |
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal" data-bs-dismiss="modal">Forgot Password?</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ Confirm Payment Modal -->
+<div class="modal fade" id="confirmPayModal" tabindex="-1" aria-labelledby="confirmPayModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmPayModalLabel">Confirm Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmYesBtn" class="btn btn-success">Yes, Proceed</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Forgot Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="forgotPasswordForm">
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input type="email" class="form-control" name="email" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reset Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="resetPasswordForm">
+                    <input type="hidden" id="resetPhone" />
+                    <div class="mb-3">
+                        <label>Old Password</label>
+                        <input type="password" class="form-control" name="oldPassword" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>New Password</label>
+                        <input type="password" class="form-control" name="newPassword" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Confirm New Password</label>
+                        <input type="password" class="form-control" name="confirmPassword" required />
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Register Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="registerModalLabel">Register</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="registerForm">
+                    <div class="mb-3">
+                        <label>First Name</label>
+                        <input type="text" class="form-control" name="firstName" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Last Name</label>
+                        <input type="text" class="form-control" name="lastName" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input type="email" class="form-control" name="email" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Password</label>
+                        <input type="text" class="form-control" name="password" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Mobile</label>
+                        <input type="tel" class="form-control" name="mobile" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Gender</label>
+                        <select class="form-control" name="gender" required>
+                            <option value="">Select</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ History Modal -->
+<div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="historyModalLabel">
+                    <i class="bi bi-clock-history me-2"></i> Recharge History
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Loader -->
+                <div id="historyLoader" class="text-center my-3" style="display: none;">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2">Loading history...</p>
+                </div>
+
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle text-center" id="historyTable">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>#</th>
+                                <th>Transaction ID</th>
+                                <th>Vehicle no</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dynamic Rows from API -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            fetchFastTagProviders();
+
+                 // Restore values after reload
+        const provider = localStorage.getItem("fastTagProvider");
+        const vehicle = localStorage.getItem("vehicleNumber");
+        const mobile = localStorage.getItem("mobileNumber");
+        const amount = localStorage.getItem("amount");
+        // const billerId1 = localStorage.getItem("billerId1");
+        // alert(billerId1);
+
+        //if (provider) $("#fastTagProvider").val(billerId1);
+        if (vehicle) $("#vehicleNumber").val(vehicle);
+        if (mobile) $("#mobileNumber").val(mobile);
+        if (amount) {
+            $("#amount").val(amount);
+            $("#amountDiv").show();
+            $("#processPayBtn").show();
+            $("#fetchBillBtn").hide();
+        }
+
+        // Clear after using
+       // localStorage.removeItem("billerId1");
+         localStorage.removeItem("fastTagProvider");
+        localStorage.removeItem("vehicleNumber");
+        localStorage.removeItem("mobileNumber");
+        localStorage.removeItem("amount");
+
+            // Fetch Bill
+         $("#fetchBillBtn").click(function () {
+             $('#Loader1').show();
+            var provider = $("#fastTagProvider").val();
+            var vehicleNo = $("#vehicleNumber").val();
+            var mobileNo = $("#mobileNumber").val();
+
+            if (!provider || !vehicleNo || !mobileNo) {
+                alert("Please enter all required fields.");
+                return;
+            }
+
+            $.ajax({
+                url: '/FasTag/FetchCreditCardBill',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    creditCardLast4: vehicleNo,
+                    customerMobile: mobileNo,
+                    billerId: provider
+                }),
+                success: function (res) {
+                    debugger;
+                    $('#Loader1').hide();
+                    if (res.success) {
+                        // ✅ Store everything in localStorage instead of hidden fields
+                        localStorage.setItem("paymentMode", res.paymentMode || "");
+                        localStorage.setItem("enquiryReferenceId", res.enquiryReferenceId || "");
+                        localStorage.setItem("param1", res.param1 || "");
+                        localStorage.setItem("param2", res.param2 || "");
+                        localStorage.setItem("billDate", res.billDate || "");
+                        localStorage.setItem("consumerName", res.consumerName || "");
+                        localStorage.setItem("amount", res.totalAmount || 0);
+                        localStorage.setItem("billerResponse", res.billerResponse || "");
+                        localStorage.setItem("adddditionalInfo", res.adddditionalInfo || "");
+                        localStorage.setItem("billFetchResponse", res.billFetchResponse || "");
+                        localStorage.setItem("customerType", res.customerType || "");
+                        localStorage.setItem("customerName", res.consumerName || "");
+                        const billerId = $("#fastTagProvider").val();
+
+                        localStorage.setItem("billerId1", billerId || "");
+
+
+                        // ✅ Populate UI from response
+                        $("#custName").text(res.consumerName);
+                        $("#amount").val(res.totalAmount.toFixed(2));
+                        $("#dueAmount").text(res.totalAmount.toFixed(2));
+                        $("#dueDate").text(res.minPayable);
+
+                        $("#billDate").text(res.billDate);
+                        $("#customerName").text(res.consumerName);
+                        $("#enterAmount").val(res.totalAmount.toFixed(2)).prop('disabled', false);
+
+                        $("#BillerResponse").text(res.billerResponse);
+                        $("#AdddditionalInfo").text(res.adddditionalInfo);
+                        $("#BillFetchResponse").text(res.billFetchResponse);
+                        $("#Customertype").text(res.customerType);
+
+                        $("#customerDetails").show();
+                        $("#amountDiv").show();
+                        $("#processPayBtn").show();
+                        $("#fetchBillBtn").hide();
+                    } else {
+                        $('#Loader1').hide();
+                        showToast(res.message, 'warning');
+                    }
+                },
+                error: function () {
+                    $('#Loader1').hide();
+                    showToast("Featch bill constraints not met.", 'warning');
+                }
+            });
+        });
+
+            // Process Pay
+        $("#processPayBtn").click(function () {
+            const phone = $("#phoneHidden").val()?.trim();
+            const amount = $("#amount").val()?.trim();
+            const amount1 = parseFloat($('#amount').val().trim());
+
+            if (amount1 < 100) {
+               $('#Loader1').hide();
+               showToast("Please enter greater than 100", 'warning');
+                return;
+            }
+            if (!phone) {
+                // If no phone, ask to login
+                $("#loginModal").modal("show");
+            } else {
+                // Already logged in → ask confirmation
+                $("#confirmMessage").text(`Do you want to proceed with payment of ₹${amount}?`);
+                $("#confirmPayModal").modal("show");
+            }
+        });
+
+            // Login
+        $("#loginForm1").on("submit", function (e) {
+                 $('#Loader1').show();
+                e.preventDefault();
+
+                var data = {
+                    Email: $("#loginMobile").val(),
+                    Password: $("#loginPassword").val()
+                };
+
+                $.ajax({
+                    url: "/Login/WebLogin",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(data),
+                    success: function (res) {
+                         $('#Loader1').hide();
+                        if (res.success) {
+                               // Save current form values before reload
+                           localStorage.setItem("fastTagProvider", $("#fastTagProvider").val());
+                           localStorage.setItem("vehicleNumber", $("#vehicleNumber").val());
+                           localStorage.setItem("mobileNumber", $("#mobileNumber").val());
+                           localStorage.setItem("amount", $("#amount").val());   // ✅ save amount
+
+
+                             location.reload();
+                           // $("#loginModal").modal("hide");
+                           // $("#mobileNumber").val(res.mobile); // ✅ fixed
+                            //$("#phoneHidden").val(res.userphone);  // store for session check
+                             // Show confirm modal
+                            //const amount = $("#amount").val()?.trim();
+                            // $("#confirmMessage").text(`Do you want to proceed with payment of ₹${amount}?`);
+                            // $("#confirmPayModal").modal("show");
+                        } else {
+                            alert("Invalid login, please try again");
+                        }
+                    },
+                    error: function () {
+                         $('#Loader1').hide();
+                        alert("Something went wrong while logging in.");
+                    }
+                });
+            });
+
+
+        function ProcessFasTagBill() {
+            $('#Loader1').show();
+
+        var enquiryReferenceId = localStorage.getItem("enquiryReferenceId");
+        var paymentMode = localStorage.getItem("paymentMode");
+        var param1 = localStorage.getItem("param1");
+        var param2 = localStorage.getItem("param2");
+        var customrName = localStorage.getItem("customerName");
+
+
+            const billerId = $("#fastTagProvider").val();
+            const lastFourDigits = $('#vehicleNumber').val().trim();
+            const customerMobile = $("#mobileNumber").val();
+
+            const amount = parseFloat($('#amount').val().trim());
+            const phone = $('#phoneHidden').val();
+
+            const customerName = customrName;
+            const device = 'Web';
+
+            const billerResponse = ($('#BillerResponse').text() || '').trim();
+            const adddditionalInfo = ($('#AdddditionalInfo').text() || '').trim();
+            const billFetchResponse = ($('#BillFetchResponse').text() || '').trim();
+
+
+
+            $.ajax({
+                url: '/FasTag/ProcessPayment',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    billerId, customerMobile, amount, phone,
+                    paymentMode, enquiryReferenceId, param1, param2, lastFourDigits,
+                    customerName, device, billerResponse, adddditionalInfo, billFetchResponse
+                }),
+                success: function (response) {
+                    localStorage.removeItem("paymentMode");
+        localStorage.removeItem("enquiryReferenceId");
+        localStorage.removeItem("param1");
+        localStorage.removeItem("param2");
+        localStorage.removeItem("billDate");
+        localStorage.removeItem("consumerName");
+        localStorage.removeItem("amount");
+        localStorage.removeItem("billerResponse");
+        localStorage.removeItem("adddditionalInfo");
+        localStorage.removeItem("billFetchResponse");
+        localStorage.removeItem("customerType");
+
+                    $('#Loader1').hide();
+                    const transactionId = encodeURIComponent(response.transactionId || "TXN123456");
+                    const cardNumber = encodeURIComponent(lastFourDigits);
+                    const url = `/FasTag/PayStatus?IsSuccess=${response.success}&Amount=${amount}&TransactionId=${transactionId}&CardNumber=${cardNumber}`;
+                    window.location.href = url;
+                },
+                error: function () {
+                    localStorage.removeItem("paymentMode");
+        localStorage.removeItem("enquiryReferenceId");
+        localStorage.removeItem("param1");
+        localStorage.removeItem("param2");
+        localStorage.removeItem("billDate");
+        localStorage.removeItem("consumerName");
+        localStorage.removeItem("amount");
+        localStorage.removeItem("billerResponse");
+        localStorage.removeItem("adddditionalInfo");
+        localStorage.removeItem("billFetchResponse");
+        localStorage.removeItem("customerType");
+                    $('#Loader1').hide();
+                    const cardNumber = encodeURIComponent(lastFourDigits);
+                    const url = `/FasTag/PayStatus?IsSuccess=false&Amount=${amount}&TransactionId=FAILED&CardNumber=${cardNumber}`;
+                    window.location.href = url;
+                }
+            });
+        }
+
+                // Confirm Yes → Call API
+        $("#confirmYesBtn").click(function () {
+            $('#Loader1').show();
+            $("#confirmPayModal").modal("hide");
+            const amount = parseFloat($('#amount').val().trim());
+            const mobile = $('#mobileNumber').val();
+
+            if (isNaN(amount)) {
+                $('#Loader1').hide();
+                alert("Amount must be required");
+                return;
+            }
+
+
+
+              var pphone = $('#phoneHidden').val();
+                                     const dd = new Date();
+                                     var actionType = 1;
+                                     let orderId = 'PAYMAN' + dd.getTime();
+
+
+
+
+                                       //  payUIntegration();
+
+         $.ajax({
+             type: 'POST',
+             dataType: 'JSON',
+             url: 'https://paymanfintech.in/PayMan/IntiatePayment',
+             data: { amount: amount, cardnumber: "411111111111111" },
+
+             success: function (recData) {
+                 $('#Loader1').hide();
+                 if (recData.orderId != null) {
+
+                     const options = {
+                         key: 'rzp_test_lGsdswJA3Wc7jY',
+                         name: 'PAYMAN',
+                         description: 'Pro Membership',
+                         order_id: recData.orderId,
+
+                         handler: (response) => {
+
+                              window.location.href = "https://fastag.paymanfintech.in";
+
+                             // var url =
+                             //   "https://paymanfintech.in/PayMan/ConfirmPayment?" +
+                             //   "razorpay_payment_id=" + response.razorpay_payment_id +
+                             //   "&razorpay_order_id=" + response.razorpay_order_id +
+                             //   "&razorpay_signature=" + response.razorpay_signature +
+                             //   "&amount=" + amount +
+                             //   "&enterCustomerNumber=" + shgdmobile;
+
+                             // $.ajax({
+                             //     url: url,
+                             //     type: 'GET',
+                             //     success: function () {
+                             //         window.location.href = "/Edu/PaymentStatus";
+                             //     }
+                             // });
+                         },
+
+                         // 👉 NEW: Razorpay auto-fill from your form
+                         prefill: {
+                             name: $('#fullName').val(),
+                             email: $('#email').val(),
+                             contact: $('#whatsapp').val()
+                         },
+
+                         theme: { color: '#2222d6' }
+                     };
+
+                     const rzp1 = new window.Razorpay(options);
+                     rzp1.open();
+                 }
+             }
+         });
+
+
+                                       // window.location.href = "https://fastag.payman.in";
+                 //                       $.ajax({
+                 //                                url: "https://fastag.paymanfintech.in/FasTag/Initiate",
+                 //     type: "POST",
+                 //                                            data: { 'orderId': orderId, 'amount': amount, 'actionType': actionType, 'email': 'jurrajanardhan@gmail.com', 'phone': pphone, 'custmobile': mobile, 'custcard':'fastag', 'custname':'fastag' },
+                 //     success: function (res) {
+                 //         if (res.success) {
+                 //             window.location.href = res.url;
+                 //         } else {
+                 //             alert(res.message);
+                 //         }
+                 //     }
+                 // });
+
+            // $.ajax({
+            //     type: 'POST',
+            //     dataType: 'JSON',
+            //      url: 'https://paymanfintech.in/PayMan/IntiatePayment',
+            //     data: { amount: amount, cardnumber: mobile },
+            //     success: function (recData) {
+            //         if (recData.orderId != null) {
+            //             const options = {
+            //                 key: `rzp_live_2EIqs9bxOALurg`,
+            //                 name: 'PAYMAN',
+            //                 description: 'Pro Membership',
+            //                 order_id: recData.orderId,
+            //                 handler: (response) => {
+            //                      var url = "https://paymanfintech.in/PayMan/ConfirmPayment?" +
+            //                         "razorpay_payment_id=" + response.razorpay_payment_id +
+            //                         "&razorpay_order_id=" + response.razorpay_order_id +
+            //                         "&razorpay_signature=" + response.razorpay_signature +
+            //                         "&amount=" + amount +
+            //                         "&enterCustomerNumber=" + mobile;
+
+            //                     $.ajax({
+            //                         url: url,
+            //                         type: 'GET',
+            //                         success: function () {
+            //                             ProcessFasTagBill();
+            //                         },
+            //                         error: function (xhr, status, error) {
+            //                             console.error('Error:', error);
+            //                         }
+            //                     });
+            //                 },
+            //                 prefill: { email: "jurrajanardhan@gmail.com" },
+            //                 theme: { color: '#2222d6' },
+            //                 method: {
+            //                     "card": true,
+            //                     "netbanking": true,
+            //                     "upi": true,
+            //                     "wallet": true
+            //                 }
+            //             };
+            //             const rzp1 = new window.Razorpay(options);
+            //             rzp1.open();
+            //         }
+            //     },
+            //     error: function () { alert('Error initiating payment'); }
+            // });
+
+        });
+
+            // // Register form submit
+            $("#registerForm").on("submit", function (e) {
+                e.preventDefault();
+                $('#Loader1').show();
+
+                var data = {
+                    FirstName: $(this).find("[name=firstName]").val(),
+                    LastName: $(this).find("[name=lastName]").val(),
+                    Email: $(this).find("[name=email]").val(),
+                    Phone: $(this).find("[name=mobile]").val(),
+                    Gender: $(this).find("[name=gender]").val(),
+                    Password: $(this).find("[name=password]").val()
+                };
+
+                $.ajax({
+                    url: "https://srredu.in/Users/FastTrackRegister", // 🔹 your API endpoint
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(data),
+                    success: function (res) {
+                        $('#Loader1').hide();
+                        alert("Registration success!");
+                        $("#registerModal").modal("hide");
+                       // location.reload();
+                       $("#loginModal").modal("show");
+                    },
+                    error: function (xhr) {
+                        $('#Loader1').hide();
+                        alert("Register failed: " + xhr.responseText);
+                    }
+                });
+            });
+
+              // Forgot Password
+        $("#forgotPasswordForm").on("submit", function (e) {
+            e.preventDefault();
+            $('#Loader1').show();
+
+            var data = { phone: $(this).find("[name=email]").val() , divice: "Web"};
+
+            $.ajax({
+                url: "https://paymanfintech.in/LogIn/SendResetPinMail",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function () {
+                    $('#Loader1').hide();
+                     //$('#resetPhone').val(phone);
+                    alert("Your password sent to your email!");
+                    $("#forgotPasswordModal").modal("hide");
+                    window.location.href = "https://fastag.paymanfintech.in";
+                    // new bootstrap.Modal(document.getElementById('resetPasswordModal')).show();
+                },
+                error: function (xhr) {
+                    $('#Loader1').hide();
+                    alert("Error: " + xhr.responseText);
+                }
+            });
+        });
+
+         // Reset Password
+        $("#resetPasswordForm").on("submit", function (e) {
+            e.preventDefault();
+            $('#Loader1').show();
+             const phone = $('#resetPhone').val();
+
+            var data = {
+                mobile: phone,
+                otp: $(this).find("[name=oldPassword]").val(),
+                newPassword: $(this).find("[name=newPassword]").val()
+            };
+
+            if (data.NewPassword !== data.ConfirmPassword) {
+                alert("New and Confirm password do not match!");
+                $('#Loader1').hide();
+                return;
+            }
+
+            $.ajax({
+                url: "https://srredu.in/Users/ResetPassword",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function () {
+                    $('#Loader1').hide();
+                    alert("Password changed successfully!");
+                    $("#resetPasswordModal").modal("hide");
+                },
+                error: function (xhr) {
+                    $('#Loader1').hide();
+                    alert("Error: " + xhr.responseText);
+                }
+            });
+        });
+
+        $("#openHistoryBtn").on("click", function () {
+            $("#historyModal").modal("show");
+            loadHistoryData();
+        });
+
+         function loadHistoryData() {
+            $("#historyLoader").show();
+            $("#historyTable tbody").empty();
+
+            $.ajax({
+                url: "/FasTag/History", // 🔹 API endpoint (update to your actual API)
+                method: "GET",
+                success: function (response) {
+                    $("#historyLoader").hide();
+
+                    if (response && response.length > 0) {
+                        $.each(response, function (index, item) {
+                            let row = `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${item.refId}</td>
+                                    <td>${item.accountNo}</td>
+                                    <td>${item.dateTime}</td>
+                                    <td>₹${item.amount}</td>
+                                    <td>
+                                        <span class="badge ${item.status === 'Success' ? 'bg-success' : 'bg-danger'}">
+                                            ${item.status}
+                                        </span>
+                                    </td>
+                                </tr>`;
+                            $("#historyTable tbody").append(row);
+                        });
+                    } else {
+                        $("#historyTable tbody").append(`
+                            <tr><td colspan="5" class="text-muted">No history found</td></tr>
+                        `);
+                    }
+                },
+                error: function () {
+                    $("#historyLoader").hide();
+                    $("#historyTable tbody").append(`
+                        <tr><td colspan="5" class="text-danger">Failed to load data</td></tr>
+                    `);
+                }
+            });
+        }
+
+
+        });
+
+        // Fetch Biller Providers
+        function fetchFastTagProviders() {
+            $.ajax({
+                url: 'https://paymanfintech.in/FasTag/FastTagBillers',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    let $dropdown = $('#fastTagProvider');
+                    $dropdown.empty().append('<option value="">-- Select Provider --</option>');
+                    $.each(data.billers, function (index, item) {
+                        $dropdown.append(
+                            $('<option>', {
+                                value: item.billerId,
+                                text: item.billerName
+                            })
+                        );
+                    });
+                    // ✅ Restore selected provider after dropdown is filled
+            const billerId1 = localStorage.getItem("billerId1");
+            if (billerId1) {
+                $dropdown.val(billerId1);
+            }
+                },
+                error: function () {
+                    $('#fastTagProvider').html('<option value="">Failed to load billers</option>');
+                }
+            });
+        }
+
+
+    </script>
+}

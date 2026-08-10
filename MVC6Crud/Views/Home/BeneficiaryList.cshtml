@@ -1,0 +1,815 @@
+﻿@model MVC6Crud.Models.PaymanWeb.BeneficiaryListModel
+
+@{
+    ViewData["Title"] = "Beneficiary List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Required Meta -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- External Styles -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+<style>
+    /* Brand colors */
+    :root {
+        --navy: #0a2540;
+        --cyan: #00b4d8;
+        --navy-light: #1a3b5c;
+        --gray-bg: #f8fafc;
+    }
+
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Container */
+    .beneficiary-container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    /* Header */
+    .beneficiary-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+        .beneficiary-header h1 {
+            color: var(--navy);
+            font-weight: 700;
+            font-size: 2rem;
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+    .add-beneficiary-btn {
+        background-color: var(--navy);
+        color: white;
+        border: none;
+        border-radius: 3rem;
+        padding: 0.7rem 1.5rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+        .add-beneficiary-btn:hover {
+            background-color: var(--navy-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(10,37,64,0.2);
+            color: white;
+        }
+
+        .add-beneficiary-btn i {
+            font-size: 1.2rem;
+        }
+
+    /* Search */
+    .search-container {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 1.1rem;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.9rem 1rem 0.9rem 2.8rem;
+        border-radius: 3rem;
+        border: 1px solid #e2e8f0;
+        font-size: 1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        transition: all 0.2s;
+    }
+
+        .search-input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(0,180,216,0.2);
+            outline: none;
+        }
+
+    /* Beneficiary Cards */
+    .beneficiary-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .beneficiary-card {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+        border: 1px solid #eef2f6;
+        transition: all 0.2s;
+    }
+
+        .beneficiary-card:hover {
+            box-shadow: 0 15px 30px -8px rgba(0,0,0,0.1);
+            border-color: var(--cyan);
+        }
+
+    .beneficiary-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .beneficiary-name {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--navy);
+    }
+
+        .beneficiary-name i {
+            color: var(--cyan);
+            font-size: 1.3rem;
+        }
+
+    .verified-badge {
+        background-color: #d1fae5;
+        color: #065f46;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+    }
+
+    .verify-btn {
+        background-color: transparent;
+        border: 1px solid var(--cyan);
+        color: var(--cyan);
+        border-radius: 2rem;
+        padding: 0.25rem 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .verify-btn:hover {
+            background-color: var(--cyan);
+            color: white;
+        }
+
+    .delete-btn {
+        background: transparent;
+        border: none;
+        color: #ef4444;
+        font-size: 1rem;
+        padding: 0.25rem 0.5rem;
+        margin-left: auto;
+    }
+
+        .delete-btn:hover {
+            color: #b91c1c;
+            transform: scale(1.1);
+        }
+
+    .beneficiary-detail {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #4b5563;
+        font-size: 0.95rem;
+    }
+
+        .beneficiary-detail i {
+            color: var(--cyan);
+            width: 1.3rem;
+            font-size: 1rem;
+        }
+
+    .ifsc-label {
+        font-weight: 500;
+        color: var(--navy);
+    }
+
+    .ifsc-code {
+        font-family: monospace;
+        background: #f1f5f9;
+        padding: 0.2rem 0.6rem;
+        border-radius: 0.5rem;
+    }
+
+    /* Amount section inside card */
+    .amount-section {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eef2f6;
+    }
+
+    .amount-input {
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        padding: 0.7rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+
+        .amount-input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(0,180,216,0.2);
+            outline: none;
+        }
+
+        .amount-input:disabled {
+            background-color: #f1f5f9;
+            cursor: not-allowed;
+        }
+
+    .pay-btn {
+        background-color: var(--navy);
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        flex: 1;
+    }
+
+        .pay-btn:hover:not(:disabled) {
+            background-color: var(--navy-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(10,37,64,0.2);
+        }
+
+        .pay-btn:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+    /* Charges section */
+    .charges-section {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        border: 1px solid #eef2f6;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+
+    .charge-item {
+        display: flex;
+        gap: 1rem;
+        font-size: 1rem;
+    }
+
+        .charge-item span:first-child {
+            color: var(--navy);
+            font-weight: 600;
+        }
+
+        .charge-item span:last-child {
+            color: #059669;
+            font-weight: 700;
+        }
+
+    /* Modals */
+    .modal-content {
+        border-radius: 1.5rem;
+        border: none;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #eef2f6;
+        padding: 1.5rem 1.5rem 1rem;
+    }
+
+    .modal-title {
+        color: var(--navy);
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            color: var(--navy);
+            font-size: 0.9rem;
+        }
+
+    .form-control, .form-select {
+        width: 100%;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(0,180,216,0.2);
+            outline: none;
+        }
+
+    .save-btn {
+        background-color: var(--navy);
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .save-btn:hover {
+            background-color: var(--navy-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(10,37,64,0.2);
+        }
+
+    /* Confirm modal */
+    #confirmModal .modal-body {
+        font-size: 1.1rem;
+    }
+
+    #confirmModal .text-primary {
+        color: var(--cyan) !important;
+    }
+
+    .btn-success {
+        background-color: #10b981;
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+    }
+
+        .btn-success:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(16,185,129,0.2);
+        }
+
+    .btn-secondary {
+        background-color: #e2e8f0;
+        color: #334155;
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+    }
+
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
+        }
+
+    /* No results */
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: #94a3b8;
+        font-size: 1.1rem;
+    }
+
+    
+</style>
+
+<!-- Beneficiary Container -->
+<div class="container-fluid beneficiary-container">
+    <header class="beneficiary-header">
+        <h1>Beneficiary List</h1>
+        <button class="add-beneficiary-btn" data-bs-toggle="modal" data-bs-target="#addBeneficiaryModal">
+            <i class="bi bi-plus"></i> Add Beneficiary
+        </button>
+    </header>
+
+    <!-- Search -->
+    <div class="search-container">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" placeholder="Search beneficiaries..." id="searchBox" class="search-input" />
+    </div>
+
+    <!-- Beneficiary Cards -->
+    <div id="beneficiaryList" class="beneficiary-list"></div>
+
+    <!-- Charges -->
+    <div class="charges-section">
+        <div class="charge-item"><span>Pay Out Charges:</span><span>₹15</span></div>
+        <div class="charge-item"><span>Account Verification:</span><span>₹5</span></div>
+    </div>
+</div>
+
+<!-- Add Beneficiary Modal -->
+<div class="modal fade" id="addBeneficiaryModal" tabindex="-1" aria-labelledby="addBeneficiaryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="beneficiaryForm">
+                <div class="modal-header">
+                    <h2 class="modal-title">Add Beneficiary</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Mobile Number</label>
+                        <input type="text" class="form-control" id="MobileNumber" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Account Holder Name</label>
+                        <input type="text" class="form-control" id="AccountHolderName" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Account Number</label>
+                        <input type="text" class="form-control" id="AccountNumber" required />
+                    </div>
+                    <div class="form-group">
+                        <label>TXN Type</label>
+                        <select class="form-select" id="TxnType" required>
+                            <option value="">--Select--</option>
+                            <option value="IMPS">IMPS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Bank</label>
+                        <select class="form-select" id="Bank" required>
+                            <option value="">Select a bank</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="save-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Payment Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to pay <span class="text-primary fw-bold" id="confirmName"></span> ₹<span id="confirmAmount"></span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="confirmYesBtn" class="btn btn-success">Yes, Pay</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Your original JavaScript – fully preserved
+        const apiBase = "https://paymanfintech.in/PayOut";
+        const userPhone = '@User.Identity.Name';
+        const isCsbBankPayoutEnabled = @Model.isCsbBankPayout.ToString().ToLower();
+
+        function loadBeneficiaries() {
+            $('#Loader1').show();
+            $.ajax({
+                url: "https://paymanfintech.in/PayOut/GetBeneficiaries",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ phone: '@Model.Phone' }),
+                success: function (data) {
+                    const container = $('#beneficiaryList');
+                    container.empty();
+
+                    if (!data || data.length === 0) {
+                        container.append('<div class="no-results">No beneficiaries found.</div>');
+                        return;
+                    }
+
+                    data.beneficiaries.forEach(b => {
+                        const card = `
+                            <div class="beneficiary-card" data-id="${b.id}">
+                                <div class="beneficiary-info">
+                                    <div class="beneficiary-name">
+                                        <i class="bi bi-person icon"></i>
+                                        <span id="hname">${b.name}</span>
+                                        ${b.isVerified
+                                            ? `<span class="verified-badge"><i class="bi bi-check"></i> Verified</span>`
+                                            : `<button class="verify-btn btn btn-sm">Verify</button>`
+                                        }
+                                        <button class="btn btn-sm delete-btn" title="Delete Beneficiary">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div class="beneficiary-detail">
+                                        <i class="bi bi-phone icon"></i>
+                                        <span>${b.mobileNumber}</span>
+                                    </div>
+                                    <div class="beneficiary-detail">
+                                        <i class="bi bi-credit-card icon"></i>
+                                        <span>Account: ${b.accountNumber}</span>
+                                    </div>
+                                    <div class="beneficiary-detail">
+                                        <span class="ifsc-label">IFSC:</span>
+                                        <span class="ifsc-code">${b.ifscCode}</span>
+                                    </div>
+                                </div>
+                                <div class="amount-section">
+                                    <input type="number" class="amount-input form-control" placeholder="Enter amount" ${!b.isVerified ? 'disabled' : ''} />
+                                    <div class="d-flex gap-2 mt-2">
+                                        ${b.isVerified
+                                            ? '<button class="btn pay-btn">Pay</button><button class="btn btn-outline-secondary" disabled>Verified</button>'
+                                            : '<button class="btn btn-secondary verify-btn">Verify</button><button class="btn btn-outline-secondary" disabled>Pay</button>'
+                                        }
+                                    </div>
+                                </div>
+                            </div>`;
+                        container.append(card);
+                    });
+
+                    $('#Loader1').hide();
+                },
+                error: function () {
+                    $('#Loader1').hide();
+                    alert("Failed to load beneficiaries. Please check your phone number or network.");
+                }
+            });
+        }
+
+        function loadBanks() {
+            $.get(`${apiBase}/GetBanks`, function (response) {
+                const bankDropdown = $('#Bank');
+                const banks = response.banks;
+                bankDropdown.empty();
+                bankDropdown.append('<option value="">--Select Bank--</option>');
+                if (Array.isArray(banks)) {
+                    banks.forEach(bank => {
+                        bankDropdown.append(`<option value="${bank}">${bank}</option>`);
+                    });
+                } else {
+                    console.error("Invalid format: banks is not an array");
+                }
+            });
+        }
+
+        $('#beneficiaryForm').submit(function (e) {
+            e.preventDefault();
+            const data = {
+                mobileNumber: $('#MobileNumber').val().trim(),
+                name: $('#AccountHolderName').val().trim(),
+                accountNumber: $('#AccountNumber').val().trim(),
+                txnType: $('#TxnType').val(),
+                bankName: $('#Bank').val(),
+                userPhone: '@Model.Phone'
+            };
+            $('#Loader1').show();
+            $.ajax({
+                url: `https://paymanfintech.in/PayOut/AddBeneficiary`,
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function () {
+                    $('#Loader1').hide();
+                    $('#addBeneficiaryModal').modal('hide');
+                    $('#beneficiaryForm')[0].reset();
+                    loadBeneficiaries();
+                    showToast("Added beneficiary successfully", 'success');
+                },
+                error: function () {
+                    $('#Loader1').hide();
+                    showToast("Failed to add beneficiary. Please try again", 'danger');
+                }
+            });
+        });
+
+        $('#searchBox').on('input', function () {
+            const query = $(this).val().toLowerCase();
+            $('.beneficiary-card').each(function () {
+                const name = $(this).find('.beneficiary-name span').text().toLowerCase();
+                const mobile = $(this).find('.beneficiary-detail span').first().text();
+                $(this).toggle(name.includes(query) || mobile.includes(query));
+            });
+        });
+
+        $(document).ready(function () {
+            loadBanks();
+            loadBeneficiaries();
+        });
+
+        let selectedPaymentData = null;
+
+        $(document).on('click', '.pay-btn', function () {
+            const $card = $(this).closest('.beneficiary-card');
+            const amount = parseFloat($card.find('.amount-input').val());
+            const name = $card.find('#hname').text().trim();
+            const id = $card.data('id');
+
+            const maxAmount = parseInt('@Model.PayOutMaxAmount');
+            const minAmount = parseInt('@Model.PayOutMinAmount');
+            const available = parseInt('@Model.UserAvlAmount');
+            const pinlabAmount = parseInt('@Model.Pinlabamount');
+            const minBalance = parseInt('@Model.MinBalanceAvl');
+            const remainingBalance = available - amount;
+
+            if (isNaN(amount)) {
+                showToast("Amount is required", 'warning');
+                return false;
+            }
+
+            if (amount < minAmount) {
+                showToast("Please enter amount greater than ₹" + minAmount, 'warning');
+                return false;
+            }
+
+            if (amount > maxAmount) {
+                showToast("Please enter amount less than ₹" + maxAmount, 'warning');
+                return false;
+            }
+
+            if (amount > available) {
+                showToast("Insufficient funds!", 'warning');
+                return false;
+            }
+
+            if (amount > pinlabAmount) {
+                showToast("Service is temporarily unavailable", 'warning');
+                return false;
+            }
+
+            if (available <= minBalance || remainingBalance <= minBalance) {
+                showToast("Minimum balance not available", 'warning');
+                return false;
+            }
+
+            $('#confirmName').text(name).addClass('fw-bold text-primary');
+            $('#confirmAmount').text(amount.toLocaleString());
+
+            selectedPaymentData = { $button: $(this), $card, name, amount, id };
+
+            const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            modal.show();
+        });
+
+        $('#confirmYesBtn').on('click', function () {
+            $('#Loader1').show();
+            const { $button, $card, id, name, amount } = selectedPaymentData;
+
+            $('#confirmModal').modal('hide');
+            $button.prop('disabled', true).text('Processing...');
+
+            if (isCsbBankPayoutEnabled) {
+                $.ajax({
+                    url: 'https://paymanfintech.in/CsbPayout/PayToBeneficiary',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: id,
+                        amount: parseFloat(amount),
+                        userPhone: '@Model.Phone'
+                    }),
+                    success: function (result) {
+                        $('#Loader1').hide();
+                        const transactionId = "TXN123456";
+                        setTimeout(() => {
+                            const url = `/PayMan/PayStatus?IsSuccess=${result.success}&Amount=${amount}&TransactionId=${transactionId}&CardNumber=${name}`;
+                            window.location.href = url;
+                        }, 100);
+                        $card.find('.amount-input').val('');
+                    },
+                    error: function () {
+                        $('#Loader1').hide();
+                        const transactionId1 = "TXN123456";
+                        setTimeout(() => {
+                            const url = `/PayMan/PayStatus?IsSuccess=false&Amount=${amount}&TransactionId=${transactionId1}&CardNumber=${name}`;
+                            window.location.href = url;
+                        }, 100);
+                    },
+                    complete: function () {
+                        $button.prop('disabled', false).text('Pay');
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: 'https://paymanfintech.in/PayOut/PayToBeneficiary',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: id,
+                        amount: parseFloat(amount),
+                        userPhone: '@Model.Phone'
+                    }),
+                    success: function (result) {
+                        $('#Loader1').hide();
+                        const transactionId = "TXN123456";
+                        setTimeout(() => {
+                            const url = `/PayMan/PayStatus?IsSuccess=${result.success}&Amount=${amount}&TransactionId=${transactionId}&CardNumber=${name}`;
+                            window.location.href = url;
+                        }, 100);
+                        $card.find('.amount-input').val('');
+                    },
+                    error: function () {
+                        $('#Loader1').hide();
+                        const transactionId1 = "TXN123456";
+                        setTimeout(() => {
+                            const url = `/PayMan/PayStatus?IsSuccess=false&Amount=${amount}&TransactionId=${transactionId1}&CardNumber=${name}`;
+                            window.location.href = url;
+                        }, 100);
+                    },
+                    complete: function () {
+                        $button.prop('disabled', false).text('Pay');
+                    }
+                });
+            }
+        });
+
+        $(document).on('click', '.verify-btn', function () {
+            $('#Loader1').show();
+            const card = $(this).closest('.beneficiary-card');
+            const id = card.data('id');
+
+            $(this).prop('disabled', true).text('Verifying...');
+
+            $.ajax({
+                url: `${apiBase}/VerifyBeneficiary`,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ Id: id }),
+                success: function (response) {
+                    $('#Loader1').hide();
+                    if (response.success) {
+                        showToast("Beneficiary verified successfully!", 'success');
+                        loadBeneficiaries();
+                    } else {
+                        showToast("Verification failed. Please try again", 'danger');
+                        card.find('.verify-btn').prop('disabled', false).text('Verify');
+                    }
+                },
+                error: function () {
+                    $('#Loader1').hide();
+                    showToast("Error verifying beneficiary", 'danger');
+                    card.find('.verify-btn').prop('disabled', false).text('Verify');
+                }
+            });
+        });
+
+        $('#beneficiaryList').on('click', '.delete-btn', function () {
+            $('#Loader1').show();
+            const $card = $(this).closest('.beneficiary-card');
+            const id = $card.data('id');
+
+            if (confirm("Are you sure you want to delete this beneficiary?")) {
+                $.ajax({
+                    url: 'https://paymanfintech.in/PayOut/DeleteBeneficiary',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ id: id }),
+                    success: function (res) {
+                        $('#Loader1').hide();
+                        if (res.success) {
+                            showToast("Beneficiary deleted successfully.", 'success');
+                            $card.remove();
+                        } else {
+                            showToast("Delete failed: " + (res.message || "Unknown error"), 'danger');
+                        }
+                    },
+                    error: function () {
+                        $('#Loader1').hide();
+                        showToast("Error while deleting beneficiary.", 'danger');
+                    }
+                });
+            }
+        });
+    </script>
+}

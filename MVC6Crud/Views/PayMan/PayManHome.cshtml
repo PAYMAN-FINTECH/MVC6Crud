@@ -1,0 +1,576 @@
+﻿
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/languages/jquery.validationEngine-en.min.js"></script>
+
+@model PayManHome
+<style>
+    body {
+    background-color: #f8f9fa;
+    }
+
+    .feature-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: white;
+    padding: 10px;
+    transition: all 0.3s ease-in-out;
+    }
+
+    .feature-box:hover {
+    border: 2px solid #007bff;
+    transform: scale(1.05);
+    }
+
+    .feature-icon {
+    font-size: 30px;
+    color: #007bff;
+    transition: color 0.3s ease-in-out;
+    }
+
+    /* .feature-box:hover .feature-icon {
+    color: white;
+    } */
+
+    .feature-title {
+    margin-top: 10px;
+    font-size: 10px;
+    color: #333;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+    }
+
+    .feature-box:hover .feature-title {
+    color: #007bff;
+    }
+</style>
+
+@{
+    ViewData["Title"] = "PayManHome Page";
+}
+@* <form role="form"> *@
+<div class="container my-5">
+    @if (TempData["PaymentSucess"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-check p-2"></i><label>@TempData["PaymentSucess"]</label>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["SuccessMsg"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMsg"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["useralrdeyexists"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            @TempData["useralrdeyexists"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["payoutamount"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["payoutamount"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    <div class="card mb-3 border-dark">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <!-- <img src="..." class="img-fluid rounded-start" alt="..."> -->
+                <div class="card border-secondary">
+                    <div class="card-header bg-transparent">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <strong><i>PROFILE</i></strong>
+                            </div>
+                            @if (Model.Name == "Jurra" || Model.Name == "Ajju")
+                            {
+                                <div class="col-md-9">
+                                    <div class="col-md-9">
+                                        <div class="row">
+                                            <form id="payOutForm">
+                                                <div class="form-check col-md-4">
+                                                    <input class="form-check-input" type="checkbox" name="paymentMethods" value="SefexPay" id="SefexPay" @(Model.SefexPay ? "checked" : "")>
+                                                    <label class="form-check-label" for="SefexPay">PayIn</label>
+                                                </div>
+                                                <div class="form-check col-md-3">
+                                                    <input class="form-check-input" type="checkbox" name="paymentMethods" value="PineLab" id="PineLab" @(Model.PineLab ? "checked" : "")>
+                                                    <label class="form-check-label" for="PineLab">PayOut</label>
+                                                </div>
+                                                <div class="form-check col-md-3">
+                                                    <input class="form-check-input" type="checkbox" name="paymentMethods" value="InstantPay" id="InstantPay" @(Model.InstantPay ? "checked" : "")>
+                                                    <label class="form-check-label" for="InstantPay">CCBill</label>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <button type="button" class="btn btn-primary btn-sm" onclick="submitPayOut()">Update</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div>
+                                    <!-- <i class="fa fa-user-o p-2" aria-hidden="true"></i> -->
+                                    <strong>Name</strong>
+                                </div>
+                                <div>
+                                    <label>@Model.Name</label>
+                                </div>
+                                <div>
+                                    <!-- <i class="fa fa-user-o" aria-hidden="true"></i> -->
+                                    <strong>Phone Number</strong>
+                                </div>
+                                <div>
+                                    <label>@Model.PhoneNumber</label>
+                                </div>
+                            </div>
+                            @if (Model.Name != "Demo"){
+                                <div class="col-md-6">
+                                    @if (Model.Name != "Admin" && Model.Name != "Ajay")
+                                    {
+
+                                        <div>
+                                            <strong class="p-1">Available Balance</strong>
+                                        </div>
+                                        <div>
+                                            <i class="fa fa-inr p-1"></i><label>@Model.Amount</label>
+                                        </div>
+                                        @if (Model.Name == "Jurra" || Model.Name == "Ajju")
+                                        {
+                                            <div>
+                                                <strong class="p-1"> PayOut Balance</strong>
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-inr p-1"></i><label>@Model.SefexFinalBalance</label>
+                                            </div>
+                                            <div>
+                                                <strong class="p-1"> InstantPay Balance</strong>
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-inr p-1"></i><label>@Model.InstantPayBalance</label>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            }
+
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card border-secondary">
+                    <div class="card-header">Member</div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li>
+                                <span class="fa fa-folder-open p-2"></span><strong style="color: green;font-weight: bold;" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">Dashboard</strong>
+
+                                <div class="collapse" id="collapseExample">
+                                    <ul>
+                                        <li><strong><a asp-area="" asp-controller="PayMan" asp-action="PayManHome" style="color: green;font-weight: bold;">Dashboard</a></strong></li>
+                                    </ul>
+
+                                </div>
+                            </li>
+                            @if (Model.Role == "1")
+                            {
+                                <li>
+                                    <span class="fa fa-user p-2"></span><strong style="color: green;font-weight: bold;" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1">Registration</strong>
+
+                                    <div class="collapse" id="collapseExample1">
+                                        <ul>
+                                            <li><strong><a asp-area="" asp-controller="PayMan" asp-action="Registration" method="get" style="color: green;font-weight: bold;">Registration</a></strong></li>
+                                        </ul>
+
+                                    </div>
+                                </li>
+                            }
+                            @if (Model.Name != "Demo" )
+                            {
+                                <li>
+                                    <span class="fa fa-cog p-2"></span><strong style="color: green;font-weight: bold;" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" aria-controls="collapseExample2">PAYMANT</strong>
+
+                                    @if(Model.PayOutEnable == true){
+                                        <div class="collapse" id="collapseExample2">
+                                            <ul>
+                                                <li><strong><a asp-area="" asp-controller="PayMan" asp-action="AddBeneficiaryAccounts" method="get" style="color: green;font-weight: bold;">DMT</a></strong></li>
+                                                @* <li> <strong><a asp-area="" asp-controller="PayMan" asp-action="CreditCardPayment" asp-route-Amount="@Model.Amount" method="get" style="color: green;font-weight: bold;">Credit Card bill</a></strong></li>
+                                            <li><strong><a asp-area="" asp-controller="PayMan" asp-action="CreditCardBillPay" method="get" style="color: green;font-weight: bold;">CC BillPay</a></strong></li> *@
+
+                                            </ul>
+
+                                        </div>
+                                    }
+
+                                </li>
+                            }
+                            <li>
+                                <span class="fa fa-file p-2"></span><strong style="color: green;font-weight: bold;" data-bs-toggle="collapse" href="#collapseExample3" role="button" aria-expanded="false" aria-controls="collapseExample3">Report</strong>
+
+                                <div class="collapse" id="collapseExample3">
+                                    <ul>
+                                        @if (Model.Name != "Demo" )
+                                        {
+                                            <li> <strong><a asp-area="" asp-controller="PayMan" asp-action="GetPassbook" method="get" style="color: green;font-weight: bold;">PassBook</a></strong></li>
+                                        }else{
+                                            <li> <strong><a asp-area="" asp-controller="PayMan" asp-action="GetPassbook" method="get" style="color: green;font-weight: bold;">Transactions</a></strong></li>
+                                        }
+
+                                        @if (Model.Name != "Demo")
+                                        {
+                                            <li><strong><a asp-area="" asp-controller="PayMan" asp-action="PayInHistory" method="get" style="color: green;font-weight: bold;">PayIn History</a></strong></li>
+                                            <li> <strong><a asp-area="" asp-controller="PayMan" asp-action="PayOutHistory" method="get" style="color: green;font-weight: bold;">PayOut History</a></strong></li>
+                                        }
+                                        @if (Model.Name == "Jurra")
+                                        {
+                                            <li> <strong><a asp-area="" asp-controller="PayMan" asp-action="TransectionHistory" method="get" style="color: green;font-weight: bold;">Transection History</a></strong></li>
+                                            <li><strong><a asp-area="" asp-controller="PayMan" asp-action="UsersList" method="get" style="color: green;font-weight: bold;">Users List</a></strong></li>
+                                            <li><strong><a asp-area="" asp-controller="PayMan" asp-action="GetAllAdharDetais" method="get" style="color: green;font-weight: bold;">Adhar details</a></strong></li>
+
+                                            @*  <li><strong><a asp-area="" asp-controller="PayMan" asp-action="PayManDashBoard" method="get" style="color: green;font-weight: bold;">PayMan Dashboard</a></strong></li> *@
+                                        }
+                                    </ul>
+
+                                </div>
+                            </li>
+                            @if (Model.Name == "Jurra")
+                            {
+                                <li>
+                                    <span class="fa fa-file p-2"></span><strong style="color: green;font-weight: bold;" data-bs-toggle="collapse" href="#collapseExample4" role="button" aria-expanded="false" aria-controls="collapseExample4">Gateway Settelments</strong>
+
+                                    <div class="collapse" id="collapseExample4">
+                                        <ul>
+
+                                            <li>RazorPay: @Model.PayInAmountRazorPaySettelment</li>
+                                            <li>Lyra: @Model.PayInAmountLyraPaySettelment</li>
+                                            <li>RazorPay To Bank: @Model.PayInAmountRazorPayCommissionSettelment</li>
+                                            <li>Lyra To Bank: @Model.PayInAmountLyraPayCommissionSettelment</li>
+
+                                        </ul>
+
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="fa fa-file p-2"></span><strong><a asp-area="" asp-controller="PayMan" asp-action="AddFailedTransections" method="get" style="color: green;font-weight: bold;">Add Failed Transections</a></strong>
+                                </li>
+                                @* <li>
+                                    <span class="fa fa-file p-2"></span><strong><a asp-area="" asp-controller="PayMan" asp-action="GenerateInvoicePdf" method="get" style="color: green;font-weight: bold;">Generate Invoice</a></strong>
+                                </li> *@
+                            }
+
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-8">
+                @if (Model.Name == "Jurra")
+                {
+                    <form asp-action="SubmitPayIn" asp-controller="PayMan" method="post">
+                        <div class="row col-12 p-1">
+                            <input type="hidden" asp-for="SefexFinalBalance" class="form-control input-sm" placeholder="After Bank Commission" />
+                            <input type="hidden" asp-for="InstantPayBalance" class="form-control input-sm" placeholder="After Bank Commission" />
+
+                            <!-- Amount Textbox -->
+                            <div class="form-group col-3">
+                                <label style="font-size: smaller;font-style: oblique;color: blue;">Easbuzz Amt</label>
+                                <input type="text" asp-for="EasebuzzFeatueSeletment" class="form-control input-sm" placeholder="After Bank Commission" />
+                            </div>
+
+                            <!-- Amount Textbox -->
+                            <div class="form-group col-3">
+                                <label style="font-size: smaller;font-style: oblique;color: blue;">Srr Amt</label>
+                                <input type="text" asp-for="Srrbankamount" class="form-control input-sm" placeholder="After Bank Commission" />
+                            </div>
+
+                            <!-- Amount Textbox -->
+                            <div class="form-group col-3">
+                                <label style="font-size: smaller;font-style: oblique;color: blue;">RazorPay</label>
+                                <input type="text" asp-for="RazorpayAmount" class="form-control input-sm" placeholder="After Bank Commission" />
+                            </div>
+
+                            <div class="form-group col-3">
+                                <label style="font-size: smaller;font-style: oblique;color: blue;">Users PayOut Avl..</label>
+                                <input type="text" readonly class="form-control input-sm" asp-for="PayOutUsersAvaliableBalance" placeholder="PayOut Avaliable">
+
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="form-group col-3">
+                                <label style="font-size: smaller;font-style: oblique;color: blue;">&nbsp;</label>
+                                <button type="submit" class="btn btn-sm btn-primary form-control">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                    @* <div class="row col-12 p-1">
+                        <div class="form-group col-3">
+                            <label style="font-size: smaller;font-style: oblique;color: blue;">PayIn Amount</label>
+                            <input type="text" name="EnterCustomerNumber" readonly class="form-control input-sm" asp-for="PayInAmount" placeholder="PayIn Amount">
+
+                        </div>
+                        <div class="form-group col-3">
+                            <label style="font-size: smaller;font-style: oblique;color: blue;">Bank Commission</label>
+                            <input type="text" name="EnterCustomerNumber" readonly class="form-control input-sm" asp-for="PayInAmountAfterBankCommission" placeholder="After Bank Commission">
+
+                        </div>
+                        <div class="form-group col-3">
+                            <label style="font-size: smaller;font-style: oblique;color: blue;">Users PayOut Avl..</label>
+                            <input type="text" name="EnterCustomerNumber" readonly class="form-control input-sm" asp-for="PayOutUsersAvaliableBalance" placeholder="PayOut Avaliable">
+
+                        </div>
+                        <div class="form-group col-3">
+                            <label style="font-size: smaller;font-style: oblique;color: blue;">PayMan Profit</label>
+                            <input type="text" name="EnterCustomerNumber" readonly class="form-control input-sm" asp-for="PayManProfilt" placeholder="PayMan Profilt">
+
+                        </div>
+
+                    </div> *@
+                }
+                <div class="card p-4">
+                    <strong class="text-danger">Services..</strong><br />
+                    <div class="row">
+
+
+                        <div class="container mt-1">
+                            <div class="row justify-content-center text-center">
+
+                                @if (Model.Name != "Demo" )
+                                {
+                                    <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                                        <a asp-area="" asp-controller="PayMan" asp-action="Pay" class="text-decoration-none">
+                                            <div class="feature-box">
+                                                <i class="fa fa-code feature-icon"></i>
+                                                <div class="feature-title">Balance TopUp</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                }
+                                @if (Model.Name != "Demo")
+                                {
+                                    <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                                        <a asp-area="" asp-controller="PayMan" asp-action="PayInHistory" class="text-decoration-none">
+                                            <div class="feature-box">
+                                                <i class="fa fa-user feature-icon"></i>
+                                                <div class="feature-title">My PayIns</div>
+                                            </div>
+                                        </a>
+                                    </div>
+
+
+                                    <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                                        <a asp-area="" asp-controller="PayMan" asp-action="PayOutHistory" class="text-decoration-none">
+                                            <div class="feature-box">
+                                                <i class="fa fa-user feature-icon"></i>
+                                                <div class="feature-title">My Payouts</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                }else{
+                                    <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                                        <a asp-area="" asp-controller="PayMan" asp-action="PayInHistory" class="text-decoration-none">
+                                            <div class="feature-box">
+                                                <i class="fa fa-user feature-icon"></i>
+                                                <div class="feature-title">My Transactions</div>
+                                            </div>
+                                        </a>
+                                    </div>
+
+
+                                    <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                                        <a asp-area="" asp-controller="PayMan" asp-action="PayOutHistory" class="text-decoration-none">
+                                            <div class="feature-box">
+                                                <i class="fa fa-user feature-icon"></i>
+                                                <div class="feature-title">My Bills</div>
+                                            </div>
+                                        </a>
+                                    </div>
+
+                                }
+
+
+
+                                <!-- Credit Card Bill Pay -->
+                                <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                                    <a asp-area="" asp-controller="PayMan" asp-action="CreditCardBillPay" class="text-decoration-none">
+                                        <div class="feature-box">
+                                            <i class="fa fa-credit-card feature-icon"></i>
+                                            <div class="feature-title">Credit Card Bill Pay</div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Credit Card Bill Pay -->
+                                @if (Model.Name == "Demo")
+                                {
+                                    <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                                        <a asp-area="" asp-controller="PayMan" asp-action="FastTag" class="text-decoration-none">
+                                            <div class="feature-box">
+                                                <i class="fa fa-road feature-icon"></i>
+                                                <div class="feature-title">Fastag</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                }
+
+
+
+
+                                <!-- Expense Cards -->
+                                <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                                    <a href="#" class="text-decoration-none">
+                                        <div class="feature-box">
+                                            <i class="fa fa-money-bill feature-icon"></i>
+                                            <div class="feature-title">Expense Cards</div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Gift Cards -->
+                                <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                                    <a href="#" class="text-decoration-none">
+                                        <div class="feature-box">
+                                            <i class="fa fa-gift feature-icon"></i>
+                                            <div class="feature-title">Gift Cards</div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Bill Payments -->
+                                <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                                    <a href="#" class="text-decoration-none">
+                                        <div class="feature-box">
+                                            <i class="fa fa-file-invoice feature-icon"></i>
+                                            <div class="feature-title">Bill Payments</div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+
+
+
+                       @*  @if (Model.Name != "Admin" && Model.Name != "Ajay")
+                        {
+                            <div class="col-sm-3">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <strong><a asp-area="" asp-controller="PayMan" asp-action="Pay" method="get">Balance TopUp</a></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+
+
+                        <div class="col-sm-3">
+                            <div class="card border-primary">
+                                <div class="card-body">
+                                    <strong><a asp-area="" asp-controller="PayMan" asp-action="Electricity" method="get">Electricity</a></strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="card border-primary">
+                                <div class="card-body">
+                                    <strong><a asp-area="" asp-controller="PayMan" asp-action="Internet" method="get">Internet</a></strong>
+                                </div>
+                            </div>
+                        </div>
+                        @if (Model.Name != "Admin" && Model.Name != "Ajay")
+                        {
+                            <div class="col-sm-3">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <strong><a asp-area="" asp-controller="PayMan" asp-action="Reacharge" method="get">Reacharge</a></strong>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 my-3">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <strong><a asp-area="" asp-controller="PayMan" asp-action="DTH" method="get">DTH</a></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-sm-3 my-3">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <strong><a asp-area="" asp-controller="PayMan" asp-action="WaterBill" method="get">WATER BILL</a></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        } *@
+                    </div>
+                    @if (Model.Name != "Demo")
+                    {
+                        <div class="img-responsive">
+                            <img src="~/images/2decfe19-3f9f-4473-80d7-32b8c76ea11a0000.jpeg" style="width:100%" />
+
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<script>
+     $(window).on('load', function () {
+        $('#Loader').fadeOut('slow');
+    });
+
+    function submitPayOut() {
+        let selectedMethods = [];
+
+        document.querySelectorAll("input[name='paymentMethods']:checked").forEach((checkbox) => {
+            selectedMethods.push(checkbox.value);
+        });
+
+        fetch('/PayMan/PayOutConfc', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ PaymentMethods: selectedMethods })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);  // Display success message
+            location.reload();  // Reload to reflect changes
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+
+</script>

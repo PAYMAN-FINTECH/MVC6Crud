@@ -1,0 +1,100 @@
+﻿@model MVC6Crud.Models.PaymanWeb.MultiLayOut
+
+@{
+    ViewData["Title"] = "Home";
+    Layout = Model.Isedu ? "~/Views/Shared/_EduLayout.cshtml" : "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/css/landing.css" rel="stylesheet" />
+<!-- Section 1: Image Left, Text Right -->
+<div class="section">
+    <div class="section-image">
+        <img src="https://media.licdn.com/dms/image/v2/D5612AQFWVqh49fnZ3w/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1739218493571?e=2147483647&v=beta&t=Zi4e5FGgUET7nCBKMuxdmWjBq2dM6FQcVkx5nR2oWtY" alt="Financial Support" />
+    </div>
+    <div class="section-content">
+        <h2>Your Financial Partner</h2>
+        <p>When you need any financial support, we are always here for you.</p>
+        <ul class="feature-list">
+            <li><i class="bi bi-check-circle-fill text-cyan me-2"></i>One of the best fintech platforms.</li>
+            <li><i class="bi bi-check-circle-fill text-cyan me-2"></i>Trusted, independent, and convenient services.</li>
+            <li><i class="bi bi-check-circle-fill text-cyan me-2"></i>Seamless digital financial solutions for everyone.</li>
+            <li><i class="bi bi-check-circle-fill text-cyan me-2"></i>Reliable credit card and instant payment support.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Section 2: Reverse Layout -->
+<div class="section reverse">
+    <div class="section-image">
+        <img src="https://img.freepik.com/premium-photo/shopping-phone-credit-card-woman-ecommerce-travel-payment-sale-discount-person-with-smile-designer-fashion-retail-promotion-paper-bag-online-fintech-banking-app_590464-146498.jpg" alt="Trusted Fintech" />
+    </div>
+    <div class="section-content">
+        <h2>Why PAYMAN?</h2>
+        <p>PAYMAN FINTECH SOLUTIONS PVT LTD leads the way in digital finance.</p>
+        <ul class="feature-list">
+            <li><i class="bi bi-check-circle-fill text-cyan me-2"></i>Advanced customer acquisition capabilities.</li>
+            <li><i class="bi bi-check-circle-fill text-cyan me-2"></i>Uninterrupted service in credit and payments.</li>
+            <li><i class="bi bi-check-circle-fill text-cyan me-2"></i>Pan-India presence in digital banking tools.</li>
+            <li><i class="bi bi-check-circle-fill text-cyan me-2"></i>Trusted by thousands across the nation.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Section 3: Cards (Value Props) -->
+<div class="section2">
+    <div class="cards">
+        <img src="https://paymanfintech.in/images/commition%20199x%20199.png" alt="Commission" />
+        <div>
+            <h3>BEST COMMISSION</h3>
+            <p>Best Commission in Electricity Bill Payment 1% Margin</p>
+        </div>
+    </div>
+    <div class="cards">
+        <img src="https://paymanfintech.in/images/helpe199x199.png" alt="Support" />
+        <div>
+            <h3>BEST SUPPORT</h3>
+            <p>24X7 Whatsapp & Chat Support Available</p>
+        </div>
+    </div>
+    <div class="cards">
+        <img src="https://paymanfintech.in/images/speed%20199x199.png" alt="Speed" />
+        <div>
+            <h3>SUPER FAST</h3>
+            <p>Smart Pay Provides Super Fast Service with Highest Success Ratio</p>
+        </div>
+    </div>
+    <div class="cards">
+        <img src="https://paymanfintech.in/images/trust%20199x199.png" alt="Trust" />
+        <div>
+            <h3>TRUSTED</h3>
+            <p>Smart Pay is 100% Trustable With the Mutual Cooperation & Transparency</p>
+        </div>
+    </div>
+</div>
+
+<!-- Section 4: Services Icons -->
+<div class="section3">
+    <h2>Our Services</h2>
+    <p>At <b>PAYMAN</b>, we give not just the Best but Legendary satisfaction to our Customers, through Service Excellence</p>
+    <div class="service-grid">
+        <div class="service-card">
+            <img src="https://paymanfintech.in/images/lpg%20gas%2080x80.jpg" alt="Gas Bill" />
+            <h3>Gas Bill</h3>
+        </div>
+        <div class="service-card">
+            <img src="https://paymanfintech.in/images/postepaied%2080x80.png" alt="Postpaid Bill" />
+            <h3>Postpaid Bill</h3>
+        </div>
+        <div class="service-card">
+            <img src="https://paymanfintech.in/images/elatricity%2080x80.png" alt="Electricity" />
+            <h3>Electricity</h3>
+        </div>
+        <div class="service-card">
+            <img src="https://paymanfintech.in/images/water_bill.jpg" alt="Water Bill" />
+            <h3>Water Bill</h3>
+        </div>
+        <div class="service-card">
+            <img src="~/images/fastag_icon_80x80_white.png" alt="Fast Tag" />
+            <h3>Fast Tag</h3>
+        </div>
+    </div>
+</div>

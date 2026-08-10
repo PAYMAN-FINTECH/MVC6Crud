@@ -1,0 +1,57 @@
+﻿@model  MVC6Crud.Models.PaymanApp.ContactFormModel
+
+@{
+    ViewData["Title"] = "Contact Us";
+    Layout = "~/Views/Shared/_FasTag.cshtml";   // adjust path if your layout is somewhere else
+}
+
+<div class="container py-5">
+    <h2 class="fw-bold mb-4">Contact Us</h2>
+
+    <div class="row">
+        <!-- Contact Form -->
+        <div class="col-md-6 mb-4">
+            <form asp-action="Contact" method="post">
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Your Name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">Email</label>
+                    <input asp-for="Email" class="form-control" placeholder="Your Email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Subject" class="form-label">Subject</label>
+                    <input asp-for="Subject" class="form-control" placeholder="Subject" />
+                    <span asp-validation-for="Subject" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Message" class="form-label">Message</label>
+                    <textarea asp-for="Message" class="form-control" rows="5" placeholder="Type your message"></textarea>
+                    <span asp-validation-for="Message" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+        </div>
+
+        <!-- Office Info -->
+        <div class="col-md-6">
+            <div class="mb-4">
+                <h5>Our Office</h5>
+                <p>
+                    9-12 HMT NAGAR STNUMBER 1,<br />
+                    NACHARAM, HYDERABAD, 500076,<br />
+                    Telangana, India
+                </p>
+                <p>Phone: +91-9100748033</p>
+                <p>Email: <a href="mailto:support@paymanfintech.in">support@paymanfintech.in</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

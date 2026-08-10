@@ -1,0 +1,49 @@
+﻿@model PayPayment
+
+<div class="row col-md-12">
+    <div class="col-md-6">
+        <div class="container">
+            <h2>Pay Payment</h2>
+            <br />
+            <div class="row">
+
+                <div class="jumbotron">
+                    <form role="form" asp-action="BalanceTopUp" asp-controller="PayMan" method="post">
+
+                        <label class="text-danger">@ViewBag.message</label>
+                        <div class="form-group col-8">
+                            <label for="EnterCustomerNumber"><i class="fa fa-user-o p-2" aria-hidden="true"></i><strong>Enter Customer Number</strong></label>
+                            <input type="enterCustomerNumber" name="EnterCustomerNumber" asp-for="EnterCustomerNumber" autocomplete="off" class="form-control input-sm" placeholder="Enter Customer Number">
+                            <span asp-validation-for="EnterCustomerNumber" class="text-danger"></span>
+                        </div>
+                        <br />
+                        <div class="form-group col-8">
+                            <label for="Amount"><i class="fa fa-inr p-2"></i><strong>Amount</strong></label>
+                            <input type="amount" name="Amount" asp-for="Amount" autocomplete="off" class="form-control input-sm" placeholder="Amount">
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+                        <br />
+                        <div class="form-group col-8">
+                            <label for="SelectPaymentGateWay"><i class="fa fa-address-card-o p-2" aria-hidden="true"></i><strong>Select Payment GateWay</strong></label>
+                            <input type="selectPaymentGateWay" name="SelectPaymentGateWay" asp-for="SelectPaymentGateWay" autocomplete="off" class="form-control input-sm" placeholder="Select Payment GateWay">
+                            <span asp-validation-for="SelectPaymentGateWay" class="text-danger"></span>
+                        </div>
+                        <br />
+                        
+                        <input type="submit" value="Save" class="btn btn-primary">
+                        <input asp-action="PayManHome" asp-controller="PayMan" type="submit" value="Back" class="btn btn-danger">
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6">
+		<div class="img-responsive">
+            <img src="~/images/cardpayimage.jpg" style="width:100%" />
+
+        </div>
+    </div>
+</div>

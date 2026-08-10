@@ -1,0 +1,52 @@
+﻿@model Registartion
+
+<div class="row col-md-12">
+    <div class="col-md-6">
+        <div class="container">
+            <h4>USER SIGN UP</h4>
+            <br />
+            <div class="row">
+
+                <div class="jumbotron">
+                    <form role="form" asp-action="signup" asp-controller="Home" method="post">
+
+                        <label class="text-danger">@ViewBag.message</label>
+                        <input type="hidden" asp-for="Id" />
+                        <div class="form-group col-8">
+                            <label for="Email"><i class="fa fa-user p-2"></i><strong>User Name</strong></label>
+                            <input type="userName" name="UserName" asp-for="UserName" autocomplete="off" class="form-control input-sm" placeholder="UserName">
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-8">
+                            <label for="Email"><i class="fa fa-envelope p-2" aria-hidden="true"></i><strong>Email</strong></label>
+                            <input type="email" name="Email" asp-for="Email" autocomplete="off" class="form-control input-sm" placeholder="Email Address">
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-8">
+                        <label for="Password"><i class="fa-regular fa-eye p-2"></i><strong>Password</strong></label>
+                        <input type="text" name="Password" asp-for="Password" autocomplete="off" class="form-control input-sm" placeholder="Password">
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-8">
+                            <label for="PhoneNumber"><i class="fa fa-phone p-2" aria-hidden="true"></i><strong>Phone Number</strong></label>
+                            <input type="phoneNumber" name="PhoneNumber" asp-for="PhoneNumber" autocomplete="off" class="form-control input-sm" placeholder="Phone Number">
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                        <br />
+                        <input type="submit" value="Sign Up" class="btn btn-primary">
+                        <input asp-action="PayManHome" asp-controller="PayMan" type="submit" value="Back" class="btn btn-danger">
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6">
+        <div class="img-responsive">
+            <img src="~/images/rrrrrrr.jpeg" style="width:100%" />
+
+        </div>
+    </div>
+</div>

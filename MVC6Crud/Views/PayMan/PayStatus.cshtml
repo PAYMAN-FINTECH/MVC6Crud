@@ -1,0 +1,173 @@
+﻿@model MVC6Crud.Models.PaymanWeb.PaymentStatusViewModel
+@{
+    ViewBag.Title = "Payment Status";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Payment Status | PAYMAN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Bootstrap Icons for consistent icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Font for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 2.5rem 2rem;
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        
+
+        .status-icon {
+            font-size: 5rem;
+            line-height: 1;
+            margin-bottom: 1.5rem;
+        }
+
+            .status-icon.success {
+                color: #10b981;
+            }
+
+            .status-icon.fail {
+                color: #ef4444;
+            }
+
+        .status-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #0a2540; /* navy */
+        }
+
+        .status-message {
+            font-size: 1.1rem;
+            color: #4b5563;
+            margin-bottom: 1rem;
+        }
+
+        .amount-box {
+            background: #f1f5f9;
+            border-radius: 1rem;
+            padding: 0.75rem 1.5rem;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: #0a2540;
+            font-size: 1.25rem;
+        }
+
+            .amount-box span {
+                font-weight: 400;
+                color: #64748b;
+                margin-right: 0.5rem;
+            }
+
+        .redirect-info {
+            background: #f8fafc;
+            border-radius: 2rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+            .redirect-info i {
+                color: #0d6efd;
+                animation: spin 2s linear infinite;
+            }
+
+      
+    </style>
+</head>
+<body>
+    <div class="status-card">
+        @if (Model.IsSuccess)
+        {
+            <div class="status-icon success">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h1 class="status-title">Payment Successful!</h1>
+            <div class="amount-box">
+                <span>Amount:</span> ₹@Model.Amount
+            </div>
+        }
+        else
+        {
+            <div class="status-icon fail">
+                <i class="bi bi-x-circle-fill"></i>
+            </div>
+            <h1 class="status-title">Payment Failed</h1>
+            @if (!string.IsNullOrEmpty(Model.Message))
+            {
+                <div class="status-message">@Model.Message</div>
+            }
+            <div class="amount-box">
+                <span>Amount:</span> ₹@Model.Amount
+            </div>
+        }
+
+        <div class="redirect-info">
+            <i class="bi bi-arrow-repeat"></i>
+            <span>Redirecting to dashboard in 3 seconds...</span>
+        </div>
+    </div>
+
+    <script>
+        setTimeout(function () {
+            if('@Model.Gateway' == "fastag"){
+                window.location.href = 'https://fastag.paymanfintech.in/';
+
+            }else if('@Model.Gateway' == "edu"){
+                window.location.href = 'https://edu.paymanfintech.in/';
+            }
+            else{
+                if (window.opener) {
+                // Opened in new window
+                window.opener.location.href = '/Home/Dashboard';
+                window.close();
+            } else if (window.parent && window.parent !== window) {
+                // In iframe/modal
+                window.parent.location.href = '/Home/Dashboard';
+            } else {
+                // Normal page
+                window.location.href = '/Home/Dashboard';
+            }
+            }
+            
+        }, 3000);
+    </script>
+</body>
+</html>

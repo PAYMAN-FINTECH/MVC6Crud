@@ -1,0 +1,474 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Insurence.cshtml";
+}
+
+@{
+    ViewData["Title"] = "Insurance List - Payman Insurance";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Insurance Premium Payments by Payman</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --light-bg: #f8f9fa;
+            --dark-color: #343a40;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            padding-top: 76px; /* Account for fixed navbar */
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 60px 0 40px;
+            margin-bottom: 40px;
+        }
+
+            .page-header h1 {
+                font-size: 2.8rem;
+                margin-bottom: 10px;
+            }
+
+            .page-header .subtitle {
+                font-size: 1.2rem;
+                opacity: 0.9;
+                font-weight: 300;
+            }
+
+        .content-section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+            .section-title:after {
+                content: '';
+                position: absolute;
+                left: 0;
+                bottom: -2px;
+                width: 80px;
+                height: 2px;
+                background-color: var(--primary-color);
+            }
+
+        .feature-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+
+            .feature-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+            }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .do-list, .dont-list {
+            padding-left: 0;
+            list-style: none;
+        }
+
+            .do-list li, .dont-list li {
+                padding: 8px 0;
+                padding-left: 35px;
+                position: relative;
+            }
+
+                .do-list li:before {
+                    content: '✓';
+                    position: absolute;
+                    left: 0;
+                    color: var(--success-color);
+                    font-weight: bold;
+                    font-size: 1.2rem;
+                }
+
+                .dont-list li:before {
+                    content: '✗';
+                    position: absolute;
+                    left: 0;
+                    color: #dc3545;
+                    font-weight: bold;
+                    font-size: 1.2rem;
+                }
+
+        .info-card {
+            background-color: var(--light-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+        }
+
+        .company-info {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            padding: 30px;
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .contact-icon {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-right: 15px;
+            min-width: 24px;
+        }
+
+        .disclosure-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        .back-to-home {
+            display: inline-block;
+            margin-top: 30px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            .back-to-home:hover {
+                text-decoration: underline;
+            }
+
+       
+
+                .page-header h1 {
+                    font-size: 2.2rem;
+                }
+        }
+    </style>
+</head>
+<body>
+   
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1>About PayMan Insurance</h1>
+            <p class="subtitle">Secure Insurance Premium Payment Facilitation Platform</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Introduction Section -->
+        <div class="content-section">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2 class="section-title">Who We Are</h2>
+                    <p>Insurance by Payman, operated by Payman Fintech Solutions Private Limited, is a digital payment facilitation platform designed exclusively for insurance premium payments in India.</p>
+                    <p>Our platform enables individuals and businesses to conveniently pay premiums for their existing insurance policies issued by IRDAI-registered insurance companies, using secure and RBI-mandated payment infrastructure.</p>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="feature-card p-4">
+                        <i class="fas fa-building feature-icon"></i>
+                        <h4>Payman Fintech Solutions</h4>
+                        <p>Operated by Payman Fintech Solutions Private Limited, a registered legal entity dedicated to secure payment facilitation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Our Role Section -->
+        <div class="content-section">
+            <h2 class="section-title">Our Role</h2>
+            <p>Insurance by Payman acts solely as a payment facilitator. We provide the technology layer that allows customers to:</p>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h5><i class="fas fa-check-circle text-success me-2"></i>What We Do</h5>
+                        <ul class="do-list mt-3">
+                            <li>Pay insurance premiums online</li>
+                            <li>Renew existing insurance policies</li>
+                            <li>Receive payment acknowledgements</li>
+                            <li>Access transaction records for completed premium payments</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h5><i class="fas fa-times-circle text-danger me-2"></i>What We Do NOT Do</h5>
+                        <p class="small text-muted">To ensure complete transparency and regulatory compliance:</p>
+                        <ul class="dont-list mt-2">
+                            <li>We are not an insurance company</li>
+                            <li>We are not an insurance broker or corporate agent</li>
+                            <li>We are not a web aggregator</li>
+                            <li>We do not provide insurance advice or recommendations</li>
+                            <li>We do not influence policy pricing, coverage, or claims</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Infrastructure Section -->
+        <div class="content-section">
+            <h2 class="section-title">Payment Infrastructure</h2>
+            <p>Insurance premium payments on Payman are facilitated through secure and regulated channels:</p>
+
+            <div class="row mt-4">
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card p-4 text-center h-100">
+                        <i class="fas fa-university feature-icon"></i>
+                        <h4>BBPS System</h4>
+                        <p>Bharat Bill Payment System – an RBI-mandated bill payment ecosystem ensuring secure and standardized transactions.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card p-4 text-center h-100">
+                        <i class="fas fa-shield-alt feature-icon"></i>
+                        <h4>Authorized Gateways</h4>
+                        <p>RBI-authorized payment gateway partners that comply with all regulatory guidelines for financial transactions.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card p-4 text-center h-100">
+                        <i class="fas fa-lock feature-icon"></i>
+                        <h4>Secure Banking Channels</h4>
+                        <p>Secure banking and payment channels with end-to-end encryption for all premium payment transactions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security & Data Protection Section -->
+        <div class="content-section">
+            <h2 class="section-title">Security & Data Protection</h2>
+            <p>We prioritize data security and privacy. Payman follows industry-standard security practices including:</p>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-start mb-3">
+                        <i class="fas fa-lock text-primary me-3 mt-1"></i>
+                        <div>
+                            <h5>Secure SSL Encryption</h5>
+                            <p class="text-muted">All data transmitted through our platform is protected with secure SSL encryption.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start mb-3">
+                        <i class="fas fa-credit-card text-primary me-3 mt-1"></i>
+                        <div>
+                            <h5>No Credential Storage</h5>
+                            <p class="text-muted">We do not store card, UPI, or bank credentials on our servers.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-start mb-3">
+                        <i class="fas fa-user-shield text-primary me-3 mt-1"></i>
+                        <div>
+                            <h5>Limited Access</h5>
+                            <p class="text-muted">Strict access controls ensure limited access to sensitive customer information.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start mb-3">
+                        <i class="fas fa-gavel text-primary me-3 mt-1"></i>
+                        <div>
+                            <h5>RBI Compliance</h5>
+                            <p class="text-muted">Use of payment gateways that comply with RBI guidelines and regulations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Policy Processing & Refunds Section -->
+        <div class="content-section">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h3 class="section-title">Policy Confirmation & Processing</h3>
+                    <div class="info-card">
+                        <p>While Payman provides instant payment acknowledgment, final policy renewal confirmation and premium credit updates are subject to processing by the respective insurance company.</p>
+                        <p class="fw-bold">Customers are advised to refer to insurer-issued communications or official insurer portals for final policy status.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <h3 class="section-title">Refunds & Cancellations</h3>
+                    <div class="info-card">
+                        <p>Insurance by Payman does not process premium refunds directly. Any refund, cancellation, or policy adjustment is governed by:</p>
+                        <ul class="do-list">
+                            <li>The insurance company's policy terms</li>
+                            <li>BBPS and payment gateway rules</li>
+                            <li>Applicable regulatory guidelines</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Company Information Section -->
+        <div class="content-section">
+            <h2 class="section-title">Company Information</h2>
+
+            <div class="company-info">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="contact-detail">
+                            <i class="fas fa-building contact-icon"></i>
+                            <div>
+                                <h5>Legal Entity</h5>
+                                <p>Payman Fintech Solutions Private Limited</p>
+                            </div>
+                        </div>
+                        <div class="contact-detail">
+                            <i class="fas fa-trademark contact-icon"></i>
+                            <div>
+                                <h5>Brand Name</h5>
+                                <p>Insurance by Payman</p>
+                            </div>
+                        </div>
+                        <div class="contact-detail">
+                            <i class="fas fa-briefcase contact-icon"></i>
+                            <div>
+                                <h5>Nature of Business</h5>
+                                <p>Insurance Premium Payment Facilitation</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="contact-detail">
+                            <i class="fas fa-globe contact-icon"></i>
+                            <div>
+                                <h5>Website</h5>
+                                <p><a href="https://insurance.paymanfintech.in" class="text-decoration-none">https://insurance.paymanfintech.in</a></p>
+                            </div>
+                        </div>
+                        <div class="contact-detail">
+                            <i class="fas fa-envelope contact-icon"></i>
+                            <div>
+                                <h5>Email</h5>
+                                <p><a href="mailto:support@paymanfintech.in" class="text-decoration-none">support@paymanfintech.in</a></p>
+                            </div>
+                        </div>
+                        <div class="contact-detail">
+                            <i class="fas fa-phone contact-icon"></i>
+                            <div>
+                                <h5>Phone</h5>
+                                <p>+91 9652724937</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h5><i class="fas fa-map-marker-alt text-primary me-2"></i>Address</h5>
+                    <p class="mb-0">PAYMAN FINTECH SOLUTIONS PVT LTD,</p>
+                    <p class="mb-0">9-12 HMT NAGAR STNUMBER 1,</p>
+                    <p class="mb-0">NACHARAM, HYDERABAD, Telangana, 500076</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mandatory Disclosure -->
+        <div class="disclosure-box">
+            <h5 class="text-warning"><i class="fas fa-exclamation-triangle me-2"></i>Mandatory Disclosure</h5>
+            <p class="mb-0">Payman is not an insurance company, broker, corporate agent, or web aggregator. Insurance policies are issued by IRDAI-registered insurance companies. Payman's role is limited to facilitating insurance premium payments only.</p>
+        </div>
+
+        <!-- Back to Home Link -->
+        <div class="text-center mb-5">
+            <a href="/" class="back-to-home">
+                <i class="fas fa-arrow-left me-2"></i>Back to Home
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Insurance by Payman</h5>
+                    <p>Secure insurance premium payment facilitation platform.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1">&copy; 2026 Payman Fintech Solutions Private Limited. All rights reserved.</p>
+                    <p class="mb-0">Operated under RBI guidelines and regulations.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+   @*  <!-- Custom Script for Navbar Update -->
+    <script>
+        // Update navbar for logged in state
+        function updateNavbarForLoggedIn() {
+            const navbar = document.querySelector('#navbarNav .navbar-nav');
+            if (navbar) {
+                // Remove login/signup buttons
+                const loginBtn = navbar.querySelector('button[data-bs-target="#loginModal"]');
+                const signupLink = navbar.querySelector('a[data-bs-target="#signupModal"]');
+                const aboutUsItem = navbar.querySelector('.nav-item .nav-link[href="/about.html"]').parentElement;
+
+                if (loginBtn) loginBtn.parentElement.remove();
+                if (signupLink) signupLink.parentElement.remove();
+                if (aboutUsItem) aboutUsItem.remove();
+
+                // Add user info
+                const userLi = document.createElement('li');
+                userLi.className = 'nav-item ms-2';
+                userLi.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-user-circle me-2 text-primary"></i>
+                        <span class="fw-bold">Ajay Ajay</span>
+                    </div>
+                `;
+                navbar.appendChild(userLi);
+            }
+        }
+    </script> *@
+</body>
+</html>

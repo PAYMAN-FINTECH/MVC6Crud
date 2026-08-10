@@ -1,0 +1,101 @@
+﻿@model AddBeneficiaryAccountsDTO
+
+@if (Model.UserId != null && Model.UserId != ""){
+    @for (int i = 0; i < Model.BeneficiaryAccounts.Count; i++)
+    {
+        <div class="p-1">
+            <div class="card">
+                <div class="card-header">
+                    <label>Mobile Number :</label><strong>@Model.BeneficiaryAccounts[i].MobileNumber</strong>
+                    <label class="fa-pull-right"><a asp-area="" asp-controller="PayMan" asp-action="InActivateAccount" asp-route-Id="@Model.BeneficiaryAccounts[i].Id" method="get"><i class="fa-regular fa-trash-can"></i></a></label>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div>
+                                <label>Name : </label><strong>@Model.BeneficiaryAccounts[i].ContactName</strong>
+                            </div>
+                            <div>
+                                <label>Account Number : </label><strong>@Model.BeneficiaryAccounts[i].AccountNo</strong>
+                            </div>
+                            <div>
+                                <label>Ifsc Code : </label><strong>@Model.BeneficiaryAccounts[i].IfscCode</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            @if (Model.BeneficiaryAccounts[i].VerficationFlag == "Y")
+                            {
+                                <div class="form-group p-1">
+                                    <input type="text" id="@Model.BeneficiaryAccounts[i].Id" required name="EnterCustomerNumber" autocomplete="off" class="form-control input-sm" placeholder="Enter amount">
+                                </div>
+                                <div></div>
+                                <div class="p-1">
+                                    <button class="btn btn-success btn-sm" disabled>Verified</button>
+                                    <input type="button" value="Pay" class="btn btn-primary btn-sm" onclick="Pay('@Model.BeneficiaryAccounts[i].Id','@Model.AvaliableAmount','@Model.BeneficiaryAccounts[i].ContactName','@Model.SefexFinalBalance')" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="p-1">
+                                    <input type="button" value="Verify" class="btn btn-primary btn-sm" onclick="VerifyBank('@Model.BeneficiaryAccounts[i].Id')" />
+                                    <button class="btn btn-primary btn-sm" disabled>Pay</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+    }
+}else{
+    @for (int i = 0; i < Model.PayManBeneficiaryAccounts.Count; i++)
+    {
+        <div class="p-1">
+            <div class="card">
+                <div class="card-header">
+                    <label>Mobile Number :</label><strong>@Model.PayManBeneficiaryAccounts[i].MobileNumber</strong>
+                    <label class="fa-pull-right"><a asp-area="" asp-controller="PayMan" asp-action="InActivateAccount" asp-route-Id="@Model.PayManBeneficiaryAccounts[i].Id" method="get"><i class="fa-regular fa-trash-can"></i></a></label>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div>
+                                <label>Name : </label><strong>@Model.PayManBeneficiaryAccounts[i].ContactName</strong>
+                            </div>
+                            <div>
+                                <label>Account Number : </label><strong>@Model.PayManBeneficiaryAccounts[i].AccountNo</strong>
+                            </div>
+                            <div>
+                                <label>Ifsc Code : </label><strong>@Model.PayManBeneficiaryAccounts[i].IfscCode</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            @if (Model.PayManBeneficiaryAccounts[i].VerficationFlag == "Y")
+                            {
+                                <div class="form-group p-1">
+                                    <input type="text" id="@Model.PayManBeneficiaryAccounts[i].Id" required name="EnterCustomerNumber" autocomplete="off" class="form-control input-sm" placeholder="Enter amount">
+                                </div>
+                                <div></div>
+                                <div class="p-1">
+                                    <button class="btn btn-success btn-sm" disabled>Verified</button>
+                                    <input type="button" value="Pay" class="btn btn-primary btn-sm" onclick="Pay('@Model.PayManBeneficiaryAccounts[i].Id','@Model.AvaliableAmount','@Model.PayManBeneficiaryAccounts[i].ContactName','@Model.SefexFinalBalance')" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="p-1">
+                                    <input type="button" value="Verify" class="btn btn-primary btn-sm" onclick="VerifyBank('@Model.PayManBeneficiaryAccounts[i].Id')" />
+                                    <button class="btn btn-primary btn-sm" disabled>Pay</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+    }
+}
+
+

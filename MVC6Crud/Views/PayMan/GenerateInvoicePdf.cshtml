@@ -1,0 +1,228 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.14/jspdf.plugin.autotable.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+@model GenerateInvoicePdf
+
+<div class="row col-md-12">
+    <div class="col-md-6">
+        <div class="container">
+            <h2>Pay Payment</h2>
+            <br />
+            <div class="row">
+
+                <div class="jumbotron">
+                    <div class="form-group">
+                        <label for="SelectUser" class="text-left"><strong>Select User</strong></label>
+                        <select id="userDropdown" class="form-control" asp-for="SelectedOption" required asp-items="Model.Options"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="SelectAmount" class="text-left"><strong>Select Amount</strong></label>
+                        <select id="amountDropdown" class="form-control" asp-for="SelectedAmountOption" required></select>
+                    </div>
+                    <br />
+                    <button onclick="downloadPDF()" class="btn btn-primary">Genarate Invoice</button>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    let selectedUtrId = null;
+     let selectedAccount = null;
+     let selectedIfsc = null;
+    let datetime = null;
+    // Function to populate the amount dropdown based on selected user
+    $('#userDropdown').change(function () {
+        var userId = $(this).val();
+        if (userId) {
+            $.ajax({
+                url: '@Url.Action("GetAmountsByUser", "PayMan")',
+                type: 'GET',
+                data: { userId: userId },
+                success: function (data) {
+                    // Clear the previous options in the amount dropdown
+                    $('#amountDropdown').empty();
+                    $('#amountDropdown').append('<option value="">Select an Amount</option>');
+
+                    // Populate the amount dropdown with new options
+                    $.each(data, function (index, option) {
+                        $('#amountDropdown').append(new Option(option.text, option.value));
+                    });
+                }
+            });
+        } else {
+            // Clear the amount dropdown if no user is selected
+            $('#amountDropdown').empty();
+            $('#amountDropdown').append('<option value="">Select an Amount</option>');
+        }
+    });
+
+    $('#amountDropdown').change(function () {
+        var selectedAmountValue = $(this).val(); // Get the value (not the text) of the selected amount
+        if (selectedAmountValue) {
+            $.ajax({
+                url: '@Url.Action("GetUtrByAmount", "PayMan")',
+                type: 'GET',
+                data: { amount: selectedAmountValue },
+                success: function (result) {
+                    debugger;
+                    selectedUtrId = result.utrNumber; // Store the retrieved UTR ID
+                    selectedAccount = result.accountNo;
+                    selectedIfsc = result.ifsc;
+
+                }
+            });
+        } else {
+            selectedUtrId = null; // Reset UTR ID if no amount is selected
+        }
+    });
+
+    function getBase64Image(url, callback) {
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = function () {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            const dataURL = canvas.toDataURL("image/png");
+            callback(dataURL);
+        };
+        img.src = url;
+    }
+
+    function GenrateInvoice(TransectionId, Amount, AccountNo, AccountHolderName, UserId) {
+        debugger;
+        const invoiceId = generateInvoiceId();      
+    }
+   
+    function downloadPDF() {
+
+        const invoiceId = generateInvoiceId();
+        var selectedUser = $('#userDropdown option:selected').text();
+        var selectedAmount = $('#amountDropdown option:selected').text();
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        //addWatermark(doc, "PAYMAN FINTECH");
+
+        // Add Logo at the top (assuming you have a base64 or URL image for the logo)
+        // const logoUrl = 'path_to_logo_image.png';
+        // doc.addImage(logoUrl, 'PNG', 10, 10, 30, 15);
+
+        const logoWidth = 20; // Reduce width
+        const logoHeight = 10; // Reduce height
+        
+
+        getBase64Image('/images/home1.png', function (logoBase64) {
+            doc.addImage(logoBase64, 'PNG', 10, 20, logoWidth, logoHeight);
+
+            const title = "INVOICE";
+            doc.setFontSize(16);
+            const pageWidth = doc.internal.pageSize.width;
+            const titleWidth = doc.getTextWidth(title);
+            const titleX = (pageWidth - titleWidth) / 2; // Calculate centered X position
+            doc.text(title, titleX, 15); // Adjust Y position if needed
+
+            // Document title and subtitle
+            doc.setFontSize(12);
+            doc.text("PAYMAN", 10, 35);
+            doc.setFontSize(10);
+            doc.text("9-112 HMT NAGAR STNUMBER 1", 10, 40);
+            doc.text("NACHARAM,HYDERABAD,Telangana, 500076", 10, 45);
+
+            // Add invoice details
+            doc.setFontSize(10);
+            doc.text("Invoice No: " + invoiceId, 140, 30);
+            doc.text("Invoice Month: " + datetime, 140, 35);
+            doc.text("Sender Name: PayMan Admin", 140, 40);
+            doc.text("Sender No: 9100748033", 140, 45);
+
+            // Beneficiary details
+            doc.text("Beneficiary Name: " + selectedUser, 140, 55);
+            doc.text("Account No: " + selectedAccount, 140, 60);
+            doc.text("IFSC Code: " + selectedIfsc, 140, 65);
+
+            // Define table header and content
+            const headers = [["PROVIDER NAME", "AMOUNT", "URN", "SERVICE CHARGE", "MARGIN", "ORDER ID", "GST"]];
+            const data = [
+                ["Bill Payment", selectedAmount, "123456789012", "0.0000", "0.0000", "188773949", "0.00"]
+            ];
+
+            // Add table to PDF
+            doc.autoTable({
+                head: headers,
+                body: data,
+                startY: 80,          // Adjust starting Y position as needed
+                margin: { left: 10 }, // Set left margin to 0 to start X position from the left edge
+            });
+
+            // Total information at the bottom
+
+            doc.text("Gross Total : " + selectedAmount, 10, doc.lastAutoTable.finalY + 10);
+            doc.text("Net Total : " + selectedAmount, 10, doc.lastAutoTable.finalY + 15);
+            doc.text("CIN: U62099TS2023PTC179868", 10, doc.lastAutoTable.finalY + 25);
+            doc.text("PAN: AAOCP3061H", 10, doc.lastAutoTable.finalY + 30);
+            doc.text("GSTIN: 36AAOCP3061H1Z9", 10, doc.lastAutoTable.finalY + 35);
+            doc.text("State: Telangana", 10, doc.lastAutoTable.finalY + 40);
+
+            // Disclaimer
+            doc.setFontSize(8);
+            doc.text("This is a computer generated invoice hence signature is not required.", 10, doc.lastAutoTable.finalY + 50);
+
+            // Download the PDF
+            doc.save("PAYMAN_INVOICE.pdf");
+        });
+    }
+
+    function generateInvoiceId() {
+        const prefix = "PM";
+
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const milliseconds = String(now.getMilliseconds()).padStart(3, '0'); // Three digits for milliseconds
+        
+        // Concatenate the parts to form the invoice ID
+        const invoiceId = `${prefix}${year}${month}${day}${hours}${minutes}${seconds}`;
+        datetime = year + "/" + month + "/" + day;
+
+        return invoiceId;
+    }
+
+
+    function addWatermark(doc, watermarkText) {
+        // Set the font size and color for the watermark
+        doc.setFontSize(60);
+        doc.setTextColor(150, 150, 150); // Light grey for watermark
+
+        // Set transparency
+        doc.setGState(new doc.GState({ opacity: 0.3 })); // Adjust opacity
+
+        // Rotate the watermark text and place it diagonally
+        doc.text(
+            watermarkText,
+            doc.internal.pageSize.getWidth() / 2,
+            doc.internal.pageSize.getHeight() / 2,
+            {
+                angle: 45,
+                align: "center"
+            }
+        );
+
+        // Reset the font size and color if needed for further text
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0); // Reset to black
+    }
+
+</script>

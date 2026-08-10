@@ -1,0 +1,361 @@
+﻿@{
+    ViewData["Title"] = "Bharat Connect Services";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    .card-section {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold">Bharat Connect Billers</h3>
+            <p class="text-muted mb-0">Select biller from category and enter customer details to fetch your bill.</p>
+        </div>
+        <div>
+            <img src="~/images/bharat connect primary logo_jpg.jpg" alt="Bharat Connect Logo" style="height: 50px;">
+        </div>
+    </div>
+    <!-- Tabs -->
+    <ul class="nav nav-tabs" id="bconnectTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="billers-tab" data-bs-toggle="tab" data-bs-target="#billers" type="button" role="tab">Bharat Connect Biller</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="query-tab" data-bs-toggle="tab" data-bs-target="#query" type="button" role="tab">Query Transaction</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="complaint-tab" data-bs-toggle="tab" data-bs-target="#complaint" type="button" role="tab">Raise Complaint</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="status-tab" data-bs-toggle="tab" data-bs-target="#status" type="button" role="tab">Check Complaint Status</button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content pt-4">
+        <!-- Tab 1: Bharat Connect Biller -->
+        <div class="tab-pane fade show active" id="billers" role="tabpanel">
+            @* Existing full Biller section *@
+            <div class="card-section">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Category*</label>
+                        <select id="ddlCategory" class="form-select">
+                            <option value="">== Select Biller Category ==</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Biller*</label>
+                        <select id="ddlBiller" class="form-select">
+                            <option value="">== Select Biller ==</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="billerDetailsSection" class="d-none">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Last 4 Digits (if required)</label>
+                            <input type="text" id="txtLast4Digits" class="form-control" maxlength="4" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Registered Mobile No*</label>
+                            <input type="text" id="txtMobile" class="form-control" maxlength="10" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Customer Number*</label>
+                            <input type="text" id="txtCustomerNumber" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <button id="btnFetchBill" class="btn btn-primary">Fetch Bill</button>
+                    </div>
+                </div>
+
+                <div id="fetchedBillSection" class="d-none">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Amount</label>
+                            <input type="text" id="txtAmount" class="form-control" readonly />
+                        </div>
+                    </div>
+                    <div id="billerInfo" class="border p-3 bg-light rounded">
+                        <h5 class="fw-bold mb-3">Biller Details</h5>
+                        <p><strong>Customer Name:</strong> <span id="lblCustomerName"></span></p>
+                        <p><strong>Bill Number:</strong> <span id="lblBillNumber"></span></p>
+                        <p><strong>Due Date:</strong> <span id="lblDueDate"></span></p>
+                        <p><strong>Status:</strong> <span id="lblStatus"></span></p>
+                    </div>
+                    <div class="mt-3">
+                        <button id="btnProcess" class="btn btn-success">Process Payment</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Query Transaction -->
+        <div class="tab-pane fade" id="query" role="tabpanel">
+            <div class="card-section">
+                <p class="mb-3">Check your transaction status using Mobile number or Transaction Ref ID</p>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Enter Mobile No</label>
+                        <input type="text" class="form-control" placeholder="Mobile number" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Select From Date</label>
+                        <input type="date" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Select To Date</label>
+                        <input type="date" class="form-control" />
+                    </div>
+                </div>
+                <div class="text-center my-3">OR</div>
+                <div class="mb-3">
+                    <label>Enter Transaction Ref. ID</label>
+                    <input type="text" class="form-control" placeholder="Ref ID" />
+                </div>
+                <button class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+
+        <!-- Tab 3: Raise Complaint -->
+        <div class="tab-pane fade" id="complaint" role="tabpanel">
+            <div class="card-section">
+                <p class="mb-3">Enter details to raise complaint</p>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Mobile Number</label>
+                        <input type="text" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Type of Complaint</label>
+                        <select class="form-select">
+                            <option>Service</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Participation Type</label>
+                        <select class="form-select">
+                            <option>-- Select Participation Type --</option>
+                            <option>Transaction Successful, account not updated</option>
+                            <option>Amount deducted, biller account credited but transaction ID not received</option>
+                            <option>Amount deducted, biller account not credited & transaction ID not received</option>
+                            <option>Amount deducted multiple times</option>
+                            <option>Double payment updated</option>
+                            <option>Erroneously paid in wrong account</option>
+                            <option>Others (provide details in description)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label>Service Reason</label>
+                        <select class="form-select">
+                            <option>-- Select Service Reason --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Description</label>
+                        <textarea class="form-control"></textarea>
+                    </div>
+                </div>
+                <button class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+
+        <!-- Tab 4: Check Complaint Status -->
+        <div class="tab-pane fade" id="status" role="tabpanel">
+            <div class="card-section">
+                <p class="mb-3">Check complaint status using Complaint ID</p>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label>Complaint ID</label>
+                        <input type="text" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Type of Complaint</label>
+                        <select class="form-select">
+                            <option>-- Select Type Of Complaint --</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Success Modal -->
+<div class="modal fade" id="paymentSuccessModal" tabindex="-1" aria-labelledby="paymentSuccessLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- Modal Header with Logo -->
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h4 class="modal-title text-primary">Bharat Connect - Payment Confirmation</h4>
+                <div class="d-flex align-items-center">
+                    <img src="~/images/b assured logo_jpg.jpg" alt="Bharat Connect Logo" style="height: 60px; margin-right: 10px;" />
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <p><strong>Thank You.</strong> We have received your payment request. Please quote your Transaction Reference ID for any queries regarding the payment.</p>
+
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr><td>Name of the biller</td><td id="billerName"></td></tr>
+                        <tr><td>Mobile number</td><td id="mobileNumber"></td></tr>
+                        <tr><td>Bill Number</td><td id="billNumber"></td></tr>
+                        <tr><td>Bill Date</td><td id="billDate"></td></tr>
+                        <tr><td>Bill Due Date</td><td id="billDueDate"></td></tr>
+                        <tr><td>B-Connect Txn ID</td><td id="txnId"></td></tr>
+                        <tr><td>Customer Convenience Fee</td><td id="fee">7.00</td></tr>
+                        <tr><td>Registered Mobile Number</td><td id="regMobile"></td></tr>
+                        <tr><td>Bill Amount</td><td id="billAmount"></td></tr>
+                        <tr><td>Total Amount</td><td id="totalAmount"></td></tr>
+                        <tr><td>Transaction Date and Time</td><td id="txnDateTime"></td></tr>
+                        <tr><td>Status</td><td id="status" class="text-success">PAID</td></tr>
+                    </tbody>
+                </table>
+
+                <!-- Footer Links -->
+                <div class="text-end">
+                    <a href="javascript:window.print()">Print This Page</a> |
+                    <a href="/BillAvenue/Index">Make Another Payment</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<audio id="successSound" src="~/images/sounds/bharatconnect%20mogo%20270824.mp3" preload="auto"></audio>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            loadCategories();
+
+            $('#ddlCategory').on('change', function () {
+                const category = $(this).val();
+                if (category) {
+                    $.get(`/BillAvenue/GetBillers?category=${category}`, function (data) {
+                        $('#ddlBiller').empty().append('<option value="">== Select Biller ==</option>');
+                        $.each(data, function (i, item) {
+                            $('#ddlBiller').append(`<option value="${item.value}">${item.text}</option>`);
+                        });
+                    });
+                }
+            });
+
+            $('#ddlBiller').on('change', function () {
+                const selected = $(this).val();
+                $('#billerDetailsSection').toggleClass('d-none', !selected);
+                $('#fetchedBillSection').addClass('d-none');
+            });
+
+            $('#btnFetchBill').on('click', function () {
+                const billerId = $('#ddlBiller').val();
+                const mobile = $('#txtMobile').val();
+                const customerNumber = $('#txtCustomerNumber').val();
+                const last4 = $('#txtLast4Digits').val();
+
+                if (!billerId || !mobile || !customerNumber) {
+                    alert('Please fill all required fields.');
+                    return;
+                }
+
+                $.get(`/BillAvenue/FetchBill?billerId=${billerId}&mobile=${mobile}&customerNumber=${customerNumber}&last4=${last4}`, function (data) {
+                    $('#txtAmount').val(data.amount);
+                    $('#lblCustomerName').text(data.customerName);
+                    $('#lblBillNumber').text(data.billNumber);
+                    $('#lblDueDate').text(data.dueDate);
+                    $('#lblStatus').text(data.status);
+
+                    $('#fetchedBillSection').removeClass('d-none');
+                    $('#btnFetchBill').addClass('d-none');
+                });
+            });
+
+        $('#btnProcess').on('click', function () {
+            const billerId = $('#ddlBiller').val();
+            const mobile = $('#txtMobile').val();
+            const customerNumber = $('#txtCustomerNumber').val();
+            const last4 = $('#txtLast4Digits').val();
+            const amount = $('#txtAmount').val();
+
+            if (!amount || isNaN(amount)) {
+                showToast("Amount is missing or invalid.", 'danger');
+                return;
+            }
+
+            const paymentData = {
+                billerId,
+                mobile,
+                customerNumber,
+                last4Digits: last4,
+                amount
+            };
+
+            $.ajax({
+                url: '/BillAvenue/ProcessPayment',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(paymentData),
+                success: function (response) {
+                    if (response.isSuccess) {
+            // Fill modal fields
+            $('#billerName').text(response.billerName);
+            $('#mobileNumber').text(response.mobileNumber);
+            $('#billNumber').text(response.billNumber);
+            $('#billDate').text(response.billDate);
+            $('#billDueDate').text(response.dueDate);
+            $('#txnId').text(response.transactionId);
+            $('#regMobile').text(response.registeredMobile);
+            $('#billAmount').text(response.amount);
+            $('#totalAmount').text(response.amount); // include convenience fee if any
+            $('#txnDateTime').text(response.dateTime);
+
+            // Show modal
+            $('#paymentSuccessModal').modal('show');
+            document.getElementById('successSound').play();
+        } else {
+            alert('Payment failed: ' + response.message);
+        }
+                },
+                error: function () {
+                    showToast('Payment failed. Please try again.', 'danger');
+                }
+            });
+        });
+
+
+
+
+
+
+            function loadCategories() {
+                $.get('/BillAvenue/GetCategories', function (data) {
+                    $('#ddlCategory').empty().append('<option value="">== Select Biller Category ==</option>');
+                    $.each(data, function (i, item) {
+                        $('#ddlCategory').append(`<option value="${item.value}">${item.text}</option>`);
+                    });
+                });
+            }
+        });
+    </script>
+}

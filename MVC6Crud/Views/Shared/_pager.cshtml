@@ -1,0 +1,25 @@
+﻿@model Pager
+
+
+<div class="container">
+    @if (Model.TotalPages > 0)
+    {
+        <ul class="pagination justify-content-end">
+            @for (var pge = Model.StartPage; pge <= Model.EndPage; pge++)
+            {
+                <li class="page-item @(pge == Model.CurrentPage ? "active": "")">
+                    <a class="page-link" method="get" asp-controller="PayMan" asp-action="AddBeneficiaryAccounts" asp-route-pg="@pge">@pge</a>
+                </li>
+            }
+            @* @if (Model.CurrentPage < Model.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" method="get" asp-controller="PayMan" asp-action="AddBeneficiaryAccounts" asp-route-pg="(Model.CurrentPage + 1)">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" method="get" asp-controller="PayMan" asp-action="AddBeneficiaryAccounts" asp-route-pg="(Model.TotalPages)">Last</a>
+                </li>
+            } *@
+        </ul>
+    }
+</div>

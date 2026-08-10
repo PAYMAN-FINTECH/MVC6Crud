@@ -1,0 +1,163 @@
+﻿@{
+    ViewData["Title"] = "About Us";
+    Layout = "~/Views/Shared/_EduLayout.cshtml";
+}
+
+<style>
+    .about-wrapper {
+        max-width: 1100px;
+        margin: 50px auto;
+        padding: 20px;
+    }
+
+    .about-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .about-header h1 {
+            font-weight: 700;
+            color: #0d6efd;
+        }
+
+    .about-hero {
+        background: linear-gradient(135deg, #0d6efd, #0047ab);
+        color: white;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(13, 110, 253, 0.25);
+        margin-bottom: 40px;
+        font-size: 15px;
+        line-height: 1.8;
+    }
+
+    .features-title {
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: 600;
+        color: #1c1c1c;
+    }
+
+    .feature-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        transition: 0.3s ease;
+        border-top: 4px solid #0d6efd;
+        height: 100%;
+    }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h5 {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #0d6efd;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.7;
+        }
+
+    .footer-links {
+        margin-top: 50px;
+        text-align: center;
+        font-size: 14px;
+    }
+
+        .footer-links a {
+            text-decoration: none;
+            margin: 0 8px;
+            color: #0d6efd;
+            font-weight: 500;
+        }
+
+            .footer-links a:hover {
+                text-decoration: underline;
+            }
+</style>
+
+<div class="about-wrapper">
+
+    <div class="about-header">
+        <h1>About Us</h1>
+    </div>
+
+    <div class="about-hero">
+        <p>
+            <strong>At EDU payman (PAYMAN FINTECH SOLUTIONS PVT LTD)</strong>,
+            we bring you LIVE, interactive, hands-on classes led by the top 1% industry experts
+            across various domains, including: Data Science & AI, Cloud Computing, DevOps,
+            Cybersecurity, Web Development, Business Analytics, Management & Leadership,
+            Programming Languages, Interview Preparation, Mock Exams & Practice Labs.
+        </p>
+        <p>
+            We work with 100+ Enterprises to upskill and certify their employees,
+            continuously making them more productive at the workplace.
+        </p>
+    </div>
+
+    <h4 class="features-title">
+        Top Features of EDU payman (PAYMAN FINTECH SOLUTIONS PVT LTD)
+    </h4>
+
+    <div class="row g-4">
+
+        <div class="col-md-6">
+            <div class="feature-card">
+                <h5>LIVE, Interactive Learning</h5>
+                <p>
+                    Learn directly from the top 1% industry experts in real-time
+                    through hands-on projects, case studies, and interactive discussions.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="feature-card">
+                <h5>Flexible Schedules</h5>
+                <p>
+                    Choose class timings that fit your routine, making LIVE learning
+                    accessible and convenient for professionals and students alike.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="feature-card">
+                <h5>Industry-Relevant Curriculum</h5>
+                <p>
+                    Gain expertise through job-focused, practical training designed
+                    to prepare you for real-world challenges and career success.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="feature-card">
+                <h5>Pre-Course Study Materials</h5>
+                <p>
+                    Get immediate access to study materials as soon as you enroll,
+                    allowing you to start learning and stay ahead from day one.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer-links">
+        <a asp-action="Aboutus" asp-controller="Edu">About</a> |
+        <a asp-action="Contact" asp-controller="Edu">Contact</a> |
+        <a asp-action="termsandconditions" asp-controller="Edu">Terms & Conditions</a> |
+        <a asp-action="Privacy" asp-controller="Edu">Privacy Policy</a> |
+        <a asp-action="Privacy" asp-controller="Edu">Refund Policy</a>
+        <p class="mt-3 text-muted">© 2026 Payman Fintech Private Limited. All rights reserved.</p>
+    </div>
+
+</div>

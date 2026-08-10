@@ -1,0 +1,190 @@
+﻿@model MVC6Crud.Models.PaymanApp.AgreementPage
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-3 px-3 px-md-5" id="invoiceHtml">
+
+    <!-- TITLE -->
+    <div class="text-center mb-4">
+        <h3 class="fw-bold">E-Signature Agreement</h3>
+        <p class="text-muted d-block d-md-none" style="font-size: 14px;">
+            Mobile Friendly Version
+        </p>
+    </div>
+
+
+    <!-- KYC DETAILS CARD -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white fw-semibold fs-6">
+            KYC Information
+        </div>
+
+        <div class="card-body">
+            <p class="text-muted mb-3">Details auto-filled from your verified KYC records.</p>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" style="min-width: 140px;">Field</th>
+                            <th scope="col">Value</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>Full Name</td>
+                            <td>@Model.UserName</td>
+                        </tr>
+                        <tr>
+                            <td>PAN Number</td>
+                            <td>@Model.PanNumber</td>
+                        </tr>
+                        <tr>
+                            <td>Aadhaar Number</td>
+                            <td>@Model.AadhaarNumber</td>
+                        </tr>
+                        <tr>
+                            <td>Registered Address</td>
+                            <td>@Model.Address</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- AGREEMENT SUMMARY -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-secondary text-white fw-semibold fs-6">
+            Agreement Summary
+        </div>
+
+        <div class="card-body">
+
+            <p class="mb-3" style="font-size: 15px;">
+                This Agreement outlines your responsibilities when using services provided by
+                <strong>PAYMAN FINTECH SOLUTIONS PVT LTD</strong>. You acknowledge that all
+                transactions performed under your account are valid, authorised, and legally compliant.
+            </p>
+
+            <!-- SECTION 1 -->
+            <h6 class="fw-bold mt-3">1. Usage of Wallet & Settlement Services</h6>
+            <ul class="mt-2">
+                <li>Wallet top-up and settlement services are strictly for genuine business use only.</li>
+                <li>Funds transferred to your bank account are your sole responsibility.</li>
+            </ul>
+
+            <!-- SECTION 2 -->
+            <h6 class="fw-bold mt-3">2. Fraudulent or Suspicious Transactions</h6>
+            <ul class="mt-2">
+                <li>PAYMAN may block or deduct funds if suspicious activity is detected.</li>
+                <li>You are liable for any fraud-related recovery if your wallet balance is insufficient.</li>
+            </ul>
+
+            <!-- SECTION 3 -->
+            <h6 class="fw-bold mt-3">3. Compliance Responsibility</h6>
+            <ul class="mt-2 mb-2">
+                <li>You must comply with legal requirements set by regulatory authorities.</li>
+                <li>PAYMAN is not responsible for penalties arising from your business practices.</li>
+            </ul>
+
+        </div>
+    </div>
+
+
+
+    <!-- AGREEMENT ACCEPT & SIGN -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+
+            <!-- Checkbox -->
+            <div class="form-check mb-3 mb-md-0 me-md-3 flex-grow-1">
+                <input class="form-check-input" type="checkbox" id="agreeCheck" onchange="toggleSignButton()">
+                <label class="form-check-label fw-semibold" for="agreeCheck" style="font-size: 15px;">
+                    I have read and agree to the above terms & conditions.
+                </label>
+            </div>
+
+            <!-- Press To Sign Button -->
+            <div class="text-md-end w-100 w-md-auto">
+
+                <button id="pressToSignBtn" onclick="sendToServer()"
+                        class="btn btn-success px-4 py-2 fw-semibold"
+                        disabled>
+                    Press To Sign
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+
+<script>
+    function toggleSignButton() {
+        const checkbox = document.getElementById("agreeCheck");
+        const button = document.getElementById("pressToSignBtn");
+        button.disabled = !checkbox.checked;
+    }
+
+
+
+    async function generatePdfBytes() {
+        const element = document.getElementById("invoiceHtml");
+
+        const pdfBlob = await html2pdf().from(element).outputPdf("blob");
+        const arrayBuffer = await pdfBlob.arrayBuffer();
+        const byteArray = new Uint8Array(arrayBuffer);
+
+        return Array.from(byteArray);
+    }
+
+    async function sendToServer() {
+
+         $('#Loader1').show();
+
+         const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+
+    const latitude = position.coords.latitude.toString();
+    const longitude = position.coords.longitude.toString();
+
+        const pdfBytes = await generatePdfBytes();
+        const userPhone = '@Model.UserPhone';
+
+        const response = await fetch("/DigiLocker/UploadPdfBytes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                pdfBytes: pdfBytes,
+                userPhone: userPhone,
+                latitude: latitude,
+                longitude: longitude
+
+            })
+        });
+
+        if (!response.ok) {
+            alert("Failed to upload PDF.");
+            return;
+        }
+
+        const result = await response.json();
+
+        window.location.href = result.signingLink;
+         $('#Loader1').hide();
+    }
+</script>

@@ -1,0 +1,89 @@
+﻿@using MVC6Crud.Models.PaymanWeb
+@model RazorpaySessionModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Razorpay Init</title>
+
+    <!-- ✅ LOAD JQUERY FIRST -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+    <div id="Loader1" style="display:none">Processing...</div>
+
+<script>
+    $(document).ready(function () {
+
+        const amount = parseFloat('@Model.Amount');
+
+
+        $.ajax({
+            type: 'POST',
+            url: '/Edu/CreateRazorpayOrder',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                Amount: amount,
+                merchent: 'Utility'
+            }),
+            success: function (recData) {
+
+                const options = {
+                    key: recData.key,
+                    order_id: recData.orderId,
+                    name: 'PAYMAN',
+                    description: 'Utility Payment',
+
+                    prefill: {
+                        contact: '@Model.Mobile',
+                        email: '@Model.Email'
+                    },
+
+                    handler: function (response) {
+                        verifyPayment(response);
+                    },
+
+                    modal: {
+                        ondismiss: function () {
+                            redirectFailed("USER_CANCELLED");
+                        }
+                    }
+                };
+
+                new Razorpay(options).open();
+            }
+        });
+    });
+
+    function verifyPayment(response) {
+        
+
+        $.ajax({
+            type: 'POST',
+            url: '/Edu/VerifyRazorPayPayment',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                RazorpayPaymentId: response.razorpay_payment_id,
+                RazorpayOrderId: response.razorpay_order_id,
+                RazorpaySignature: response.razorpay_signature,
+                Amount: amount,
+                CustomerMobile: '@Model.Mobile',
+                CardNumber: '@Model.Card'
+            }),
+            success: function (res) {
+                window.location.href =
+                    "/PayMan/PayStatus?IsSuccess=" + res.success +
+                    "&Amount=@Model.Amount" +
+                    "&TransactionId=" + res.transactionId;
+            }
+        });
+    }
+</script>
+</body>
+</html>

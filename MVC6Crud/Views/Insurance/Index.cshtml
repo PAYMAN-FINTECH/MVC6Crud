@@ -1,0 +1,864 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Insurence.cshtml";
+}
+
+@{
+    ViewData["Title"] = "Insurance Premium Payments by Payman";
+}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="hero-title">Pay Your Insurance Premium Securely</h1>
+                <p class="hero-subtitle">
+                    Pay Existing Insurance Premiums Securely with BBPS For policies issued by IRDAI-registered insurers
+                </p>
+                <button type="button" class="btn cta-button" data-bs-toggle="modal" data-bs-target="#loginModal">
+                    <i class="fas fa-file-invoice-dollar me-2"></i>Pay Insurance Bill
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose BankPay Section -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title">Why Choose Payman Insurance?</h2>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">🏛️</div>
+                    <h3 class="feature-title">RBI-mandated BBPS Premium Payments</h3>
+                    <p class="feature-description">
+                        RBI-authorized Bharat Bill Payment System for secure transactions
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3 class="feature-title">Supports Existing Policies from Leading Insurers</h3>
+                    <p class="feature-description">
+                        Pay bills for Life, Health, Motor, and General Insurance from anywhere
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Secure & Fast Payment Confirmation</h3>
+                    <p class="feature-description">
+                        Instant payment acknowledgment; any policy change is subject to insurer processing.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Simple & Reliable Checkout</h3>
+                    <p class="feature-description">
+                        Bank-grade security with encrypted payment gateway
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Insurance Categories Section -->
+<section class="categories-section">
+    <div class="container">
+        <h2 class="section-title">Insurance Categories We Support</h2>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="category-card">
+                    <div class="category-icon">❤️</div>
+                    <h3 class="category-title">Life Insurance</h3>
+                    <p class="feature-description">
+                        Pay premiums for all major life insurance providers including LIC, HDFC Life, SBI Life, ICICI Prudential, and more.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="category-card">
+                    <div class="category-icon">🏥</div>
+                    <h3 class="category-title">Health Insurance</h3>
+                    <p class="feature-description">
+                        Renew your health insurance policies from Star Health, Care Health, Religare, Max Bupa, and others.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="category-card">
+                    <div class="category-icon">🚗</div>
+                    <h3 class="category-title">Motor Insurance</h3>
+                    <p class="feature-description">
+                        Pay vehicle insurance premiums for cars, bikes, and commercial vehicles from top insurers.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="category-card">
+                    <div class="category-icon">🏠</div>
+                    <h3 class="category-title">General Insurance</h3>
+                    <p class="feature-description">
+                        Home, travel, and other general insurance bill payments made simple and quick.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- What is BBPS Section -->
+<section class="bbps-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="bbps-content">
+                    <h2 class="bbps-title">What is BBPS?</h2>
+                    <p class="bbps-description">
+                        Bharat Bill Payment System (BBPS) is an RBI-mandated system that offers interoperable and accessible bill payment services to customers across India. Through BBPS, you can pay all your insurance bills through a single platform with complete safety and convenience.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> Centralized bill payment system</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> Multiple payment modes available</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> Instant payment confirmation</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> 24/7 payment facility</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="process-steps">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <p class="step-text">Select Insurance Provider</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <p class="step-text">Enter Policy Details</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <p class="step-text">Pay Securely</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How to Pay Section -->
+<section class="payment-steps-section">
+    <div class="container">
+        <h2 class="section-title">How to Pay Insurance Bills</h2>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="step-card">
+                    <div class="step-circle">1</div>
+                    <h3 class="step-card-title">Login to Portal</h3>
+                    <p class="step-card-description">
+                        Access your Payman Insurance account from anywhere, anytime
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="step-card">
+                    <div class="step-circle">2</div>
+                    <h3 class="step-card-title">Choose Insurance Type</h3>
+                    <p class="step-card-description">
+                        Select from Life, Health, Motor, or General Insurance category
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="step-card">
+                    <div class="step-circle">3</div>
+                    <h3 class="step-card-title">Enter Policy Details</h3>
+                    <p class="step-card-description">
+                        Provide your policy number and verify the premium amount
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="step-card">
+                    <div class="step-circle">4</div>
+                    <h3 class="step-card-title">Make Payment</h3>
+                    <p class="step-card-description">
+                        Complete payment using your preferred payment method securely
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2 class="cta-title">Ready to Pay Your Insurance Premium?</h2>
+        <p class="cta-subtitle">
+            Join thousands of customers who trust us for hassle-free insurance bill payments
+        </p>
+        <button type="button" class="btn cta-button-secondary" data-bs-toggle="modal" data-bs-target="#loginModal">
+            Get Started Now <i class="fas fa-arrow-right ms-2"></i>
+        </button>
+    </div>
+</section>
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Close Button -->
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            
+            <!-- Modal Body -->
+            <div class="modal-body p-5">
+                <!-- Logo -->
+                <div class="text-center mb-4">
+                    <h1 class="h3 fw-bold text-primary mb-1">
+                        <i class="fas fa-shield-alt me-2"></i>Insurance
+                    </h1>
+                    <p class="text-muted mb-0">by Payman</p>
+                </div>
+
+                <!-- Welcome Text -->
+                <div class="text-center mb-4">
+                    <h2 class="h5 fw-bold text-dark mb-2">Welcome Back</h2>
+                    <p class="text-muted small">Login to pay your insurance bills</p>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm">
+                    <!-- Mobile Number -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mobile Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-mobile-alt text-muted"></i>
+                            </span>
+                            <input type="tel" class="form-control border-start-0" 
+                                   placeholder="Enter your mobile number" 
+                                   pattern="[0-9]{10}" required>
+                        </div>
+                        <div class="invalid-feedback">
+                            Please enter a valid 10-digit mobile number.
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label fw-bold">Password</label>
+                            <a href="#" class="text-decoration-none small text-primary" 
+                               data-bs-toggle="modal" data-bs-target="#forgotPasswordModal" 
+                               data-bs-dismiss="modal">
+                                Forgotten Password?
+                            </a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-lock text-muted"></i>
+                            </span>
+                            <input type="password" class="form-control border-start-0" 
+                                   placeholder="Enter your password" required>
+                            <button class="btn btn-outline-secondary border-start-0" type="button" 
+                                    id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">
+                            Please enter your password.
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="button" class="btn btn-primary py-2 fw-bold" onclick="handleLogin()">
+                            Login
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary py-2" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                    </div>
+
+                    <!-- Sign Up Link -->
+                    <div class="text-center mt-3">
+                        <p class="small text-muted mb-0">
+                            Don't have an account? 
+                            <a href="#" class="text-primary fw-bold text-decoration-none" 
+                               data-bs-toggle="modal" data-bs-target="#signupModal" 
+                               data-bs-dismiss="modal">
+                                Sign Up
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sign Up Modal -->
+<!-- Sign Up Modal -->
+<div class="modal fade" id="signupModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <button type="button"
+                    class="btn-close position-absolute top-0 end-0 m-3"
+                    data-bs-dismiss="modal"></button>
+
+            <div class="modal-body p-5">
+                <div class="text-center mb-4">
+                    <h4 class="fw-bold text-primary">Sign Up</h4>
+                    <p class="text-muted small">Create your account</p>
+                </div>
+
+                <form id="signupForm">
+
+                    <!-- Mobile -->
+                    <div class="mb-3">
+                        <label class="form-label">Mobile No</label>
+                        <input type="tel"
+                               class="form-control"
+                               name="mobile"
+                               placeholder="10-digit mobile"
+                               pattern="[0-9]{10}"
+                               required>
+                        <div class="invalid-feedback">Enter valid mobile</div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email"
+                               class="form-control"
+                               name="email"
+                               placeholder="Email"
+                               required>
+                        <div class="invalid-feedback">Enter valid email</div>
+                    </div>
+
+                    <!-- Name -->
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text"
+                               class="form-control"
+                               name="name"
+                               placeholder="Full name"
+                               required>
+                        <div class="invalid-feedback">Enter name</div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password"
+                               class="form-control"
+                               name="password"
+                               placeholder="Password"
+                               required>
+                        <div class="invalid-feedback">Enter password</div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="button"
+                                class="btn btn-primary"
+                                onclick="handleSignUp()">
+                            Submit
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Close Button -->
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            
+            <!-- Modal Body -->
+            <div class="modal-body p-5">
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <h2 class="h4 fw-bold text-primary">
+                        <i class="fas fa-key me-2"></i>Forgot Password
+                    </h2>
+                    <p class="text-muted small">Enter your mobile number to reset password</p>
+                </div>
+
+                <!-- Forgot Password Form -->
+                <form id="forgotPasswordForm">
+                    <!-- Mobile Number -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Mobile Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-mobile-alt text-muted"></i>
+                            </span>
+                            <input type="tel" class="form-control border-start-0" 
+                                   placeholder="Enter registered mobile number" 
+                                   pattern="[0-9]{10}" required>
+                        </div>
+                        <div class="invalid-feedback">
+                            Please enter your registered mobile number.
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="button" class="btn btn-primary py-2 fw-bold" onclick="handleForgotPassword()">
+                            Send OTP
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary py-2" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                    </div>
+
+                    <!-- Back to Login -->
+                    <div class="text-center mt-3">
+                        <p class="small text-muted mb-0">
+                            Remember your password? 
+                            <a href="#" class="text-primary fw-bold text-decoration-none" 
+                               data-bs-toggle="modal" data-bs-target="#loginModal" 
+                               data-bs-dismiss="modal">
+                                Back to Login
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal (After Login) -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Close Button -->
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            
+            <!-- Modal Body -->
+            <div class="modal-body p-0">
+                <div class="row g-0">
+                    <!-- Left Side - Payment Form -->
+                    <div class="col-md-8">
+                        <div class="p-4 p-lg-5">
+                            <h2 class="h4 fw-bold text-primary mb-4">
+                                <i class="fas fa-credit-card me-2"></i>Pay Insurance Premium
+                            </h2>
+                            
+                            <!-- Payment Form -->
+                            <form id="paymentForm">
+                                <!-- Insurance Type -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Select Insurance Type</label>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <input type="radio" class="btn-check" name="insuranceType" id="life" checked>
+                                            <label class="btn btn-outline-primary w-100" for="life">
+                                                <i class="fas fa-heart me-1"></i> Life
+                                            </label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="radio" class="btn-check" name="insuranceType" id="health">
+                                            <label class="btn btn-outline-primary w-100" for="health">
+                                                <i class="fas fa-heartbeat me-1"></i> Health
+                                            </label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="radio" class="btn-check" name="insuranceType" id="motor">
+                                            <label class="btn btn-outline-primary w-100" for="motor">
+                                                <i class="fas fa-car me-1"></i> Motor
+                                            </label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="radio" class="btn-check" name="insuranceType" id="general">
+                                            <label class="btn btn-outline-primary w-100" for="general">
+                                                <i class="fas fa-home me-1"></i> General
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Insurance Provider -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Insurance Provider</label>
+                                    <select class="form-select" required>
+                                        <option value="">Select company</option>
+                                        <option value="lic">LIC</option>
+                                        <option value="hdfc">HDFC Life</option>
+                                        <option value="sbi">SBI Life</option>
+                                        <option value="icici">ICICI Prudential</option>
+                                        <option value="star">Star Health</option>
+                                    </select>
+                                </div>
+
+                                <!-- Policy Number -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Policy Number</label>
+                                    <input type="text" class="form-control" placeholder="Enter policy number" required>
+                                </div>
+
+                                <!-- Premium Amount -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Premium Amount (₹)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₹</span>
+                                        <input type="number" class="form-control" placeholder="Enter amount" min="1" required>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Method -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Payment Method</label>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <input type="radio" class="btn-check" name="paymentMethod" id="debit" checked>
+                                            <label class="btn btn-outline-success w-100" for="debit">
+                                                <i class="fas fa-credit-card me-1"></i> Debit Card
+                                            </label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="radio" class="btn-check" name="paymentMethod" id="credit">
+                                            <label class="btn btn-outline-success w-100" for="credit">
+                                                <i class="far fa-credit-card me-1"></i> Credit Card
+                                            </label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="radio" class="btn-check" name="paymentMethod" id="netbanking">
+                                            <label class="btn btn-outline-success w-100" for="netbanking">
+                                                <i class="fas fa-university me-1"></i> Net Banking
+                                            </label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="radio" class="btn-check" name="paymentMethod" id="upi">
+                                            <label class="btn btn-outline-success w-100" for="upi">
+                                                <i class="fas fa-mobile-alt me-1"></i> UPI
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Terms and Conditions -->
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" id="terms" required>
+                                    <label class="form-check-label small text-muted" for="terms">
+                                        I agree to the terms and conditions
+                                    </label>
+                                </div>
+
+                                <!-- Pay Button -->
+                                <div class="d-grid">
+                                    <button type="button" class="btn btn-primary btn-lg py-3 fw-bold" onclick="processPayment()">
+                                        <i class="fas fa-lock me-2"></i> Pay Securely
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Right Side - BBPS Info -->
+                    <div class="col-md-4 bg-light">
+                        <div class="p-4 p-lg-5 h-100 d-flex flex-column">
+                            <div class="text-center mb-4">
+                                <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                                <h5 class="fw-bold">BBPS Secure Payment</h5>
+                                <p class="small text-muted">RBI-mandated payment system</p>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <div class="alert alert-success small">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <strong>100% Secure:</strong> Your payment is encrypted and protected
+                                </div>
+                                <div class="alert alert-info small">
+                                    <i class="fas fa-bolt me-2"></i>
+                                    <strong>Instant Confirmation:</strong> Receive payment acknowledgment immediately
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-body p-5 text-center">
+                <div class="mb-4">
+                    <div class="success-checkmark">
+                        <div class="check-icon">
+                            <span class="icon-line line-tip"></span>
+                            <span class="icon-line line-long"></span>
+                            <div class="icon-circle"></div>
+                            <div class="icon-fix"></div>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="fw-bold text-success mb-3">Payment Successful!</h4>
+                <p class="text-muted mb-4">Your insurance premium has been paid successfully.</p>
+                <button type="button" class="btn btn-primary w-100" data-bs-dismiss="modal">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword')?.addEventListener('click', function() {
+            const passwordInput = this.parentNode.querySelector('input');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Handle Login
+        function handleLogin() {
+             showLoader();
+            const loginForm = document.getElementById('loginForm');
+            const mobileInput = loginForm.querySelector('input[type="tel"]');
+            const passwordInput = loginForm.querySelector('input[type="password"]');
+            
+            let isValid = true;
+            
+            // Validate mobile number
+            const mobilePattern = /^[0-9]{10}$/;
+            if (!mobilePattern.test(mobileInput.value)) {
+                mobileInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                mobileInput.classList.remove('is-invalid');
+            }
+            
+            // Validate password
+            if (!passwordInput.value.trim()) {
+                passwordInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                passwordInput.classList.remove('is-invalid');
+            }
+            
+            if (isValid) {
+
+                    // 🔥 API CALL
+        $.ajax({
+            url: '/Insurance/Login',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                mobile: mobileInput.value,
+                password: passwordInput.value
+            }),
+            success: function (response) {
+                debugger;
+                if (response.isSuccess) {
+
+                            // ✅ STORE USER DATA
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("userName", response.data.user.payload); // <-- dynamic name
+
+                    // Close login modal
+                    bootstrap.Modal.getInstance(
+                        document.getElementById('loginModal')
+                    ).hide();
+                    setTimeout(function () {
+                        hideLoader();
+                    }, 2000);
+
+                    // Redirect to dashboard
+                    window.location.href = '/Insurance/Dashboard';
+
+                } else {
+                             hideLoader();
+                    alert(response.message || 'Invalid mobile or password');
+                }
+            },
+            error: function () {
+                         hideLoader();
+                alert('Server error. Please try again later.');
+            }
+        });
+
+                // Close login modal
+                // const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+                // loginModal.hide();
+                
+                // // Show payment modal after a short delay
+                // setTimeout(() => {
+                //     const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+                //     paymentModal.show();
+                // }, 300);
+            }
+        }
+
+        // Handle Sign Up
+       function handleSignUp() {
+                   showLoader();
+
+    const form = document.getElementById('signupForm');
+
+    const nameInput = form.querySelector('input[name="name"]');
+    const mobileInput = form.querySelector('input[name="mobile"]');
+    const emailInput = form.querySelector('input[name="email"]');
+    const passwordInput = form.querySelector('input[name="password"]');
+
+    let isValid = true;
+
+    [nameInput, mobileInput, emailInput, passwordInput].forEach(input => {
+        if (!input.value.trim()) {
+            input.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            input.classList.remove('is-invalid');
+        }
+    });
+
+    const emailPattern = /^[^\s]+[^\s]+\.[^\s]+$/;
+    if (!emailPattern.test(emailInput.value)) {
+        emailInput.classList.add('is-invalid');
+        isValid = false;
+    }
+
+    if (!isValid) return;
+
+    $.ajax({
+        url: '/Insurance/Register',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            name: nameInput.value,
+            mobile: mobileInput.value,
+            email: emailInput.value,
+            password: passwordInput.value
+        }),
+        success: function (res) {
+            if (res.isSuccess) {
+                         hideLoader();
+
+                alert('Account created successfully');
+
+                bootstrap.Modal.getInstance(
+                    document.getElementById('signupModal')
+                ).hide();
+
+                setTimeout(() => {
+                    new bootstrap.Modal(
+                        document.getElementById('loginModal')
+                    ).show();
+                }, 300);
+
+            } else {
+                         hideLoader();
+                alert(res.message);
+            }
+        },
+        error: function () {
+                     hideLoader();
+            alert('Server error');
+        }
+    });
+}
+        // Handle Forgot Password
+        function handleForgotPassword() {
+            const forgotForm = document.getElementById('forgotPasswordForm');
+            const mobileInput = forgotForm.querySelector('input[type="tel"]');
+            
+            const mobilePattern = /^[0-9]{10}$/;
+            if (!mobilePattern.test(mobileInput.value)) {
+                mobileInput.classList.add('is-invalid');
+                return;
+            }
+            
+            mobileInput.classList.remove('is-invalid');
+            
+            // Show success message
+            alert('OTP has been sent to your mobile number. Please check your SMS.');
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'));
+            modal.hide();
+            
+            // Show login modal
+            setTimeout(() => {
+                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                loginModal.show();
+            }, 300);
+        }
+
+        // Process Payment
+        function processPayment() {
+            const paymentForm = document.getElementById('paymentForm');
+            const termsCheckbox = document.getElementById('terms');
+            
+            if (!termsCheckbox.checked) {
+                termsCheckbox.classList.add('is-invalid');
+                return;
+            }
+            
+            termsCheckbox.classList.remove('is-invalid');
+            
+            // Close payment modal
+            const paymentModal = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
+            paymentModal.hide();
+            
+            // Show success modal after a short delay
+            setTimeout(() => {
+                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                successModal.show();
+            }, 500);
+        }
+
+        // Modal switching
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-focus on first input when modal opens
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('shown.bs.modal', function() {
+                    const firstInput = this.querySelector('input, select, textarea');
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                });
+            });
+            
+            // Mobile number formatting
+            document.querySelectorAll('input[type="tel"]').forEach(input => {
+                input.addEventListener('input', function(e) {
+                    this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+                });
+            });
+        });
+    </script>
+}

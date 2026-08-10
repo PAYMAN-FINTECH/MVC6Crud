@@ -1,0 +1,231 @@
+﻿@model AddBeneficiaryAccountsDTO
+@{
+    Pager pager = new Pager();
+    int pageNo = 0;
+    if (ViewBag.Pager != null)
+    {
+        pager = ViewBag.Pager;
+        pageNo = pager.CurrentPage;
+    }
+}
+
+
+<div class="row col-md-12">
+    <div class="col-md-6">
+        <div class="container">
+            @if (TempData["VerificationStatus"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["VerificationStatus"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["BeneficiaryAdded"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["BeneficiaryAdded"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <h4>Beneficiary List</h4>
+            <button type="button" id="addBeneficiary" class="btn btn-primary btn-sm m-2">Add Beneficiary</button>
+
+            <div class="row">
+                <div class="form-group m-1">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search..." />
+                </div>
+
+                <div id="searchResults">
+                    @await Html.PartialAsync("_BeneficiaryGrid", Model)
+                </div>
+            </div>
+            <div>
+                <partial name="_pager" model="@pager"></partial>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6" style="background-color: gainsboro;">
+        <div class="p-5">
+            <div class="card">
+                <div class="card-header bg-light text-dark">
+                    <strong>PayMan Charges</strong>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Pay Out Charges: 15</li>
+                        <li class="list-group-item">Account Verification: 5</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Beneficiary Modal -->
+<div class="modal fade" id="AddBeneficiary" tabindex="-1" aria-labelledby="addBeneficiaryLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addBeneficiaryLabel">Add Beneficiary</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form role="form" method="post" asp-action="AddBeneficiaryAccounts" asp-controller="PayMan">
+                    <div class="mb-3">
+                        <label class="form-label">Mobile Number</label>
+                        <input type="text" name="MobileNumber" asp-for="MobileNumber" required class="form-control" placeholder="Mobile Number">
+                        <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Account Holder Name</label>
+                        <input type="text" name="ContactName" asp-for="ContactName" required class="form-control" placeholder="Account Holder Name">
+                        <span asp-validation-for="ContactName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Account No</label>
+                        <input type="text" name="AccountNo" asp-for="AccountNo" required class="form-control" placeholder="Account No">
+                        <span asp-validation-for="AccountNo" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">TXN Type</label>
+                        <select class="form-control" asp-for="TxnType" required>
+                            <option value="">--Select--</option>
+                            <option value="IMPS">IMPS</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Bank</label>
+                        <select id="dropdown" class="form-control" asp-for="SelectedOption" required asp-items="Model.Options"></select>
+                    </div>
+                    <div class="mb-3 d-none">
+                        <label class="form-label">IFSC</label>
+                        <input type="text" name="IfscCode" id="ifscCard" class="form-control" placeholder="IFSC Code">
+                        <span asp-validation-for="IfscCode" class="text-danger"></span>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#addBeneficiary').on('click', function () {
+                var modal = new bootstrap.Modal(document.getElementById('AddBeneficiary'));
+                modal.show();
+            });
+
+            $('#dropdown').change(function () {
+                var selectedId = $(this).val();
+                $.ajax({
+                    url: '@Url.Action("GetBankDescription", "PayMan")',
+                    type: 'GET',
+                    data: { id: selectedId },
+                    success: function (data) {
+                        $('#ifscCard').val(data.description);
+                    }
+                });
+            });
+
+            $('#searchInput').on('input', function () {
+                var query = $(this).val();
+                $.ajax({
+                    url: '@Url.Action("SearchBeneficiaryAccounts", "PayMan")',
+                    type: 'GET',
+                    data: { search: query },
+                    success: function (data) {
+                        $('#searchResults').html(data);
+                    }
+                });
+            });
+        });
+
+        function VerifyBank(Id) {
+            $('#Loader').show();
+            $.post('/PayMan/BankdetailsVerify', { Id: Id }, function (data) {
+                $('#Loader').hide();
+                alert(data.success ? "Account verified successfully!" : "Verification failed");
+                location.reload();
+            }).fail(function () {
+                $('#Loader').hide();
+                alert("Error verifying account.");
+            });
+        }
+
+        function Pay(Id, availableAmount, name, SefexFinalBalance) {
+            var amount = parseInt($("#" + Id).val());
+
+    function Pay(Id, avaliableamount, name, SefexFinalBalance) {
+        console.log(avaliableamount);
+        console.log("test:" + Id);
+        console.log($("#" + Id).val());
+        var amount = $("#" + Id).val();
+
+        var PayOutMinAmount ='@Model.PayOutMinAmount';
+        var PayOutMaxAmount = '@Model.PayOutMaxAmount';
+        var MinBalanceAvl = '@Model.MinBalanceAvl';
+
+        debugger;
+        if (parseInt(amount) > PayOutMaxAmount) {
+            alert("Please enter less then "+PayOutMaxAmount+" amount.");
+            return false;
+        }
+        if (parseInt(amount) < PayOutMinAmount) {
+            alert("Please enter grater then "+PayOutMinAmount+" amount.");
+            return false;
+        }
+        if (parseInt(amount) > parseInt(avaliableamount)) {
+            alert("Insufficient Funds!");
+            return false;
+        }
+        if (parseInt(amount) > parseInt(SefexFinalBalance)) {
+            alert("Service is temporarily unavailable");
+            return false;
+        }
+        var minbal = parseInt(avaliableamount) - parseInt(amount);
+        if (avaliableamount <= MinBalanceAvl || minbal <= MinBalanceAvl) {
+            alert("Minimum balance not available.");
+            return false;
+        }
+
+            if (confirm("Are you sure to pay " + name + "?")) {
+                $('#Loader1').show();
+                window.location.href = `/PayOut/PayToBeneficiaryWeb?Id=${Id}&amount=${amount}`;
+                // $.post('/PayOut/PayToBeneficiaryWeb', { Id: Id, amount: amount }, function (data) {
+                //     $('#Loader').hide();
+
+                //     if (data) {
+
+                //     } else {
+                //         $('#Loader1').hide();
+                //         window.location.href = "/Home/Dashboard";
+                //     }
+                // }).fail(function () {
+                //     $('#Loader1').hide();
+                //     alert("Error during payment.");
+                // });
+            }
+        }
+
+
+        function formatDateInIST() {
+            let currentdate = new Date();
+            let ISTTime = new Date(currentdate.getTime() + (5.5 * 60 * 60000));
+            let month = (ISTTime.getMonth() + 1).toString().padStart(2, '0');
+            let day = ISTTime.getDate().toString().padStart(2, '0');
+            let year = ISTTime.getFullYear();
+            let hours = ISTTime.getHours(), minutes = ISTTime.getMinutes().toString().padStart(2, '0');
+            let seconds = ISTTime.getSeconds().toString().padStart(2, '0');
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = (hours % 12 || 12).toString().padStart(2, '0');
+            return `${month}/${day}/${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+        }
+    </script>
+}

@@ -1,0 +1,185 @@
+﻿<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/languages/jquery.validationEngine-en.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+@model RisterDTO
+<style>
+    .card {
+        margin-top: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        font-weight: bold;
+        background-color: #f8f9fa;
+    }
+
+    .clickable-row:hover, .clickable-dept:hover {
+        cursor: pointer;
+        background-color: #f1f1f1;
+    }
+</style>
+
+<div class="row col-md-12">
+    <div class="col-md-8">
+        <div class="container">
+            <h4>Users List</h4>
+            <br />
+            <div>
+                <table class="table table-sm table-hover table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th></th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Pwd</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Margin</th>
+                            <th>Master Margin</th>
+                            <th>DMT Accessable</th>
+                            <th>Balance TopUp</th>
+                            <th>Srr Enable</th>
+                            <th>Is Active</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in Model.registartions)
+                        {
+                            <tr data-toggle="collapse" data-target="#details-@product.Id" class="clickable-row">
+                                <td><i class="fa fa-plus-circle"></i></td>
+                                <td>@product.Name</td>
+                                <td>@product.Email</td>
+                                <td>@product.Password</td>
+                                <td>@product.Phone</td>
+                                <td>@product.Role</td>
+                                <td>@product.Margin</td>
+                                <td>@product.MasterMargin</td>
+                                <td>@product.DMTAccessable</td>
+                                <td>@product.BalanceTopUp</td>
+                                <td>@product.SrrEnable</td>
+                                <td>@product.IsActive</td>
+                                <td><a asp-action="Registration" asp-controller="PayMan" asp-route-id="@product.Id">Edit</a></td>
+                            </tr>
+                            <tr id="details-@product.Id" class="collapse">
+                                <td colspan="13">
+                                    <!-- Bootstrap Card for Employee Details -->                                  
+                                    <div class="card">
+                                        <div class="card-header bg-light">
+                                            <strong>PAYIN</strong>
+                                        </div>
+                                        <div class="card-body">
+                                            <table class="table table-sm table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Order Ref</th>
+                                                        <th>Card No</th>
+                                                        <th>Amount</th>
+                                                        <th>PayIn Comm</th>
+                                                        <th>Status</th>
+                                                        <th>Created Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var emp in product.payIns)
+                                                    {
+                                                        <tr data-toggle="collapse" data-target="#dept-@emp.Id" class="clickable-dept">
+                                                            <td>@emp.OrderRefNumber</td>
+                                                            <td>@emp.MobileNumber</td>
+                                                            <td>@emp.Amount</td>
+                                                            <td>@emp.PayInCommission</td>
+                                                            <td>@emp.Sttaus</td>
+                                                            <td>@emp.CreatedDate</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-header bg-light">
+                                            <strong>PAYOUT</strong>
+                                        </div>
+                                        <div class="card-body">
+                                            <table class="table table-sm table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Order RefNo</th>
+                                                        <th>Name</th>
+                                                        <th>Account No</th>
+                                                        <th>Amount</th>
+                                                        <th>Status</th>
+                                                        <th>Created Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var emp in product.payOutTransectionDetails)
+                                                    {
+                                                        <tr data-toggle="collapse" data-target="#dept-@emp.Id" class="clickable-dept">
+                                                            <td>@emp.orderRefNo</td>
+                                                            <td>@emp.accountHolderName</td>
+                                                            <td>@emp.accountNo</td>
+                                                            <td>@emp.txnAmount</td>
+                                                            <td>@emp.bankStatus</td>
+                                                            <td>@emp.CreatedDate</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Toggle icons for employee rows
+        document.querySelectorAll(".clickable-row").forEach(row => {
+            row.addEventListener("click", function () {
+                const targetId = this.getAttribute("data-target");
+                const target = document.querySelector(targetId);
+                const icon = this.querySelector("i");
+
+                if (target.classList.contains("show")) {
+                    target.classList.remove("show");
+                    icon.classList.remove("fa-minus-circle");
+                    icon.classList.add("fa-plus-circle");
+                } else {
+                    target.classList.add("show");
+                    icon.classList.remove("fa-plus-circle");
+                    icon.classList.add("fa-minus-circle");
+                }
+            });
+        });
+
+        // Toggle icons for department rows
+        document.querySelectorAll(".clickable-dept").forEach(row => {
+            row.addEventListener("click", function () {
+                const targetId = this.getAttribute("data-target");
+                const target = document.querySelector(targetId);
+                const icon = this.querySelector("i");
+
+                if (target.classList.contains("show")) {
+                    target.classList.remove("show");
+                    icon.classList.remove("fa-minus-circle");
+                    icon.classList.add("fa-plus-circle");
+                } else {
+                    target.classList.add("show");
+                    icon.classList.remove("fa-plus-circle");
+                    icon.classList.add("fa-minus-circle");
+                }
+            });
+        });
+    });
+</script>

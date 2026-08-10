@@ -1,0 +1,60 @@
+﻿.privacy-policy-page {
+    padding: 50px 20px;
+    background-color: #f8f9fb;
+    font-family: 'Segoe UI', sans-serif;
+    animation: fadeIn 0.6s ease-in;
+}
+
+.privacy-policy-hero {
+    max-width: 1000px;
+    margin: auto;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+.privacy-policy-content h1 {
+    font-size: 2.5rem;
+    color: #004aad;
+    margin-bottom: 20px;
+}
+
+.privacy-policy-content h2 {
+    color: #222;
+    margin-top: 30px;
+    font-size: 1.5rem;
+}
+
+.privacy-policy-content p {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.6;
+    margin: 10px 0;
+}
+
+.privacy-policy-content ul {
+    padding-left: 20px;
+}
+
+    .privacy-policy-content ul li {
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+
+a {
+    color: #004aad;
+    text-decoration: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

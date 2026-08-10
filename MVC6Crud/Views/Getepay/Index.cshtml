@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Payment Page";
+}
+
+<h2>Pay Now</h2>
+<div>
+    <label>Email:</label>
+    <input type="email" id="email" />
+</div>
+<div>
+    <label>Amount:</label>
+    <input type="text" id="amount" />
+</div>
+<button id="payBtn">Pay</button>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $('#payBtn').click(function () {
+        var email = $('#email').val();
+        var amount = $('#amount').val();
+
+        $.ajax({
+            url: '/Getepay/GenerateInvoice',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ Email: email, Amount: amount }),
+            success: function (res) {
+                if (res.paymentUrl) {
+                    window.location.href = res.paymentUrl; // Redirect to Getepay
+                } else {
+                    alert('Payment URL not generated');
+                }
+            },
+            error: function (err) {
+                alert("Error: " + err.responseText);
+            }
+        });
+    });
+</script>

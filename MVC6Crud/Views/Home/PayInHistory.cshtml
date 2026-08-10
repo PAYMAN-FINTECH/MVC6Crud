@@ -1,0 +1,717 @@
+﻿@model MVC6Crud.Models.PaymanWeb.BeneficiaryListModel
+@{
+    ViewData["Title"] = "PayIn History";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Styles -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+<style>
+    /* Brand colors */
+    :root {
+        --navy: #0a2540;
+        --cyan: #00b4d8;
+        --navy-light: #1a3b5c;
+        --gray-bg: #f8fafc;
+    }
+
+    body {
+        background-color: #f5f7fa;
+    }
+
+    .page-title {
+        color: var(--navy);
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.02em;
+    }
+
+    /* Filter card */
+    .filter-card {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        border: 1px solid #eef2f6;
+    }
+
+    .filter-label {
+        font-weight: 600;
+        color: var(--navy);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .form-control {
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+
+        .form-control:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(0,180,216,0.2);
+            outline: none;
+        }
+
+    /* Buttons */
+    .btn-navy {
+        background-color: var(--navy);
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .btn-navy:hover {
+            background-color: var(--navy-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(10,37,64,0.3);
+            color: white;
+        }
+
+    .btn-cyan {
+        background-color: var(--cyan);
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .btn-cyan:hover {
+            background-color: #0096b4;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(0,180,216,0.4);
+            color: white;
+        }
+
+    .btn-outline-navy {
+        background-color: transparent;
+        color: var(--navy);
+        border: 2px solid var(--navy);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .btn-outline-navy:hover {
+            background-color: var(--navy);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(10,37,64,0.3);
+        }
+
+    /* Table */
+    .table-container {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        border: 1px solid #eef2f6;
+    }
+
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+
+        .table thead th {
+            background-color: var(--navy);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem;
+            border: none;
+        }
+
+            .table thead th:first-child {
+                border-top-left-radius: 1rem;
+            }
+
+            .table thead th:last-child {
+                border-top-right-radius: 1rem;
+            }
+
+        .table tbody tr {
+            transition: background-color 0.2s;
+        }
+
+            .table tbody tr:hover {
+                background-color: #f1f5f9;
+            }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #eef2f6;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+    /* Status badges */
+    .badge-success {
+        background-color: #d1fae5;
+        color: #065f46;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.85rem;
+    }
+
+    .badge-danger {
+        background-color: #fee2e2;
+        color: #991b1b;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.85rem;
+    }
+
+    .invoice-icon {
+        cursor: pointer;
+        color: var(--cyan);
+        font-size: 1.2rem;
+        transition: color 0.2s;
+    }
+
+        .invoice-icon:hover {
+            color: var(--navy);
+        }
+</style>
+
+<div class="container py-4">
+    <h1 class="page-title">PayIn History</h1>
+
+    <!-- Filter Section -->
+    <div class="filter-card">
+        <div class="row align-items-end g-3">
+            <div class="col-md-3 col-sm-6">
+                <label class="filter-label">Start Date</label>
+                <input type="date" class="form-control" id="startDate" />
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <label class="filter-label">End Date</label>
+                <input type="date" class="form-control" id="endDate" />
+            </div>
+            <div class="col-md-6 col-sm-12 d-flex gap-2 justify-content-md-end">
+                <button id="loadDataBtn" class="btn btn-navy px-4">Load Data</button>
+                <button id="btnDownloadExcel" class="btn btn-cyan px-4">Download Excel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table id="payinTable" class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Card Number</th>
+                        <th>EasePayId</th>
+                        <th>Phone</th>
+                        <th>Commission</th>
+                        <th>Status</th>
+                        <th>Invoice</th>   <!-- New column -->
+                    </tr>
+                </thead>
+                <tbody id="payinBody">
+                    <tr><td colspan="8" class="text-center text-muted py-4">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden div used for invoice generation -->
+<div id="invoiceTemplate" style="position: absolute; top: -9999px; left: -9999px; width: 210mm; background: white;"></div>
+
+@section Scripts {
+    <!-- jQuery & Moment -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+
+    <!-- Date Range Picker -->
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <!-- SheetJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Invoice PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        let payinData = [];
+
+        $(document).ready(function () {
+            const today = new Date().toISOString().split('T')[0];
+            $('#startDate').val(today);
+            $('#endDate').val(today);
+
+            const start = $('#startDate').val();
+            const end = $('#endDate').val();
+
+            loadPayInData(start, end);
+
+            $('#loadDataBtn').click(function () {
+                const start1 = $('#startDate').val();
+                const end1 = $('#endDate').val();
+                loadPayInData(start1, end1);
+            });
+
+            $('#btnDownloadExcel').click(function () {
+                exportJsonToExcel(payinData);
+            });
+        });
+
+        function loadPayInData(startDate, endDate) {
+            $('#payinBody').html('<tr><td colspan="8" class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+            $.ajax({
+                url: 'https://srredu.in/PayIn/GetPayInHistory',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    phone: '@Model.Phone',
+                    startDate: startDate,
+                    endDate: endDate
+                }),
+                success: function (res) {
+                    if (!res.success || res.data.length === 0) {
+                        $('#payinBody').html('<tr><td colspan="8" class="text-center text-muted py-4">No data found</td></tr>');
+                        payinData = [];
+                        return;
+                    }
+
+                    payinData = res.data;
+
+                    let rows = '';
+                    res.data.forEach(item => {
+                        rows += `
+                             <tr>
+                                 <td>${formatISTManually(item.createdDate)}</td>
+                                 <td><strong>₹${item.amount}</strong></td>
+                                 <td>${item.cardNumber}</td>
+                                 <td>${item.easePayId}</td>
+                                 <td>${item.userPhone}</td>
+                                 <td>₹${item.payInCommission}</td>
+                                 <td><span class="badge-${item.status === true ? 'success' : 'danger'}">${item.result}</span></td>
+                                 <td><i class="fas fa-download invoice-icon" onclick="generateInvoice('${item.easePayId0}')"></i></td>
+                             </tr>`;
+                    });
+                    $('#payinBody').html(rows);
+                },
+                error: function () {
+                    $('#payinBody').html('<tr><td colspan="8" class="text-center text-danger py-4">Error loading data</td></tr>');
+                }
+            });
+        }
+       
+        function exportJsonToExcel(jsonData) {
+            const worksheet = XLSX.utils.json_to_sheet(jsonData.map(row => ({
+                Date: moment(row.createdDate).format("DD/MM/YYYY hh:mm A"),
+                Amount: row.amount,
+                CardNumber: row.cardNumber,
+                EasePayId: row.easePayId,
+                Phone: row.userPhone,
+                Email: row.email,
+                Commission: row.payInCommission,
+                Status: row.status,
+                Result: row.result
+            })));
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "PayIn History");
+            XLSX.writeFile(workbook, "PayInHistory.xlsx");
+        }
+
+        // ---------- Invoice generation ----------
+                // Replace formatISTManually if you want to keep it for other dates, but for invoice we'll use raw date
+        function formatISTManually(dateStr) {
+            if (!dateStr || dateStr === "NA" || typeof dateStr !== 'string') return "N/A";
+            // If date is already in readable format like "08-Aug-2025", return as is
+            if (dateStr.includes('-') && !dateStr.includes('T')) return dateStr;
+            const cleanStr = dateStr.endsWith('Z') ? dateStr.slice(0, -1) : dateStr;
+            const [datePart, timePart] = cleanStr.split('T');
+            if (!datePart || !timePart) return dateStr;
+            const [year, month, day] = datePart.split('-');
+            let [hours, minutes] = timePart.split(':');
+            hours = parseInt(hours, 10);
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            if (hours === 0) hours = 12;
+            const hoursStr = String(hours).padStart(2, '0');
+            return `${day}/${month}/${year} ${hoursStr}:${minutes} ${ampm}`;
+        }
+
+       function generateInvoice(txnId) {
+            $.ajax({
+                     url: '/PayIn/GetInvoiceDetails',
+                type: 'GET',
+                     data: { txn: txnId },
+                success: function (invoices) {
+                    let index = 0;
+                    function downloadNext() {
+                        if (index >= invoices.length) {
+                            alert('All invoices downloaded!');
+                            return;
+                        }
+                        renderInvoiceTemplate(invoices[index]).then(() => {
+                            index++;
+                            setTimeout(downloadNext, 1000); // wait 1 second between downloads
+                        });
+                    }
+                    downloadNext();
+                },
+                error: function (err) {
+                    alert('Error fetching invoices: ' + err.statusText);
+                }
+            });
+        }
+
+        function renderInvoiceTemplate(invoice) {
+            return new Promise((resolve, reject) => {
+                function getProp(obj, ...keys) {
+                    for (let key of keys) {
+                        if (obj && obj[key] !== undefined) return obj[key];
+                    }
+                    return undefined;
+                }
+
+                const invoiceNo = getProp(invoice, 'InvoiceNo', 'invoiceNo');
+                const transactionId = getProp(invoice, 'TransactionId', 'transactionId');
+                const date = getProp(invoice, 'Date', 'date', 'createdDate');
+                const from = getProp(invoice, 'From', 'from') || {};
+                const to = getProp(invoice, 'To', 'to') || {};
+                const lineItems = getProp(invoice, 'LineItems', 'lineItems') || [];
+                const cgst = getProp(invoice, 'CGST', 'cgst') || 0;
+                const sgst = getProp(invoice, 'SGST', 'sgst') || 0;
+                const total = getProp(invoice, 'Total', 'total') || 0;
+                const totalGST = cgst + sgst;
+
+                const fromName = getProp(from, 'Name', 'name');
+                const fromAddress = getProp(from, 'Address', 'address');
+                const fromGstin = getProp(from, 'GSTIN', 'gstin');
+                const toName = getProp(to, 'Name', 'name');
+                const toAddress = getProp(to, 'Address', 'address');
+                const toEmail = getProp(to, 'Email', 'email');
+                const toMobile = getProp(to, 'Mobile', 'mobile');
+
+                const renderLineItems = () => {
+                    if (!lineItems.length) return '<tr><td colspan="6">No items</td></tr>';
+                    return lineItems.map(li => {
+                        const sNo = getProp(li, 'SNo', 'sNo');
+                        const service = getProp(li, 'Service', 'service');
+                        const hsnSac = getProp(li, 'HsnSac', 'hsnSac');
+                        const qty = getProp(li, 'Qty', 'qty');
+                        const unitPrice = getProp(li, 'UnitPrice', 'unitPrice');
+                        const amount = getProp(li, 'Amount', 'amount');
+                        return `
+                            <tr>
+                                <td style="border:1px solid #000; padding:8px; text-align:center;">${sNo || ""}</td>
+                                <td style="border:1px solid #000; padding:8px;">${service || ""}</td>
+                                <td style="border:1px solid #000; padding:8px; text-align:center;">${hsnSac || ""}</td>
+                                <td style="border:1px solid #000; padding:8px; text-align:center;">${qty || ""}</td>
+                                <td style="border:1px solid #000; padding:8px; text-align:right;">₹${(unitPrice || 0).toFixed(2)}</td>
+                                <td style="border:1px solid #000; padding:8px; text-align:right;">₹${(amount || 0).toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                };
+
+                const template = `
+                    <div style="width:210mm; padding:10mm; background:#fff;">
+                        <div style="width:100%; min-height:277mm; padding:10mm; border:5px solid #000; box-sizing:border-box; position:relative; font-family:Arial;">
+                            <div style="position:absolute; top:50%; left:5%; opacity:0.05; font-size:70px; font-weight:bold; transform:rotate(-30deg);">
+                                PAYMAN FINTECH
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                                <img src="/images/FinalIcon.png" style="height:60px;">
+                                <div style="font-size:20pt; font-weight:bold;">TAX INVOICE</div>
+                                <img crossorigin="anonymous"
+                                     src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https%3A%2F%2Fpaymanfintech.in%2FCourseInvoice%2FViewInvoice%3Ftxn%3D${transactionId}%26InvoiceNo%3D${invoiceNo}"
+                                     width="100">
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                                <div style="width:48%; border:1px solid #000; padding:10px;">
+                                    <b>From:</b><br>
+                                    ${fromName || "N/A"}<br>
+                                    ${fromAddress || "N/A"}<br>
+                                    GSTIN: ${fromGstin || "N/A"}
+                                </div>
+                                <div style="width:48%; border:1px solid #000; padding:10px;">
+                                    <b>To:</b><br>
+                                    ${toName || "N/A"}<br>
+                                    ${toAddress || "N/A"}<br>
+                                    Email: ${toEmail || "N/A"}<br>
+                                    Mobile: ${toMobile || "N/A"}
+                                </div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; border:1px solid #000; padding:10px; margin-bottom:15px;">
+                                <div>
+                                    <b>Invoice No:</b> ${invoiceNo || "N/A"}<br>
+                                    <b>Payment Mode:</b> Online
+                                </div>
+                                <div style="text-align:right;">
+                                    <b>Date:</b> ${date || "N/A"}<br>
+                                    <b>Transaction ID:</b> ${transactionId || "N/A"}
+                                </div>
+                            </div>
+                            <table style="width:100%; border-collapse:collapse; margin-bottom:15px;">
+                                <thead style="background:#f2f2f2;">
+                                    <tr>
+                                        <th style="border:1px solid #000; padding:8px;">S.No.</th>
+                                        <th style="border:1px solid #000; padding:8px;">Service</th>
+                                        <th style="border:1px solid #000; padding:8px;">HSN/SAC</th>
+                                        <th style="border:1px solid #000; padding:8px;">Qty</th>
+                                        <th style="border:1px solid #000; padding:8px;">Unit Price</th>
+                                        <th style="border:1px solid #000; padding:8px;">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${renderLineItems()}
+                                </tbody>
+                            </table>
+                            <div style="width:45%; margin-left:auto; border:1px solid #000; padding:12px;">
+                                CGST (9%): ₹${cgst.toFixed(2)}<br>
+                                SGST (9%): ₹${sgst.toFixed(2)}<br>
+                                <b>Total GST:</b> ₹${totalGST.toFixed(2)}
+                                <hr>
+                                <h3>Grand Total: ₹${total.toFixed(2)}</h3>
+                            </div>
+                            <p style="margin-top:30px; font-size:12px;">
+                                <b>Declaration:</b> This is system generated invoice.
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                let container = document.getElementById("invoiceTemplate");
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = "invoiceTemplate";
+                    container.style.position = "absolute";
+                    container.style.top = "-9999px";
+                    container.style.left = "-9999px";
+                    document.body.appendChild(container);
+                }
+
+                container.innerHTML = template;
+                container.style.display = "block";
+
+                // 🔥 COMPRESSION CHANGES HERE 🔥
+                html2canvas(container, {
+                    scale: 1.2,           // reduced from 2 → 1.2 (much smaller)
+                    useCORS: true,
+                    backgroundColor: "#ffffff",
+                    logging: false
+                }).then((canvas) => {
+                    // Use JPEG with 85% quality (smaller than PNG)
+                    const imgData = canvas.toDataURL("image/jpeg", 0.85);
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF("p", "mm", "a4");
+                    const pdfWidth = 210;
+                    const imgWidth = pdfWidth - 10;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    pdf.addImage(imgData, "JPEG", 5, 5, imgWidth, imgHeight);
+                    pdf.save(`Invoice_${transactionId || "unknown"}.pdf`);
+                    container.style.display = "none";
+                    resolve();
+                }).catch(reject);
+            });
+        }
+
+   //      function generateInvoice(txnId) {
+   //          // Show loading spinner on the icon
+   //          $('#payinBody').find('i.fa-download').each(function() {
+   //              if ($(this).closest('tr').find('td:nth-child(4)').text() === txnId) {
+   //                  $(this).removeClass('fa-download').addClass('fa-spinner fa-spin');
+   //              }
+   //          });
+
+   //          $.ajax({
+   //              url: '/PayIn/GetInvoiceDetails', // Adjust base URL if needed (e.g., "https://srredu.in/PayIn/GetInvoiceDetails")
+   //              type: 'GET',
+   //              data: { txn: txnId },
+   //              success: function (invoice) {
+   //                  console.log("Invoice data:", invoice); // Debug: log the response
+   //                  renderInvoiceTemplate(invoice).finally(() => {
+   //                      // Restore icon
+   //                      $('#payinBody').find('i.fa-spinner').each(function() {
+   //                          if ($(this).closest('tr').find('td:nth-child(4)').text() === txnId) {
+   //                              $(this).removeClass('fa-spinner fa-spin').addClass('fa-download');
+   //                          }
+   //                      });
+   //                  });
+   //              },
+   //              error: function (err) {
+   //                  console.error("Error fetching invoice:", err);
+   //                  alert("Could not generate invoice. Please try again.");
+   //                  // Restore icon
+   //                  $('#payinBody').find('i.fa-spinner').each(function() {
+   //                      if ($(this).closest('tr').find('td:nth-child(4)').text() === txnId) {
+   //                          $(this).removeClass('fa-spinner fa-spin').addClass('fa-download');
+   //                      }
+   //                  });
+   //              }
+   //          });
+   //      }
+
+   // function renderInvoiceTemplate(invoice) {
+   //          return new Promise((resolve, reject) => {
+   //              // Helper to safely get property with multiple possible names
+   //              function getProp(obj, ...keys) {
+   //                  for (let key of keys) {
+   //                      if (obj && obj[key] !== undefined) return obj[key];
+   //                  }
+   //                  return undefined;
+   //              }
+
+   //              // Extract main fields with fallbacks
+   //              const invoiceNo = getProp(invoice, 'InvoiceNo', 'invoiceNo');
+   //              const transactionId = getProp(invoice, 'TransactionId', 'transactionId');
+   //              const date = getProp(invoice, 'Date', 'date', 'createdDate');
+   //              const from = getProp(invoice, 'From', 'from') || {};
+   //              const to = getProp(invoice, 'To', 'to') || {};
+   //              const lineItems = getProp(invoice, 'LineItems', 'lineItems') || [];
+   //              // CGST: try CGST, cgst, cgt (typo from screenshot)
+   //              const cgst = getProp(invoice, 'CGST', 'cgst', 'cgt') || 0;
+   //              const sgst = getProp(invoice, 'SGST', 'sgst') || 0;
+   //              const total = getProp(invoice, 'Total', 'total') || 0;
+   //              const totalGST = cgst + sgst;
+
+   //              // Nested fields
+   //              const fromName = getProp(from, 'Name', 'name');
+   //              const fromAddress = getProp(from, 'Address', 'address');
+   //              const fromGstin = getProp(from, 'GSTIN', 'gstin');
+   //              const toName = getProp(to, 'Name', 'name');
+   //              const toAddress = getProp(to, 'Address', 'address');
+
+   //              // Render line items
+   //              const renderLineItems = () => {
+   //                  if (!lineItems.length) return '<tr><td colspan="6" style="text-align:center;">No items</td></tr>';
+   //                  return lineItems.map(li => {
+   //                      const sNo = getProp(li, 'SNo', 'sNo');
+   //                      const service = getProp(li, 'Service', 'service');
+   //                      const hsnSac = getProp(li, 'HsnSac', 'hsnSac');
+   //                      const qty = getProp(li, 'Qty', 'qty');
+   //                      const unitPrice = getProp(li, 'UnitPrice', 'unitPrice');
+   //                      const amount = getProp(li, 'Amount', 'amount');
+   //                      return `
+   //                          <tr>
+   //                              <td style="border:1px solid #000; padding:10px; text-align:center;">${sNo || ""}</td>
+   //                              <td style="border:1px solid #000; padding:10px;">${service || ""}</td>
+   //                              <td style="border:1px solid #000; padding:10px; text-align:center;">${hsnSac || ""}</td>
+   //                              <td style="border:1px solid #000; padding:10px; text-align:center;">${qty || ""}</td>
+   //                              <td style="border:1px solid #000; padding:10px; text-align:right;">₹${unitPrice || 0}</td>
+   //                              <td style="border:1px solid #000; padding:10px; text-align:right;">₹${amount || 0}</td>
+   //                          </tr>
+   //                      `;
+   //                  }).join('');
+   //              };
+
+   //              // Build the HTML template
+   //              const template = `
+   //                  <div style="width:210mm; min-height:297mm; padding:10mm; font-family:Arial; font-size:14pt; position:relative; background:#fff; color:#000; border:5px solid #000;">
+   //                      <div class="watermark" style="position:absolute; top:50%; left:3%; opacity:0.05; font-size:80px; font-weight:bold; transform:rotate(-30deg); white-space:nowrap;">
+   //                          PAYMAN FINTECH
+   //                      </div>
+   //                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+   //                          <img src="/images/FinalIcon.png" alt="Logo" style="height:60px;">
+   //                          <div style="text-align:center; flex-grow:1; font-size:20pt; font-weight:bold;">
+   //                              TAX INVOICE
+   //                          </div>
+   //                          <div>
+   //                              <img crossorigin="anonymous"
+   //                                   src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https%3A%2F%2Fpaymanfintech.in%2FPayIn%2FViewInvoice%3Ftxn%3D${transactionId}%26InvoiceNo%3D${invoiceNo}"
+   //                                   alt="QR Code" width="120" height="120">
+   //                          </div>
+   //                      </div>
+   //                      <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+   //                          <div style="width:48%; border:1px solid #000; padding:12px;">
+   //                              <h3 style="margin:0 0 8px 0;">From:</h3>
+   //                              <strong>${fromName || "N/A"}</strong><br>
+   //                              ${fromAddress || "N/A"}<br>
+   //                              GSTIN: ${fromGstin || "N/A"}
+   //                          </div>
+   //                          <div style="width:48%; border:1px solid #000; padding:12px;">
+   //                              <h3 style="margin:0 0 8px 0;">To:</h3>
+   //                              <strong>${toName || "N/A"}</strong><br>
+   //                              ${toAddress || "N/A"}
+   //                          </div>
+   //                      </div>
+   //                      <div style="display:flex; justify-content:space-between; border:1px solid #000; padding:12px; margin-bottom:20px; font-size:13pt;">
+   //                          <div>
+   //                              <p><strong>Invoice No:</strong> ${invoiceNo || "N/A"}</p>
+   //                              <p><strong>Payment Mode:</strong> Credit Card</p>
+   //                          </div>
+   //                          <div style="text-align:right;">
+   //                              <p><strong>Date:</strong> ${date || "N/A"}</p>
+   //                              <p><strong>Transaction ID:</strong> ${transactionId || "N/A"}</p>
+   //                          </div>
+   //                      </div>
+   //                      <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:13pt;">
+   //                          <thead style="background:#f5f5f5;">
+   //                              <tr>
+   //                                  <th style="border:1px solid #000; padding:10px;">S.No.</th>
+   //                                  <th style="border:1px solid #000; padding:10px;">Service</th>
+   //                                  <th style="border:1px solid #000; padding:10px;">HSN/SAC</th>
+   //                                  <th style="border:1px solid #000; padding:10px;">Qty</th>
+   //                                  <th style="border:1px solid #000; padding:10px;">Charges</th>
+   //                                  <th style="border:1px solid #000; padding:10px;">Amount</th>
+   //                              </tr>
+   //                          </thead>
+   //                          <tbody>
+   //                              ${renderLineItems()}
+   //                          </tbody>
+   //                      </table>
+   //                      <div style="display:flex; justify-content:flex-end; margin-bottom:30px;">
+   //                          <div style="width:45%; border:1px solid #000; padding:15px; font-size:14pt;">
+   //                              <p>CGST (9%): <strong>₹${cgst.toFixed(2)}</strong></p>
+   //                              <p>SGST (9%): <strong>₹${sgst.toFixed(2)}</strong></p>
+   //                              <p><strong>Total GST:</strong> ₹${totalGST.toFixed(2)}</p>
+   //                              <hr>
+   //                              <h2 style="margin-top:10px;">Grand Total: ₹${total.toFixed(2)}</h2>
+   //                          </div>
+   //                      </div>
+   //                      <p style="font-size:12pt; margin-bottom:40px;">
+   //                          <strong>Declaration:</strong> This is a system-generated invoice for the service fee charged towards credit card bill payment.
+   //                      </p>
+   //                  </div>
+   //              `;
+
+   //              const container = document.getElementById("invoiceTemplate");
+   //              container.innerHTML = template;
+   //              container.style.display = "block";
+
+   //              html2canvas(container, { scale: 2, useCORS: true }).then((canvas) => {
+   //                  const imgData = canvas.toDataURL("image/png");
+   //                  const { jsPDF } = window.jspdf;
+   //                  const pdf = new jsPDF("p", "mm", "a4");
+   //                  const margin = 5;
+   //                  pdf.addImage(imgData, "PNG", margin, margin, 210 - margin * 2, canvas.height * (210 - margin * 2) / canvas.width);
+   //                  pdf.save(`Invoice_${transactionId || "unknown"}.pdf`);
+   //                  container.style.display = "none";
+   //                  resolve();
+   //              }).catch(reject);
+   //          });
+   //      }
+    </script>
+}

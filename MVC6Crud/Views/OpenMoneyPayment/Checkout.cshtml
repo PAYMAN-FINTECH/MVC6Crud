@@ -1,0 +1,60 @@
+﻿<input type="text" id="orderId" placeholder="Order ID" />
+<input type="number" id="amount" placeholder="Amount" />
+<button id="payButton">Pay Now</button>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script id="context" type="text/javascript"  src="https://sandbox-payments.open.money/layer"></script>
+<script>
+    $("#payButton").on("click", function () {
+        var orderId = $("#orderId").val().trim();
+        var amount = $("#amount").val().trim();
+
+        $.ajax({
+            url: '/OpenMoneyPayment/CreatePaymentToken',
+            type: 'POST',
+            data: { OrderId: orderId, Amount: amount },  // 🔹 matches C# model
+            success: function (res) {
+                debugger;
+                startLayerCheckout(res.payment.id, "06c43650-97a7-11f0-8a8c-ad397fbe07ac");
+            },
+            error: function (xhr, status, error) {
+                alert("AJAX Error: " + error);
+            }
+        });
+    });
+
+    function startLayerCheckout(paymentToken, accessKey) {
+        Layer.checkout(
+            {
+                token: paymentToken,   // ✅ Payment token from API
+                accesskey: accessKey,  // ✅ Your access key
+                theme: {
+                    logo: "https://zwitch-logo.png",
+                    color: "#3d9080",
+                    error_color: "#ff2b2b"
+                }
+            },
+            function (response) {
+                alert(response);
+                // ✅ Payment status handling
+                if (response.status === "captured") {
+                    window.location.href = "/OpenMoneyPayment/CheckStatus?paymentTokenId=" + response.payment_id;
+                }
+                else if (response.status === "failed") {
+                    window.location.href = "/OpenMoneyPayment/Failure";
+                }
+                else if (response.status === "cancelled") {
+                    window.location.href = "/OpenMoneyPayment/Cancelled";
+                }
+                else {
+                    console.log("Unhandled status:", response.status, response);
+                }
+            },
+            function (err) {
+                // ✅ Integration errors (invalid token, key mismatch, etc.)
+                console.error("Layer integration error:", err);
+                alert("Something went wrong. Please try again.");
+            }
+        );
+    }
+</script>

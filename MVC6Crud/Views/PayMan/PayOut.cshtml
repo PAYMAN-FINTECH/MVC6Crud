@@ -1,0 +1,88 @@
+﻿@model PayOutBeanRequest
+
+<div class="row col-md-12">
+    <div class="col-md-6">
+        <div class="container">
+            <h3>Payout without Bene</h3>
+            <br />
+            <div class="row">
+
+                <div class="jumbotron">
+                    <form role="form" method="post" asp-action="PayOut" asp-controller="PayMan">
+
+                        <div class="form-group col-8">
+                            <label for="AccountHolderName"><strong>Account Holder Name</strong></label>
+                            <input type="text" name="AccountHolderName" asp-for="accountHolderName" required autocomplete="off" class="form-control input-sm" placeholder="Account Holder Name">
+                            <span asp-validation-for="accountHolderName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-8">
+                            <label for="EmailId"><strong>Email Id</strong></label>
+                            <input type="text"  name="EmailId" asp-for="emailId" required autocomplete="off" class="form-control input-sm" placeholder="Email Id">
+                            <span asp-validation-for="emailId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-8">
+                            <label for="MobileNo"><strong>Mobile No</strong></label>
+                            <input type="text" name="MobileNo" asp-for="mobileNo" required autocomplete="off" class="form-control input-sm" placeholder="Mobile No">
+                            <span asp-validation-for="mobileNo" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-8">
+                            <label for="TxnAmount"><strong>Txn Amount</strong></label>
+                            <input type="text"  name="TxnAmount" asp-for="txnAmount" required autocomplete="off" class="form-control input-sm" placeholder="Txn Amount">
+                            <span asp-validation-for="txnAmount" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-8">
+                            <label for="AccountNo"><strong>Account No</strong></label>
+                            <input type="text" name="AccountNo" asp-for="accountNo" required autocomplete="off" class="form-control input-sm" placeholder="Account No">
+                            <span asp-validation-for="accountNo" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-8">
+                            <label for="IfscCode"><strong>IfscCode</strong></label>
+                            <input type="text" name="IfscCode" asp-for="ifscCode" required autocomplete="off" class="form-control input-sm" placeholder="Ifsc Code">
+                            <span asp-validation-for="ifscCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-8">
+                            <label for="BankName"><strong>Bank Name</strong></label>
+                            <input type="text"  name="BankName" asp-for="bankName" required autocomplete="off" class="form-control input-sm" placeholder="Bank Name">
+                            <span asp-validation-for="bankName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-8">
+                            <label for="TxnType"><strong>TXN Type</strong></label>
+                            <select id="drpEmpList" class="form-control" required asp-for="txnType">
+                                <option  value="">--Select--</option>  
+                                <option value="IMPS">IMPS</option>
+                            </select>  
+                        </div>
+
+                        <div class="form-group col-8">
+                            <label for="AccountType"><strong>AccountType</strong></label>
+                            <select id="drpEmpList" class="form-control" required asp-for="accountType">
+                                <option value="">--Select--</option>
+                                <option value="Saving">Saving</option>
+                            </select>
+                        </div>
+                        <br />
+
+                        <input type="submit" value="Save" class="btn btn-primary">
+                        <input asp-action="PayManHome" asp-controller="PayMan" type="submit" value="Back" class="btn btn-danger">
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6">
+        <div class="img-responsive">
+            <img src="~/images/cardpayimage.jpg" style="width:100%" />
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,568 @@
+﻿@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_EduLayout.cshtml";
+
+    // ---------- COURSE DATA ----------
+    var courses = new List<dynamic>();
+
+    // 1. Existing tech courses (Education) – about 40 courses
+    string[] eduNames = {
+        "Test",
+        "Generative AI & Machine Learning Engineer",
+        "Generative AI Engineer",
+        "Data Science With GenAI Interview Prep",
+        "AI Agent Development",
+        "Generative AI & AI Agents Career Track",
+        "Multi-cloud & Devops Interview Prep",
+        "Azure Solutions Architect (AZ-305)",
+        "Azure Administrator Associate (AZ-104)",
+        "Aws & Devops Engineer",
+        "Google Cloud Architect",
+        "Multi-cloud & DevOps Career Track",
+        "Drone Development Engineer",
+        "Autonomous Robotics Development Engineer",
+        "AI Autonomous Robotics Development Engineer",
+        "AI Drone Development Engineer",
+        "Docker & Kubernetes",
+        "Docker Certified Associate",
+        "Electric Vehicle Technology Certification",
+        "Electric Vehicle with Integrated AI Career Track",
+        "Advanced Electric Vehicle Systems Engineering",
+        "AI-Integrated Electric Vehicle Development Engineer",
+        "Databricks Data Engineering Certification",
+        "AWS Certified Data Engineer - Associate (DEA-C01)",
+        "SQL Developer",
+        "Microsoft Azure Data Engineer Associate (DP-700)",
+        "Big Data Using Hadoop, Kafka & PySpark",
+        "Data Analytics",
+        "Machine Learning Bootcamp",
+        "Deep Learning Specialization",
+        "Computer Vision with AI",
+        "Natural Language Processing",
+        "Reinforcement Learning",
+        "MLOps Engineer",
+        "Data Visualization with Power BI",
+        "Tableau for Data Science",
+        "Statistics for Data Science",
+        "Python for Everybody",
+        "R Programming",
+        "Big Data Analytics with Spark",
+        "Kafka for Data Streaming"
+    };
+    foreach (var name in eduNames)
+    {
+        courses.Add(new
+        {
+            Category = "Education",
+            Name = name,
+            Duration = new Random().Next(4, 16) + " Weeks",
+            Students = new Random().Next(2, 9) + "K",
+            Fee =  name == "Test" ? "10" :new Random().Next(45000, 100000).ToString(),
+            Action = "GenAI"   // 👈 changed from "GetAI" to "GenAI"
+        });
+    }
+
+    // 2. Music – 12 courses
+    string[] musicCourses = {
+        "Piano for Beginners",
+        "Advanced Guitar Techniques",
+        "Violin Masterclass",
+        "Music Theory 101",
+        "Electronic Music Production",
+        "Vocal Training – Sing with Confidence",
+        "Songwriting Workshop",
+        "Music Business & Marketing",
+        "Orchestral Composition",
+        "Jazz Improvisation",
+        "Music Recording & Mixing",
+        "DJ Skills and Turntablism"
+    };
+    foreach (var name in musicCourses)
+    {
+        courses.Add(new
+        {
+            Category = "Music",
+            Name = name,
+            Duration = new Random().Next(4, 12) + " Weeks",
+            Students = new Random().Next(1, 6) + "K",
+            Fee = new Random().Next(20000, 60000).ToString(),
+            Action = "GenAI"   // 👈 changed
+        });
+    }
+
+    // 3. Drama – 12 courses
+    string[] dramaCourses = {
+        "Acting for Beginners",
+        "Method Acting Techniques",
+        "Shakespeare Performance",
+        "Improvisation Comedy",
+        "Directing for Stage",
+        "Playwriting Workshop",
+        "Voice and Diction",
+        "Stage Combat",
+        "Physical Theatre",
+        "Musical Theatre Performance",
+        "Screen Acting for Film",
+        "Theatre Production Management"
+    };
+    foreach (var name in dramaCourses)
+    {
+        courses.Add(new
+        {
+            Category = "Drama",
+            Name = name,
+            Duration = new Random().Next(4, 12) + " Weeks",
+            Students = new Random().Next(1, 5) + "K",
+            Fee = new Random().Next(18000, 55000).ToString(),
+            Action = "GenAI"
+        });
+    }
+
+    // 4. Art – 12 courses
+    string[] artCourses = {
+        "Oil Painting Fundamentals",
+        "Watercolor Techniques",
+        "Drawing for Beginners",
+        "Figure Drawing",
+        "Digital Art with Procreate",
+        "Calligraphy and Hand Lettering",
+        "Sculpture Basics",
+        "Art History: Renaissance to Modern",
+        "Printmaking Workshop",
+        "Mural Painting",
+        "Portrait Drawing",
+        "Abstract Art Exploration"
+    };
+    foreach (var name in artCourses)
+    {
+        courses.Add(new
+        {
+            Category = "Art",
+            Name = name,
+            Duration = new Random().Next(4, 12) + " Weeks",
+            Students = new Random().Next(1, 5) + "K",
+            Fee = new Random().Next(15000, 50000).ToString(),
+            Action = "GenAI"
+        });
+    }
+
+    // 5. Cooking – 12 courses
+    string[] cookingCourses = {
+        "Italian Cuisine Basics",
+        "French Cooking Techniques",
+        "Asian Street Food",
+        "Baking & Pastry Arts",
+        "Vegan and Plant-Based Cooking",
+        "Sushi Making Workshop",
+        "Indian Curry Masterclass",
+        "Grilling and Barbecue",
+        "Wine and Food Pairing",
+        "Chocolate Desserts",
+        "Healthy Meal Prep",
+        "Professional Kitchen Management"
+    };
+    foreach (var name in cookingCourses)
+    {
+        courses.Add(new
+        {
+            Category = "Cooking",
+            Name = name,
+            Duration = new Random().Next(3, 10) + " Weeks",
+            Students = new Random().Next(1, 6) + "K",
+            Fee = new Random().Next(12000, 45000).ToString(),
+            Action = "GenAI"
+        });
+    }
+
+    // 6. Modeling – 10 courses
+    string[] modelingCourses = {
+        "Runway Walking Techniques",
+        "Posing for Photography",
+        "Fashion Modeling 101",
+        "Commercial Modeling",
+        "Selfie to Portfolio",
+        "Makeup for Models",
+        "Fitness Modeling",
+        "Modeling Ethics & Contracts",
+        "Social Media Branding for Models",
+        "Plus-Size Modeling"
+    };
+    foreach (var name in modelingCourses)
+    {
+        courses.Add(new
+        {
+            Category = "Modeling",
+            Name = name,
+            Duration = new Random().Next(3, 8) + " Weeks",
+            Students = new Random().Next(1, 4) + "K",
+            Fee = new Random().Next(10000, 40000).ToString(),
+            Action = "GenAI"
+        });
+    }
+
+    // 7. Karate – 10 courses
+    string[] karateCourses = {
+        "Karate for Beginners (Shotokan)",
+        "Intermediate Karate – Kata",
+        "Karate Kumite (Sparring)",
+        "Self-Defense Techniques",
+        "Karate for Kids",
+        "Advanced Karate – Black Belt Prep",
+        "Karate Fitness & Conditioning",
+        "Traditional Kobudo Weapons",
+        "Karate Philosophy & History",
+        "Competition Training"
+    };
+    foreach (var name in karateCourses)
+    {
+        courses.Add(new
+        {
+            Category = "Karate",
+            Name = name,
+            Duration = new Random().Next(4, 12) + " Weeks",
+            Students = new Random().Next(1, 4) + "K",
+            Fee = new Random().Next(8000, 30000).ToString(),
+            Action = "GenAI"
+        });
+    }
+
+    // 8. Driving Instruction – 10 courses
+    string[] drivingCourses = {
+        "Defensive Driving",
+        "Automatic Transmission Basics",
+        "Manual Transmission Mastery",
+        "Parallel Parking Techniques",
+        "Highway Driving",
+        "Night Driving Skills",
+        "Winter Driving Safety",
+        "Electric Vehicle Operation",
+        "Fleet Driver Training",
+        "Driving Instructor Certification"
+    };
+    foreach (var name in drivingCourses)
+    {
+        courses.Add(new
+        {
+            Category = "Driving Instruction",
+            Name = name,
+            Duration = new Random().Next(2, 6) + " Weeks",
+            Students = new Random().Next(1, 5) + "K",
+            Fee = new Random().Next(5000, 20000).ToString(),
+            Action = "GenAI"
+        });
+    }
+
+    // 9. Traffic Safety – 10 courses
+    string[] trafficCourses = {
+        "Traffic Safety Fundamentals",
+        "Accident Prevention",
+        "Child Passenger Safety",
+        "Distracted Driving Awareness",
+        "Impaired Driving Prevention",
+        "School Bus Safety",
+        "Motorcycle Safety",
+        "Bicycle & Pedestrian Safety",
+        "Fleet Safety Management",
+        "Traffic Control Flagger Training"
+    };
+    foreach (var name in trafficCourses)
+    {
+        courses.Add(new
+        {
+            Category = "Traffic Safety",
+            Name = name,
+            Duration = new Random().Next(1, 4) + " Weeks",
+            Students = new Random().Next(1, 4) + "K",
+            Fee = new Random().Next(3000, 15000).ToString(),
+            Action = "GenAI"
+        });
+    }
+
+    // 10. Flying Instruction – 10 courses
+    string[] flyingCourses = {
+        "Private Pilot License (PPL) Prep",
+        "Instrument Rating (IR)",
+        "Commercial Pilot License (CPL)",
+        "Flight Instructor Certification",
+        "Aerodynamics for Pilots",
+        "Cross-Country Navigation",
+        "Emergency Procedures",
+        "Multi-Engine Rating",
+        "Glider Flying",
+        "Drone Pilot Certification"
+    };
+    foreach (var name in flyingCourses)
+    {
+        courses.Add(new
+        {
+            Category = "Flying Instruction",
+            Name = name,
+            Duration = new Random().Next(6, 20) + " Weeks",
+            Students = new Random().Next(1, 3) + "K",
+            Fee = new Random().Next(50000, 150000).ToString(),
+            Action = "GenAI"
+        });
+    }
+
+    // 11. Sewing – 10 courses
+    string[] sewingCourses = {
+        "Sewing Basics: Machine & Hand Stitches",
+        "Pattern Making",
+        "Garment Construction",
+        "Alterations & Repairs",
+        "Quilting for Beginners",
+        "Embroidery Techniques",
+        "Sewing with Knits",
+        "Home Decor Sewing",
+        "Fashion Design Sewing",
+        "Sewing for Kids"
+    };
+    foreach (var name in sewingCourses)
+    {
+        courses.Add(new
+        {
+            Category = "Sewing",
+            Name = name,
+            Duration = new Random().Next(3, 8) + " Weeks",
+            Students = new Random().Next(1, 4) + "K",
+            Fee = new Random().Next(6000, 25000).ToString(),
+            Action = "GenAI"
+        });
+    }
+
+    // 12. Knitting Instruction – 10 courses
+    string[] knittingCourses = {
+        "Knitting 101: Cast On to Bind Off",
+        "Sock Knitting Workshop",
+        "Cable Knitting Patterns",
+        "Lace Knitting",
+        "Fair Isle Knitting",
+        "Knitting with Beads",
+        "Crochet for Knitters",
+        "Baby Knits",
+        "Knitting Sweaters",
+        "Circular Knitting Techniques"
+    };
+    foreach (var name in knittingCourses)
+    {
+        courses.Add(new
+        {
+            Category = "Knitting Instruction",
+            Name = name,
+            Duration = new Random().Next(3, 8) + " Weeks",
+            Students = new Random().Next(1, 3) + "K",
+            Fee = new Random().Next(5000, 20000).ToString(),
+            Action = "GenAI"
+        });
+    }
+}
+
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<style>
+    html {
+        scroll-behavior: smooth;
+    }
+
+    .carousel-item img {
+        width: 100%;
+        height: auto;
+        max-height: 170px;
+        object-fit: cover;
+    }
+
+    .theme-divider {
+        width: 80px;
+        height: 3px;
+        background-color: #0d6efd;
+        margin: 0 auto 20px auto;
+    }
+
+    .card:hover {
+        transform: scale(1.03);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .brand-sub {
+        font-size: 0.5em;
+        text-transform: lowercase;
+    }
+
+    .card {
+        background-color: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .card-header {
+        background-color: #ff0000;
+        color: white;
+        font-weight: bold;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+        .card-body p {
+            margin-bottom: 0.5rem;
+            font-size: 14px;
+        }
+</style>
+
+<div class="row pb-3">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show text-center" role="alert" id="successAlert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <script>
+            setTimeout(function () {
+                var alert = document.getElementById('successAlert');
+                if (alert) { var bsAlert = new bootstrap.Alert(alert); bsAlert.close(); }
+            }, 3000);
+        </script>
+    }
+
+    <!-- Banner Carousel -->
+    <header class="main-banner-sec">
+        <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active"><img src="~/images/edu/3.jpg" class="d-block w-100" alt="Banner"></div>
+                <div class="carousel-item"><img src="~/images/edu/5-1.jpg" class="d-block w-100" alt="Banner"></div>
+                <div class="carousel-item"><img src="~/images/edu/6.jpg" class="d-block w-100" alt="Banner"></div>
+                <div class="carousel-item"><img src="~/images/edu/Sathya-Web_Banners-1.jpg" class="d-block w-100" alt="Banner"></div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+        </div>
+    </header>
+
+    <div class="container py-5" id="coursesSection">
+        <h3 class="mb-4">Explore eduPAYMAN Degrees</h3>
+        <p class="lead mb-4">Choose a category below to find the perfect program for your career goals, or browse all courses.</p>
+        <div class="row">
+            <!-- Category Dropdown (Education selected by default) -->
+            <div class="col-md-3">
+                <h5 class="mb-3">Categories</h5>
+                <select class="form-select" id="categorySelect" aria-label="Category dropdown">
+                    <option value="All">All Categories</option>
+                    <option value="Education" selected>Education (Tech)</option>
+                    <option value="Music">Music</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Art">Art</option>
+                    <option value="Cooking">Cooking</option>
+                    <option value="Modeling">Modeling</option>
+                    <option value="Karate">Karate</option>
+                    <option value="Driving Instruction">Driving Instruction</option>
+                    <option value="Traffic Safety">Traffic Safety</option>
+                    <option value="Flying Instruction">Flying Instruction</option>
+                    <option value="Sewing">Sewing</option>
+                    <option value="Knitting Instruction">Knitting Instruction</option>
+                </select>
+            </div>
+
+            <!-- Courses Grid -->
+            <div class="col-md-9">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="courseContainer">
+                    @foreach (var course in courses)
+                    {
+                        <div class="col course-card" data-category="@course.Category">
+                            <div class="card shadow h-100">
+                                <!-- Header -->
+                                <div style="background-color:#0a2a66; color:white; padding:20px; position:relative; min-height:100px;">
+                                    <h6 class="m-0" style="font-size:16px; font-weight:bold; max-width:70%;">
+                                        @course.Name
+                                    </h6>
+                                    <span style="position:absolute; top:10px; right:10px; background-color:red; color:white; font-size:12px; font-weight:bold; padding:4px 10px; border-radius:6px;">
+                                        LIVE Classes
+                                    </span>
+                                </div>
+
+                                <!-- Body -->
+                                <div class="card-body">
+                                    <h6 class="fw-bold mb-2" style="font-size:14px;">@course.Name</h6>
+                                    <p class="mb-1"><i class="bi bi-clock-fill text-primary"></i> @course.Duration</p>
+                                    <p class="mb-1"><i class="bi bi-people-fill text-primary"></i> @course.Students Students Enrolled</p>
+                                    <p class="mb-3"><i class="bi bi-laptop-fill text-primary"></i> Instructor-Led Live Sessions</p>
+
+                                    <!-- Fees and Button – now always calls "GenAI" action -->
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <div>
+                                            <p class="mb-0" style="font-size:12px;">Fees</p>
+                                            <p class="mb-0">
+                                                <del style="color:gray;">₹@(int.Parse(course.Fee) + 15000)</del>
+                                                <strong style="font-size:18px;">₹@course.Fee</strong>
+                                            </p>
+                                        </div>
+                                        <a href="@Url.Action("GetAI", "Edu", new { courseName = course.Name, amount = course.Fee })"
+                                           style="font-size:10px; border-radius:8px; padding:10px 18px;" class="btn btn-primary">
+                                            KNOW MORE
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Explore Programs CTA -->
+    <div class="text-center p-4 bg-info text-white">
+        <h1 class="fw-bold mb-3">Learn Programming in <span class="fw-bold">EDU<span class="brand-sub">payman</span></span></h1>
+        <p class="mb-3 w-50 mx-auto">
+            We believe that learning in one's native language helps in better understanding and mastery of a subject.
+        </p>
+        <a href="#" id="exploreAllBtn" class="btn btn-primary rounded-pill px-4">Explore All Programs</a>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Filtering Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const categorySelect = document.getElementById('categorySelect');
+        const courseCards = document.querySelectorAll('.course-card');
+        const exploreBtn = document.getElementById('exploreAllBtn');
+
+        function filterCourses(category) {
+            courseCards.forEach(card => {
+                if (category === 'All' || card.dataset.category === category) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Set initial filter to Education (because option "Education" is selected)
+        filterCourses('Education');
+
+        // Dropdown change
+        categorySelect.addEventListener('change', function (e) {
+            filterCourses(e.target.value);
+        });
+
+        // Explore All Programs button: set dropdown to "All", show all courses, scroll to section
+        exploreBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            categorySelect.value = 'All';
+            filterCourses('All');
+            document.getElementById('coursesSection').scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+</script>

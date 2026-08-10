@@ -1,0 +1,190 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.14/jspdf.plugin.autotable.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+@model PassBooksList
+
+<div class="row col-md-12">
+    <div class="col-md-6">
+        <div class="container">
+            <h4>PassBook</h4>
+            <br />
+            <div class="row">
+
+                @for (int i = 0; i < Model.passBooks.Count; i++)
+                {
+                    <div class="p-1">
+                        <div class="card" style="font-size: small; font-style: inherit;">
+
+                            @if (Model.passBooks[i].GateWayType == "PAY IN")
+                            {
+                                <div class="card-header" style="background-color:green">
+                                    <label></label><strong>@Model.passBooks[i].GateWayType</strong>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="card-header" style="background-color:orangered">
+                                    <label></label><strong>@Model.passBooks[i].GateWayType</strong>
+                                    <button class="btn btn-primary btn-sm float-end" onclick="GenrateInvoice('@Model.passBooks[i].TransectionId','@Model.passBooks[i].Amount','@Model.passBooks[i].AccountNo','@Model.passBooks[i].AccountHolderName','@Model.passBooks[i].UserId','@Model.passBooks[i].IfscCode','@Model.passBooks[i].CreatedDate','@Model.passBooks[i].Status')">Get Invoice</button>
+                                </div>
+                            }
+
+                            <div class="card-body">
+                                <div class="row col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>Transection Id : </label><strong>@Model.passBooks[i].TransectionId</strong>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>Amount : </label><strong>@Model.passBooks[i].Amount</strong>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label> Status : </label><strong>@Model.passBooks[i].Status</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>Account No : </label><strong>@Model.passBooks[i].AccountNo</strong>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>Name:  </label><strong>@Model.passBooks[i].AccountHolderName</strong>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label> Date : </label><strong>@Model.passBooks[i].CreatedDate</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                }
+
+            </div>
+            <div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    let selectedUtrId = null;
+    let selectedAccount = null;
+    let selectedIfsc = null;
+    let datetime = null;
+    let OrderId = null;
+
+    function getBase64Image(url, callback) {
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = function () {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            const dataURL = canvas.toDataURL("image/png");
+            callback(dataURL);
+        };
+        img.src = url;
+    }
+
+    function GenrateInvoice(TransectionId, Amount, AccountNo, AccountHolderName, UserId, IfscCode, CreatedDate, Status) {
+        const invoiceId = generateInvoiceId();
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        //addWatermark(doc, "PAYMAN FINTECH");
+
+        // Add Logo at the top (assuming you have a base64 or URL image for the logo)
+        // const logoUrl = 'path_to_logo_image.png';
+        // doc.addImage(logoUrl, 'PNG', 10, 10, 30, 15);
+
+        const logoWidth = 20; // Reduce width
+        const logoHeight = 10; // Reduce height
+
+
+        getBase64Image('/images/home1.png', function (logoBase64) {
+            doc.addImage(logoBase64, 'PNG', 10, 20, logoWidth, logoHeight);
+
+            const title = "INVOICE";
+            doc.setFontSize(16);
+            const pageWidth = doc.internal.pageSize.width;
+            const titleWidth = doc.getTextWidth(title);
+            const titleX = (pageWidth - titleWidth) / 2; // Calculate centered X position
+            doc.text(title, titleX, 15); // Adjust Y position if needed
+
+            // Document title and subtitle
+            doc.setFontSize(12);
+            doc.text("PAYMAN", 10, 35);
+            doc.setFontSize(10);
+            doc.text("9-12 HMT NAGAR STNUMBER 1", 10, 40);
+            doc.text("NACHARAM,HYDERABAD,Telangana, 500076", 10, 45);
+
+            // Add invoice details
+            doc.setFontSize(10);
+            doc.text("Invoice No: " + invoiceId, 140, 30);
+            doc.text("Invoice Month: " + datetime, 140, 35);
+            doc.text("Sender Name: PayMan Admin", 140, 40);
+            doc.text("Sender No: 9100748033", 140, 45);
+
+            // Beneficiary details
+            doc.text("Beneficiary Name: " + AccountHolderName, 140, 55);
+            doc.text("Account No: " + AccountNo, 140, 60);
+            doc.text("IFSC Code: " + IfscCode, 140, 65);
+
+            // Define table header and content
+            const headers = [["ORDER ID", "Status", "URN", "Txn Mode", "AMOUNT", "Ref No"]];
+            const data = [
+                [OrderId, Status, TransectionId, "IMPS", Amount, ""]
+            ];
+
+            // Add table to PDF
+            doc.autoTable({
+                head: headers,
+                body: data,
+                startY: 80,          // Adjust starting Y position as needed
+                margin: { left: 10 }, // Set left margin to 0 to start X position from the left edge
+            });
+
+            // Total information at the bottom
+
+            doc.text("Gross Total : " + Amount, 10, doc.lastAutoTable.finalY + 10);
+            doc.text("Net Total : " + Amount, 10, doc.lastAutoTable.finalY + 15);
+            doc.text("CIN: U62099TS2023PTC179868", 10, doc.lastAutoTable.finalY + 25);
+            doc.text("PAN: AAOCP3061H", 10, doc.lastAutoTable.finalY + 30);
+            doc.text("GSTIN: 36AAOCP3061H1Z9", 10, doc.lastAutoTable.finalY + 35);
+            doc.text("State: Telangana", 10, doc.lastAutoTable.finalY + 40);
+
+            // Disclaimer
+            doc.setFontSize(8);
+            doc.text("This is a computer generated invoice hence signature is not required.", 10, doc.lastAutoTable.finalY + 50);
+
+            // Download the PDF
+            doc.save(AccountHolderName + "_INVOICE.pdf");
+        });
+    }
+
+    function generateInvoiceId() {
+        const prefix = "PM";
+
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const milliseconds = String(now.getMilliseconds()).padStart(3, '0'); // Three digits for milliseconds
+
+        // Concatenate the parts to form the invoice ID
+        const invoiceId = `${prefix}${year}${month}${day}${hours}${minutes}${seconds}`;
+        datetime = year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
+        OrderId = `${prefix}${hours}${minutes}${seconds}`;
+
+        return invoiceId;
+    }
+</script>

@@ -1,0 +1,105 @@
+﻿@model Reacharge
+
+@{
+    ViewData["Title"] = "PayManHome Page";
+}
+<div class="row col-md-12">
+    <div class="col-md-6">
+        <div class="container">
+            <h2>Reacharge</h2>
+            <br />
+            <div class="row">
+                @using (Html.BeginForm("Reacharge", "PayMan", FormMethod.Post))
+                    {
+                    <div class="form-group">
+                        <label for="AccountHolderName"><strong>MObile Number</strong></label>
+                        <input type="text" id="mobileNumber" name="MobileNumber" asp-for="MobileNumber" required autocomplete="off" class="form-control input-sm" placeholder="Mobile Number">
+                        <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="circleDropdown">Circle</label>
+                        <select id="circleDropdown" name="circleDropdown" class="form-control">
+                            @foreach (var circle in Model.Data)
+                            {
+                                <option value="@circle.CircleCode">@circle.CircleName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="operatorDropdown">Operator</label>
+                        <select id="operatorDropdown" name="operatorDropdown" class="form-control">
+                            @foreach (var operators in Model.operators)
+                            {
+                                <option value="@operators.OperatorCode">@operators.OperatorName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="operatorDropdown">Fatch Amount</label>
+                        <select id="categoryDropdown" class="form-group" name="featchAmountDropdown"></select>
+                    </div>
+                  @*   <label for="Name" class="control-label"><strong>select Operator</strong> </label>
+                        @Html.DropDownListFor(model => model.SelectedGetOperatorId, new SelectList(Model.GetOperator, "Id", "Name"), "Select Operator", new { @class = "form-control", /*onchange = "dropdownChange()"*/ })
+                        <br />
+                    <label for="Name" class="control-label"><strong>Select Amount</strong></label>
+                        @Html.DropDownListFor(model => model.SelectedGetBalanceId, new SelectList(Model.GetBalance, "Id", "Name"), "Select Balance", new { @class = "form-control"})
+                        <br />
+                    <label for="Name" class="control-label"><strong>Mobile Number</strong></label>
+                        @Html.TextBoxFor(model => model.SelectedGetCircleId, new { @class = "form-control" })
+                        <br />
+                        <br /> *@
+                    <input type="submit" value="Submit" class="btn btn-primary" />
+                    <input asp-action="PayManHome" asp-controller="PayMan" type="button" value="Back" class="btn btn-danger">
+                    }
+                </div>
+                </div>
+                </div>
+                </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    // function dropdownChange() {
+    //     var selectedEmployeeId = $("#SelectedGetCircleId").val();
+    //     if (selectedEmployeeId !== '') {
+    //         $.ajax({
+    //             type: 'GET',
+    //             url: '/PayMan/GetOperator?employeeId=' + selectedEmployeeId,
+    //             success: function (data) {
+    //                 // Handle the response data here
+    //                 console.log(data);
+    //             },
+    //             error: function () {
+    //                 console.log('Error occurred while calling API.');
+    //             }
+    //         });
+    //     }
+    // }
+    $('#operatorDropdown').change(function () {
+        var selectedId = $(this).val();
+        var selectedId1 = $("#circleDropdown").val();
+        var mobileno = $("#mobileNumber").val();
+        $.ajax({
+            url: '@Url.Action("GetOperatorPlans", "PayMan")',
+            type: 'GET',
+            data: { OperatorCode: selectedId, CircleCode: selectedId1, mobileNumber: mobileno },
+            success: function (data) {
+
+                var dropdown = $('#categoryDropdown');
+                dropdown.empty();
+                dropdown.append('<option selected="true" disabled>Choose Category</option>');
+                dropdown.prop('selectedIndex', 0);
+              
+                $.each(data.result, function (key, entry) {
+                    dropdown.append($('<option></option>').attr('value', entry.circleCode).text(entry.circleName));
+                });
+               
+
+                // $('#categoryDropdown').find('option').remove();
+                // // Add new options based on returned data
+                // $(data.result).each(function (index, item) {
+                //     $('#categoryDropdown').append($('<option></option>').val(item.circleCode).html(item.circleName));
+                // });
+            }
+        });
+    });
+</script>

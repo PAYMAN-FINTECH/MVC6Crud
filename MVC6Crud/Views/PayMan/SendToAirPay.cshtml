@@ -1,0 +1,32 @@
+﻿@model SendtoAirpayModel
+
+<form action="https://payments.airpay.co.in/pay/index.php" method="post" name="frmsend" id="frmsend">
+    <input type="hidden" name="buyerEmail" value="@Model.BuyerEmail" />
+    <input type="hidden" name="buyerPhone" value="@Model.BuyerPhone" />
+    <input type="hidden" name="buyerFirstName" value="@Model.BuyerFirstName" />
+    <input type="hidden" name="buyerLastName" value="@Model.BuyerLastName" />
+    <input type="hidden" name="buyerAddress" value="@Model.BuyerAddress" />
+    <input type="hidden" name="buyerCity" value="@Model.BuyerCity" />
+    <input type="hidden" name="buyerState" value="@Model.BuyerState" />
+    <input type="hidden" name="buyerCountry" value="@Model.BuyerCountry" />
+    <input type="hidden" name="buyerPinCode" value="@Model.BuyerPinCode" />
+    <input type="hidden" name="customvar" value="@Model.CustomVar" />
+    <input type="hidden" name="txnsubtype" value="@Model.TxnSubtype" />
+    <input type="hidden" name="privatekey" value="@Model.PrivateKey" />
+    <input type="hidden" name="mercid" value="@Model.MerchantId" />
+    <input type="hidden" name="orderid" value="@Model.OrderId" />
+    <input type="hidden" name="currency" value="@Model.Currency" />
+    <input type="hidden" name="isocurrency" value="@Model.IsoCurrency" />
+    <input type="hidden" name="amount" value="@Model.Amount" />
+    <input type="hidden" name="checksum" value="@Model.Checksum" />
+
+    <!-- Optional: Add returnUrl (callback URL) -->
+    @* <input type="hidden" name="returnUrl" value="@Url.Action("responsefromairpay", "PayMan", null, Request.Scheme)" /> *@
+</form>
+
+<script>
+    window.onload = function () {
+        // Submit the form automatically when the page loads
+        document.forms['frmsend'].submit();
+    };
+</script>

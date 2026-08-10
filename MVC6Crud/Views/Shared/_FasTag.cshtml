@@ -1,0 +1,163 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = null;
+    var userName = Context.Session.GetString("UserName");
+    bool isLoggedIn = !string.IsNullOrEmpty(userName);
+   
+}
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FasTagPayman</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+</head>
+<body>
+    <!-- Loader Partial -->
+    @await Html.PartialAsync("_LoaderPartial")
+    <!-- Header -->
+    <header class="bg-primary shadow-sm">
+        <div class="container d-flex justify-content-between align-items-center py-3 text-white">
+            <div class="logo">
+                
+                    <a asp-controller="FasTag" asp-action="Index"  class="navbar-brand text-white">
+                        <img src="~/images/finalicon.png" width="40" height="40" class="me-2" alt="Payman Logo" />
+                        <span class="fw-bold">FASTag<span style="font-size: 0.6em;">payman</span></span>
+                    </a>
+               
+            </div>
+            <nav class="d-flex align-items-center">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="FasTag" asp-action="Index">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="FasTag" asp-action="About">About</a>
+                    </li>
+                </ul>
+            </nav>
+            @if (isLoggedIn)
+            {
+                <div class="d-flex align-items-center">
+                    <span class="me-3 text-white">Welcome, @userName</span>
+                    <a class="btn btn-outline-danger" asp-controller="FasTag" asp-action="WebLogout" onclick="localStorage.clear();">Logout</a>
+                </div>
+            }
+            
+        </div>
+    </header>
+    <!-- Main Content -->
+    <main role="main" class="container my-4">
+        @RenderBody()
+    </main>
+
+    <footer class="bg-dark text-white mt-5">
+        <div class="container py-5">
+            <div class="row">
+                <!-- Address -->
+                <div class="col-md-3">
+                    <p>
+                        9-12 HMT NAGAR STNUMBER 1,<br />
+                        NACHARAM, HYDERABAD, 500076,<br />
+                        Telangana India
+                    </p>
+                    <p>+91-9100748033</p>
+                    <p>
+                        <a href="mailto:support@paymanfintech.in" class="text-white text-decoration-none">
+                            support@paymanfintech.in
+                        </a>
+                    </p>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="https://www.facebook.com/share/19kGYXuFQE/" class="text-white fs-4"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="bi bi-linkedin"></i></a>
+                        <a href="https://www.instagram.com/payman_fintech_solutions_pvt?igsh=c3Q1MGlxOTczOGhw" class="text-white fs-4"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="bi bi-youtube"></i></a>
+                    </div>
+                </div>
+
+                <!-- Pages -->
+                <div class="col-md-3">
+                    <h5 class="fw-bold">Pages</h5>
+                    <ul class="list-unstyled">
+                        <li><a asp-controller="FasTag" asp-action="About" class="text-white text-decoration-none">About</a></li>
+                        <li><a asp-controller="FasTag" asp-action="PrivacyPolicy" class="text-white text-decoration-none">Privacy Policy</a></li>
+                        <li><a asp-controller="FasTag" asp-action="RefundPolicy" class="text-white text-decoration-none">Refund Policy</a></li>
+                        <li><a asp-controller="FasTag" asp-action="Terms" class="text-white text-decoration-none">Terms</a></li>
+                        <li><a asp-controller="FasTag" asp-action="ContactUs" class="text-white text-decoration-none">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Office -->
+                <div class="col-md-3">
+                    <h5 class="fw-bold">Office</h5>
+                    <p>
+                        9-12 HMT NAGAR STNUMBER 1,<br />
+                        NACHARAM, HYDERABAD, 500076,<br />
+                        Telangana India
+                    </p>
+                    <p>+91-9100748033</p>
+                    <p>
+                        <a href="mailto:support@paymanfintech.in" class="text-white text-decoration-none">
+                            support@paymanfintech.in
+                        </a>
+                    </p>
+                    
+                </div>
+                <div class="col-md-3">
+                    <img src="~/images/bpps.jpg" alt="BPPS Assured" class="img-fluid" style="max-height: 80px;" />
+                </div>
+            </div>
+            <hr class="border-light" />
+            <p class="text-center mb-0">
+                © 2025 <span class="fw-bold">PAYMAN FINTECH SOLUTIONS PVT LTD</span>. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+        <div id="liveToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toastMessage">Something went wrong</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    function showToast(message, type = 'danger') {
+           const toastEl = document.getElementById('liveToast');
+           const toastBody = document.getElementById('toastMessage');
+
+           toastBody.textContent = message;
+
+           // Change background based on type
+           toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
+
+           const toast = new bootstrap.Toast(toastEl);
+           toast.show();
+       }
+</script>
+
+
+

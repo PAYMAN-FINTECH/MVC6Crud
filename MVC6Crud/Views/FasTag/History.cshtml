@@ -1,0 +1,65 @@
+﻿@model IEnumerable<MVC6Crud.Models.PaymanApp.FastTagHistory>
+@{
+    ViewData["Title"] = "FASTag Recharge History";
+    Layout = "~/Views/Shared/_FasTag.cshtml"; // ✅ Use your FASTag layout
+}
+
+<div class="container py-4">
+    <h2 class="mb-4">FASTag Recharge History</h2>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            No recharge history available.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Vehicle No</th>
+                        <th>Ref ID</th>
+                        <th>Status</th>
+                        <th class="text-end">Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.DateTime?.ToString("dd-MMM-yyyy HH:mm")</td>
+                                <td>@item.AccountHolderName</td>
+                                <td>@item.AccountNo</td>
+                                <td>@item.RefId</td>
+                                <td>
+                                    <span class="badge @(item.Status == "Success" ? "bg-success" : "bg-danger")">
+                                        @item.Status
+                                    </span>
+                                </td>
+                                <td class="text-end">@item.Amount?.ToString("N2")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No transactions found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    <!-- ✅ Back Button -->
+    <div class="text-center">
+        <a asp-controller="FasTag" asp-action="FastTrackPay" asp-route-isFastTag="true" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle me-1"></i> Back to Recharge
+        </a>
+    </div>
+</div>

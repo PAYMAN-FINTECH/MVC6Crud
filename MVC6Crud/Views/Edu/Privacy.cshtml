@@ -1,0 +1,235 @@
+﻿@{
+    ViewData["Title"] = "Privacy Policy";
+    Layout = "~/Views/Shared/_EduLayout.cshtml";
+}
+
+<style>
+    .privacy-wrapper {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .privacy-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .privacy-header h1 {
+        font-weight: 700;
+        color: #0d6efd;
+    }
+
+    .privacy-date {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .policy-card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 28px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        transition: 0.3s ease;
+        border-left: 5px solid #0d6efd;
+    }
+
+    .policy-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .policy-card h2 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #1c1c1c;
+    }
+
+    .policy-card h3, .policy-card h4 {
+        font-size: 16px;
+        margin-top: 15px;
+        font-weight: 600;
+        color: #0d6efd;
+    }
+
+    .policy-card p {
+        color: #555;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .policy-card ul {
+        padding-left: 20px;
+    }
+
+    .policy-card ul li {
+        font-size: 14px;
+        margin-bottom: 6px;
+        color: #444;
+    }
+
+    .contact-card {
+        background: linear-gradient(135deg, #0d6efd, #0047ab);
+        color: white;
+        border-radius: 14px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 6px 25px rgba(13, 110, 253, 0.3);
+    }
+
+    .contact-card a {
+        color: #ffffff;
+        font-weight: 500;
+        text-decoration: underline;
+    }
+
+    .footer-links {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    .footer-links a {
+        text-decoration: none;
+        margin: 0 8px;
+        color: #0d6efd;
+        font-weight: 500;
+    }
+
+    .footer-links a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="privacy-wrapper">
+
+    <div class="privacy-header">
+        <h1>Privacy Policy</h1>
+        <div class="privacy-date">
+            Last updated: <strong>@DateTime.Now.ToString("MMMM dd, yyyy")</strong>
+        </div>
+    </div>
+
+    <div class="policy-card">
+        <h2>Introduction</h2>
+        <p>
+            Welcome to <strong>Edu Payman</strong> ("we", "our", "us"). This Privacy Policy explains how we collect,
+            use, disclose, and safeguard your information when you access or use our website, platform, and services.
+        </p>
+        <p>This Privacy Policy is governed by applicable Indian laws including:</p>
+        <ul>
+            <li>Information Technology Act, 2000</li>
+            <li>IT (Reasonable Security Practices & Sensitive Personal Data) Rules, 2011</li>
+            <li>Digital Personal Data Protection Act, 2023</li>
+        </ul>
+    </div>
+
+    <div class="policy-card">
+        <h2>1. Customer / User Information Collection</h2>
+
+        <h3>A. Information You Provide</h3>
+        <ul>
+            <li>Name</li>
+            <li>Email Address</li>
+            <li>Phone Number</li>
+            <li>Address</li>
+            <li>Payment Information</li>
+            <li>Messages or Queries</li>
+            <li>KYC / Identity Documents</li>
+        </ul>
+
+        <h3>B. Automatically Collected Information</h3>
+        <ul>
+            <li>IP Address</li>
+            <li>Browser Type</li>
+            <li>Device Information</li>
+            <li>Operating System</li>
+            <li>Pages Visited</li>
+            <li>Cookies & Tracking Data</li>
+        </ul>
+    </div>
+
+    <div class="policy-card">
+        <h2>2. Use of Information</h2>
+        <ul>
+            <li>To provide and operate services</li>
+            <li>To process enrollments and transactions</li>
+            <li>To provide customer support</li>
+            <li>To send notifications</li>
+            <li>To improve user experience</li>
+            <li>To comply with legal requirements</li>
+            <li>To prevent fraud</li>
+        </ul>
+    </div>
+
+    <div class="policy-card">
+        <h2>3. Third Party Disclosure</h2>
+        <p>We do <strong>not sell</strong> your personal data.</p>
+        <h4>Service Providers</h4>
+        <ul>
+            <li>Payment Gateways</li>
+            <li>Hosting Providers</li>
+            <li>Analytics Providers</li>
+        </ul>
+        <h4>Legal Authorities</h4>
+        <p>When required by law or regulation.</p>
+    </div>
+
+    <div class="policy-card">
+        <h2>4. Data Security</h2>
+        <ul>
+            <li>Encryption (where applicable)</li>
+            <li>Secure servers</li>
+            <li>Access control restrictions</li>
+            <li>Security monitoring</li>
+        </ul>
+    </div>
+
+    <div class="policy-card">
+        <h2>5. User Rights</h2>
+        <ul>
+            <li>Access personal data</li>
+            <li>Correction requests</li>
+            <li>Deletion requests</li>
+            <li>Withdraw consent</li>
+            <li>Raise grievances</li>
+        </ul>
+    </div>
+
+    <div class="policy-card">
+        <h2>6. Cookies Policy</h2>
+        <p>
+            We use cookies to enhance experience and analyze website performance.
+            Disabling cookies may affect functionality.
+        </p>
+    </div>
+
+    <div class="policy-card">
+        <h2>7. Jurisdiction & Governing Law</h2>
+        <p>This policy is governed by the laws of India.</p>
+    </div>
+
+    <div class="policy-card">
+        <h2>9. Changes to This Policy</h2>
+        <p>We may update this policy periodically. Updates will be reflected on this page.</p>
+    </div>
+
+    <div class="contact-card">
+        <h2>Contact Us</h2>
+        <p>Email: <a href="mailto:eduinfo@payman.in">eduinfo@payman.in</a></p>
+        <p>Phone: +91 9849800697</p>
+        <p>Website: <a href="https://edu.payman.in" target="_blank">edu.payman.in</a></p>
+    </div>
+
+    <div class="footer-links">
+        <a asp-action="Aboutus" asp-controller="Edu">About</a> |
+        <a asp-action="Contact" asp-controller="Edu">Contact</a> |
+        <a asp-action="termsandconditions" asp-controller="Edu">Terms & Conditions</a> |
+        <a asp-action="Privacy" asp-controller="Edu">Privacy Policy</a> |
+        <a asp-action="Privacy" asp-controller="Edu">Refund Policy</a>
+        <p class="mt-3 text-muted">© 2026 Payman Fintech Private Limited. All rights reserved.</p>
+    </div>
+
+</div>

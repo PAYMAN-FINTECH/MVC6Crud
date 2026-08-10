@@ -1,0 +1,65 @@
+﻿@model PayInHistoryDTO
+
+<div class="row col-md-12">
+    <div class="col-md-8">
+        <div class="container">
+            <h4>
+                PayIn History
+            </h4>
+            <br />
+            <div class="row">
+                <form role="form" asp-action="PayInHistory" asp-controller="PayMan" method="get">
+                    <div class="row">
+                        <div class="form-group col-6">
+                            <input type="text" name="EnterDate" autocomplete="off" asp-for="EnterDate" class="form-control input-sm" placeholder="DD/MM/YYYY">
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="Email"></label>
+                            <input type="submit" value="Search" class="btn btn-primary">
+                            <input asp-action="PayManHome" asp-controller="PayMan" type="submit" value="Back" method="get" class="btn btn-secondary">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <br />
+            <div>
+                <table class="table table-sm table-hover table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+
+                            <th>S No</th>
+                            <th>Txn Date</th>
+                            <th>Payment Details</th>
+                            <th>Card No</th>
+                            <th>Txn Amount</th>
+                            <th>Txn Charges</th>
+                            <th>Distributor Comm..</th>
+                            <th>Credited Amount</th>
+                            <th>Txn Status</th>
+                             <th>User Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in Model.transectionHistories)
+                        {
+                            <tr>
+
+                                <td>@product.Sno</td>
+                                <td>@product.TxnDate</td>
+                                <td>@product.PaymentDetails</td>
+                                <td>@product.CardNo</td>
+                                <td>@product.TxnAmount</td>
+                                <td>@product.TxnCharges</td>
+                                <td>@product.DistributerComm</td>
+                                <td>@product.creditAmount</td>
+                                <td>@product.TxnStatus</td>
+                                <td>@product.UserName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,213 @@
+﻿@{
+    ViewData["Title"] = "Refund Policy";
+    Layout = "~/Views/Shared/_EduLayout.cshtml";
+}
+
+<style>
+    .refund-wrapper {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .refund-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+        .refund-header h1 {
+            font-weight: 700;
+            color: #0d6efd;
+        }
+
+    .refund-date {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .refund-hero {
+        background: linear-gradient(135deg, #0d6efd, #0047ab);
+        color: white;
+        border-radius: 14px;
+        padding: 30px;
+        box-shadow: 0 6px 25px rgba(13, 110, 253, 0.3);
+        margin-bottom: 30px;
+    }
+
+    .refund-card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 28px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        transition: 0.3s ease;
+        border-left: 5px solid #0d6efd;
+    }
+
+        .refund-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .refund-card h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1c1c1c;
+        }
+
+        .refund-card p {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #555;
+        }
+
+        .refund-card ul,
+        .refund-card ol {
+            padding-left: 20px;
+        }
+
+            .refund-card ul li,
+            .refund-card ol li {
+                font-size: 14px;
+                margin-bottom: 6px;
+                color: #444;
+            }
+
+    .footer-links {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 14px;
+    }
+
+        .footer-links a {
+            text-decoration: none;
+            margin: 0 8px;
+            color: #0d6efd;
+            font-weight: 500;
+        }
+
+            .footer-links a:hover {
+                text-decoration: underline;
+            }
+</style>
+
+<div class="refund-wrapper">
+
+    <div class="refund-header">
+        <h1>Refund & Cancellation Policy</h1>
+        <div class="refund-date">
+            Last updated: <strong>@DateTime.Now.ToString("MMMM dd, yyyy")</strong>
+        </div>
+    </div>
+
+    <div class="refund-hero">
+        <p>
+            We stand behind the quality of our courses. If you're not satisfied with your purchase,
+            you may request a <strong>full refund within 30 days</strong> of your purchase date,
+            subject to eligibility criteria.
+        </p>
+    </div>
+
+    <div class="refund-card">
+        <h2>30-Day Money-Back Guarantee</h2>
+        <p>
+            If you're not satisfied with your purchase, you can request a full refund within 30 days
+            of your purchase date, no questions asked.
+        </p>
+    </div>
+
+    <div class="refund-card">
+        <h2>Eligibility for Refunds</h2>
+        <ul>
+            <li>Request must be made within <strong>30 days</strong> of purchase.</li>
+            <li>You must have completed <strong>less than 30%</strong> of the course.</li>
+            <li>Course must not be purchased under special promotional terms.</li>
+            <li>You must not have received a prior refund for the same course.</li>
+            <li>You must not have violated our Terms of Service.</li>
+        </ul>
+    </div>
+
+    <div class="refund-card">
+        <h2>How to Request a Refund</h2>
+        <ol>
+            <li>Visit our <a href="/Contact">Contact Page</a>.</li>
+            <li>Provide your <strong>Order Number</strong> and <strong>Registered Email</strong>.</li>
+            <li>Briefly explain your reason (optional).</li>
+            <li>Our team will review within <strong>2–3 business days</strong>.</li>
+        </ol>
+    </div>
+
+    <div class="refund-card">
+        <h2>Refund Processing Time</h2>
+        <p>Once approved:</p>
+        <ul>
+            <li>Refund processed in <strong>5–7 business days</strong>.</li>
+            <li>Credited to your original payment method.</li>
+            <li>May take additional <strong>3–5 days</strong> depending on your bank.</li>
+        </ul>
+    </div>
+
+    <div class="refund-card">
+        <h2>Non-Refundable Items</h2>
+        <ul>
+            <li>Courses purchased more than 30 days ago.</li>
+            <li>Courses with more than 30% completion.</li>
+            <li>Subscription renewals.</li>
+            <li>Accessed course bundles.</li>
+            <li>Issued certificates.</li>
+        </ul>
+    </div>
+
+    <div class="refund-card">
+        <h2>Course Access After Refund</h2>
+        <p>
+            Once a refund is processed, your access will be immediately revoked.
+            All progress, materials, and certificates will be permanently removed.
+        </p>
+    </div>
+
+    <div class="refund-card">
+        <h2>Subscription Cancellations</h2>
+        <ul>
+            <li>You can cancel anytime.</li>
+            <li>Access continues until the end of your billing period.</li>
+            <li>No partial-period refunds.</li>
+        </ul>
+    </div>
+
+    <div class="refund-card">
+        <h2>Certificates & Refunds</h2>
+        <ul>
+            <li>Certificates are issued only after full course completion.</li>
+            <li>No refunds after certificate issuance.</li>
+            <li>Requesting a refund cancels certificate eligibility.</li>
+        </ul>
+    </div>
+
+    <div class="refund-card">
+        <h2>Technical Issues</h2>
+        <p>
+            If you face technical issues, contact support first. If unresolved,
+            you may receive a full refund regardless of the 30-day limit.
+        </p>
+    </div>
+
+    <div class="refund-card">
+        <h2>Gift Purchases</h2>
+        <p>
+            Gifts can be refunded within 30 days if not redeemed.
+            Once redeemed, standard policy applies.
+        </p>
+    </div>
+
+    <div class="footer-links">
+        <a asp-action="Aboutus" asp-controller="Edu">About</a> |
+        <a asp-action="Contact" asp-controller="Edu">Contact</a> |
+        <a asp-action="termsandconditions" asp-controller="Edu">Terms & Conditions</a> |
+        <a asp-action="Privacy" asp-controller="Edu">Privacy Policy</a> |
+        <a asp-action="Privacy" asp-controller="Edu">Refund Policy</a>
+        <p class="mt-3 text-muted">© 2026 Payman Fintech Private Limited. All rights reserved.</p>
+    </div>
+
+</div>

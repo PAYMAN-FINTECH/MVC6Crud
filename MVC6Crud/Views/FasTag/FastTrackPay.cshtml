@@ -1,0 +1,509 @@
+﻿@model MVC6Crud.Models.PaymanWeb.BeneficiaryListModel
+@{
+    ViewData["Title"] = "Credit Card";
+    Layout =  Model.isFastTag ? "~/Views/Shared/_FasTag.cshtml":"~/Views/Shared/_Layout.cshtml";
+}
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="~/css/CCBill.css" rel="stylesheet" />
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">FASTag Recharge</h2>
+        @if (Model.isFastTag){
+            <a href="/FasTag/History" class="btn btn-outline-primary">
+                <i class="bi bi-clock-history me-1"></i> History
+            </a>
+        }
+      
+    </div>
+
+    <input type="text" id="searchInput" class="form-control mb-4" placeholder="Search Bank Name" />
+    <div class="row" id="cardContainer"></div>
+</div>
+
+
+<!-- Credit Card Bill Modal -->
+<div class="modal fade" id="creditCardModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary fw-bold">FASTag Recharge</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalBankLogo" class="img-fluid mb-2" style="max-height: 60px;" />
+                <h6 class="fw-bold mb-3" id="modalBankName"></h6>
+
+                <input type="hidden" id="billerIdHidden" />
+                <input type="hidden" id="phoneHidden" value="@Model.Phone" />
+                <input type="hidden" id="paymentModeHidden" />
+                <input type="hidden" id="enquiryReferenceIdHidden" />
+                <input type="hidden" id="param1Hidden" />
+                <input type="hidden" id="param2Hidden" />
+
+
+                <input type="hidden" id="billDate" />
+                <input type="hidden" id="minPayable" />
+                <input type="hidden" id="cuurentOutStanding" />
+                <input type="hidden" id="billerId" />
+
+                <input type="hidden" id="BillerResponse" />
+                <input type="hidden" id="AdddditionalInfo" />
+                <input type="hidden" id="BillFetchResponse" />
+                <input type="hidden" id="Customertype" />
+
+
+                <input type="text" class="form-control mb-2" id="cardNumber" placeholder="Enter Vehicle Number " />
+                <input type="text" class="form-control mb-2" id="customerMobile" placeholder="Enter Mobile Number"
+                       maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10);" />
+
+                <div id="amountSection" class="d-none">
+                    <input type="text" class="form-control mb-3" id="enterAmount" placeholder="Enter Amount" />
+                </div>
+
+                <div id="billDetails" class="bg-light p-3 rounded text-start d-none">
+                    <h6 class="text-success fw-bold">Bill Details</h6>
+                    <p><strong>FASTag Balance:</strong> <span id="dueAmount"></span></p>
+                    <p><strong>Maximum Permissible Recharge Amount:</strong> <span id="dueDate"></span></p>
+                    <p><strong>Customer Name:</strong> <span id="customerName"></span></p>
+                </div>
+
+                <button id="btnFetchBill" class="btn btn-primary w-100 fw-bold mt-3" onclick="fetchBill()">Fetch Bill</button>
+                <button id="btnProceed" class="btn btn-success w-100 fw-bold mt-3 d-none" onclick="proceedPayment()">Proceed</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Payment Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to pay <span class="text-primary fw-bold" id="confirmName"></span> ₹<span id="confirmAmount"></span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="confirmYesBtn" class="btn btn-success">Yes, Pay</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        let isProcessing = false;
+
+        $(document).ready(function () {
+            debugger;
+            fetchCreditCards();
+
+            $('#searchInput').on('keyup', function () {
+                const value = $(this).val().toLowerCase();
+                $('#cardContainer .card-item').filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+
+            $('#confirmYesBtn').on('click', function () {
+                if (isProcessing) return;
+                isProcessing = true;
+                $('#Loader1').show();
+                $('#confirmYesBtn').prop('disabled', true);
+
+                const billerId = $('#billerIdHidden').val();
+                const lastFourDigits = $('#cardNumber').val().trim();
+                const customerMobile = $('#customerMobile').val().trim();
+                const amount = parseFloat($('#enterAmount').val().trim());
+                const phone = $('#phoneHidden').val();
+                const paymentMode = $('#paymentModeHidden').val();
+                const enquiryReferenceId = $('#enquiryReferenceIdHidden').val();
+                const param1 = $('#param1Hidden').val();
+                const param2 = $('#param2Hidden').val();
+
+                const available = parseInt('@Model.UserAvlAmount');
+                const instatntPay = parseInt('@Model.InstatntPay');
+                const minBalance = parseInt('@Model.MinBalanceAvl');
+                const remainingBalance = available - amount;
+
+                const customerName = $('#customerName').text().trim();
+                const device = 'Web';
+
+                const billerResponse = $('#BillerResponse').text();
+                const adddditionalInfo = $('#AdddditionalInfo').text();
+                const billFetchResponse = $('#BillFetchResponse').text();
+
+                // if (amount > available || amount > instatntPay || available <= minBalance || remainingBalance <= minBalance) {
+                //     $('#Loader1').hide();
+                //     $('#confirmYesBtn').prop('disabled', false);
+                //     isProcessing = false;
+                //     showToast("Payment constraints not met.", 'warning');
+                //     return;
+                // }
+
+                $.ajax({
+                    url: 'https://paymanfintech.in/FasTag/ProcessPayment',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        billerId, customerMobile, amount, phone,
+                        paymentMode, enquiryReferenceId, param1, param2, lastFourDigits, customerName,device, billerResponse, adddditionalInfo, billFetchResponse
+                    }),
+                    success: function (response) {
+                        const transactionId = encodeURIComponent(response.transactionId || "TXN123456");
+                        const cardNumber = encodeURIComponent(lastFourDigits);
+                        const url = `/PayMan/PayStatus?IsSuccess=${response.success}&Amount=${amount}&TransactionId=${transactionId}&CardNumber=${cardNumber}`;
+                        window.location.href = url;
+                    },
+                    error: function () {
+                        const cardNumber = encodeURIComponent(lastFourDigits);
+                        const url = `/PayMan/PayStatus?IsSuccess=false&Amount=${amount}&TransactionId=FAILED&CardNumber=${cardNumber}`;
+                        window.location.href = url;
+                    }
+                });
+            });
+        });
+
+        function ProcessPaymmen(){
+                // if (isProcessing) return;
+                // isProcessing = true;
+                $('#Loader1').show();
+                //$('#confirmYesBtn').prop('disabled', true);
+
+        function safeVal(selector) {
+            return ($(selector).val() || '').trim();
+        }
+
+        const billerId = safeVal('#billerIdHidden');
+        const lastFourDigits = safeVal('#cardNumber');
+        const customerMobile = safeVal('#customerMobile');
+        const amountVal = safeVal('#enterAmount');
+        const amount = amountVal ? parseFloat(amountVal) : 0;   // numeric fallback
+        const phone = safeVal('#phoneHidden');
+        const paymentMode = safeVal('#paymentModeHidden');
+        const enquiryReferenceId = safeVal('#enquiryReferenceIdHidden');
+        const param1 = safeVal('#param1Hidden');
+        const param2 = safeVal('#param2Hidden');
+
+        const customerName = ($('#customerName').text() || '').trim();
+        const device = 'Web';
+
+        const billerResponse = ($('#BillerResponse').text() || '').trim();
+        const adddditionalInfo = ($('#AdddditionalInfo').text() || '').trim();
+        const billFetchResponse = ($('#BillFetchResponse').text() || '').trim();
+
+                // if (amount > 100) {
+                //     $('#Loader1').hide();
+                //     //$('#confirmYesBtn').prop('disabled', false);
+                //     //isProcessing = false;
+                //     alert("Please enter amount grater then 100.");
+                //     return;
+                // }
+
+                $.ajax({
+                    url: '/FasTag/ProcessPayment',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        billerId, customerMobile, amount, phone,
+                        paymentMode, enquiryReferenceId, param1, param2, lastFourDigits, customerName,device, billerResponse, adddditionalInfo, billFetchResponse
+                    }),
+                    success: function (response) {
+                        debugger;
+                        const transactionId = encodeURIComponent(response.transactionId || "TXN123456");
+                        const cardNumber = encodeURIComponent(lastFourDigits);
+                        if('@Model.isFastTag' == 'True'){
+                            const url = `/FasTag/PayStatus?IsSuccess=${response.success}&Amount=${amount}&TransactionId=${transactionId}&CardNumber=${cardNumber}`;
+                        window.location.href = url;
+
+                        }else{
+                            const url = `/PayMan/PayStatus?IsSuccess=${response.success}&Amount=${amount}&TransactionId=${transactionId}&CardNumber=${cardNumber}`;
+                        window.location.href = url;
+                        }
+                        
+                    },
+                    error: function () {
+                        const cardNumber = encodeURIComponent(lastFourDigits);
+                        if('@Model.isFastTag' == 'True'){
+                            const url = `/FasTag/PayStatus?IsSuccess=false&Amount=${amount}&TransactionId=FAILED&CardNumber=${cardNumber}`;
+                        window.location.href = url;
+                        }else{
+                            const url = `/PayMan/PayStatus?IsSuccess=false&Amount=${amount}&TransactionId=FAILED&CardNumber=${cardNumber}`;
+                        window.location.href = url;
+                        }
+                        
+                    }
+                });
+        }
+
+        function fetchCreditCards() {
+            debugger;
+            $('#Loader1').show();
+            $.ajax({
+                url: 'https://paymanfintech.in/FasTag/FastTagBillers',
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (data) {
+                    debugger;
+                     $('#Loader1').hide();
+                    $('#cardContainer').empty();
+                    $.each(data.billers, function (index, item) {
+                        const card = `
+                            <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4 card-item">
+                                <div class="border rounded shadow-sm p-3 text-center bg-white h-100"
+                                     data-bankname="${item.billerName}"
+                                     data-banklogo="${item.iconUrl}"
+                                     data-billerid="${item.billerId}"
+                                     data-billavenue="${data.billAvenue}"
+                                     onclick="openCreditCardModal(this)">
+                                    <img src="${item.iconUrl}" alt="${item.billerName}" class="img-fluid mb-2 card-img" />
+                                    <h6>${item.billerName}</h6>
+                                </div>
+                            </div>`;
+                        $('#cardContainer').append(card);
+                    });
+                },
+                error: function () {
+                    $('#cardContainer').html('<div class="alert alert-danger">Failed to load billers.</div>');
+                }
+            });
+        }
+
+        function openCreditCardModal(el) {
+            const bankName = $(el).data("bankname");
+            const bankLogo = $(el).data("banklogo");
+            const billerId = $(el).data("billerid");
+            const billAvenue = $(el).data("billavenue");
+
+            if(billAvenue){ // ✅ corrected
+                $('#Loader1').show();
+                $.ajax({
+                    url: 'https://paymanfintech.in/CCBill/CheckBillerCategory',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { billerId: billerId },
+                    success: function (data) {
+                        // Populate modal fields
+                        if(data.isAvailable){
+                            $('#modalBankName').text(bankName);
+                            $('#modalBankLogo').attr("src", bankLogo);
+                            $('#billerIdHidden').val(billerId);
+
+                            // Reset input fields
+                        $('#cardNumber, #cardHolderMobile, #customerMobile')
+                            .val('')
+                            .prop('disabled', false)
+                            .removeClass('is-invalid');
+
+                        $('#enterAmount').val('').prop('disabled', true);
+                        $('#amountSection, #billDetails').addClass('d-none');
+
+                        $('#btnFetchBill').removeClass('d-none');
+                        $('#btnProceed').addClass('d-none');
+
+                        // Show modal
+                        new bootstrap.Modal(document.getElementById('creditCardModal')).show();
+
+                        }else{
+                          $('#Loader1').hide();
+                          alert("No bill details found.", 'warning');
+
+                        }
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Failed to fetch biller category:", error);
+                        alert("Failed to fetch biller category. Please try again.");
+                    },
+                    complete: function () {
+                        $('#Loader1').hide();
+                    }
+                });
+            } else {
+                // Fallback if the condition is false (same code as above)
+                $('#modalBankName').text(bankName);
+                $('#modalBankLogo').attr("src", bankLogo);
+                $('#billerIdHidden').val(billerId);
+
+                $('#cardNumber, #customerMobile')
+                    .val('')
+                    .prop('disabled', false)
+                    .removeClass('is-invalid');
+
+                $('#enterAmount').val('').prop('disabled', true);
+                $('#amountSection, #billDetails').addClass('d-none');
+
+                $('#btnFetchBill').removeClass('d-none');
+                $('#btnProceed').addClass('d-none');
+
+                new bootstrap.Modal(document.getElementById('creditCardModal')).show();
+            }
+        }
+
+        function fetchBill() {
+            $('#Loader1').show();
+
+            const cardNumber = $('#cardNumber').val().trim();
+            const customerMobile = $('#customerMobile').val().trim();
+            const billerId = $('#billerIdHidden').val();
+
+            $('#cardNumber, #customerMobile').removeClass('is-invalid');
+
+            let valid = true;
+            if (cardNumber.length == 0) { $('#cardNumber').addClass('is-invalid'); valid = false; }
+            if (customerMobile.length !== 10) { $('#customerMobile').addClass('is-invalid'); valid = false; }
+            if (!valid) { $('#Loader1').hide(); return; }
+
+            $.ajax({
+                url: '/FasTag/FetchCreditCardBill',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    creditCardLast4: cardNumber,
+                    customerMobile: customerMobile,
+                    billerId: billerId
+                }),
+                success: function (response) {
+                    debugger;
+                    if (response.success) {
+                        debugger;
+                         $('#Loader1').hide();
+                        $('#paymentModeHidden').val(response.paymentMode);
+                        $('#enquiryReferenceIdHidden').val(response.enquiryReferenceId);
+                        $('#param1Hidden').val(response.param1);
+                        $('#param2Hidden').val(response.param2);
+
+                        $('#dueAmount').text(response.totalAmount.toFixed(2));
+                        $('#dueDate').text(response.minPayable);
+                        $('#billDate').text(response.billDate);
+                        $('#customerName').text(response.consumerName);
+                        $('#enterAmount').val(response.totalAmount.toFixed(2)).prop('disabled', false);
+
+                         $('#BillerResponse').text(response.billerResponse);
+                         $('#AdddditionalInfo').text(response.adddditionalInfo);
+                         $('#BillFetchResponse').text(response.billFetchResponse);
+                         $('#Customertype').text(response.customerType);
+
+                        $('#amountSection, #billDetails').removeClass('d-none');
+                        $('#btnFetchBill').addClass('d-none');
+                        $('#btnProceed').removeClass('d-none');
+
+                        $('#cardNumber, #customerMobile').prop('disabled', true);
+                    } else {
+                               $('#Loader1').hide();
+                          alert("No bill details found.");
+                    }
+                },
+                error: function () {
+                           $('#Loader1').hide();
+                    alert("Failed to fetch bill.");
+                }
+            });
+        }
+
+        function proceedPayment() {
+            const amount = parseFloat($('#enterAmount').val().trim());
+            const customerName = $('#customerName').text().trim();
+            const Customertype = $('#Customertype').text().trim();
+            const mobile = $('#customerMobile').val();
+
+            if (isNaN(amount)) {
+                alert("Amount must be required");
+                return;
+            }
+             if (amount < 100) {
+                alert("Please enter grater then 100");
+                return;
+            }
+
+            $('#confirmName').text(customerName);
+            $('#confirmAmount').text(amount.toFixed(2));
+            if(Customertype == 'new'){
+                  $('#Loader1').show();
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'JSON',
+                    url: 'https://paymanfintech.in/PayMan/IntiatePayment',
+                    data: { amount: amount, cardnumber: mobile },
+                    success: function (recData) {
+                        if (recData.orderId != null) {
+                            const options = {
+                                key: `rzp_live_2EIqs9bxOALurg`,
+                                // amount: amount,
+                                name: 'PAYMAN',
+                                description: 'Pro Membership',
+                                image: '',
+                                order_id: recData.orderId,
+                                handler: (response) => {
+                                    $('#Loader1').show();
+                                    const requestBody = {
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_signature: response.razorpay_signature
+                                    };
+                                    var url = "https://paymanfintech.in/PayMan/ConfirmPayment?" +
+                                        "razorpay_payment_id=" + response.razorpay_payment_id +
+                                        "&razorpay_order_id=" + response.razorpay_order_id +
+                                        "&razorpay_signature=" + response.razorpay_signature +
+                                        "&amount=" + amount +
+                                        "&enterCustomerNumber=" + mobile;
+
+                                    $.ajax({
+                                        url: url,
+                                        type: 'GET', // or 'POST' if your server-side expects a POST request
+                                        success: function (data) {
+                                            $('#Loader1').show();
+                                            ProcessPaymmen();
+                                             //  const transactionId =  "TXN123456";
+                                             //  const sucess = true;
+                                             //    const url = `/PayMan/PayStatus?IsSuccess=${sucess}&Amount=${amount}&TransactionId=${transactionId}&CardNumber=${mobile}`;
+                                             //    window.location.href = url;
+                                             // $('#Loader1').hide();
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error('Error:', error);
+                                            // Handle errors here
+                                        }
+                                    });
+                                     $('#Loader1').hide();
+
+                                },
+                                prefill: {
+                                    // name: username,
+                                    email: "jurrajanardhan@gmail.com",
+                                },
+                                theme: {
+                                    color: '#2222d6'
+                                },
+                                method: {
+                                    "card": true, // Allow card payments only
+                                    "netbanking": true,
+                                    "upi": true,
+                                    "wallet": true
+                                }
+                            };
+                            const rzp1 = new window.Razorpay(options);
+                            rzp1.open();
+                        }
+                         $('#Loader1').show();
+                    },
+                    error: function () { alert('A error'); }
+                });
+            }else{
+                const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                confirmModal.show();
+            }
+
+            
+        }
+
+    </script>
+}

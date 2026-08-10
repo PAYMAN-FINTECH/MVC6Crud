@@ -1,0 +1,510 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Insurence.cshtml";
+}
+
+@{
+    ViewData["Title"] = "Insurance List - Payman Insurance";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions - Insurance by Payman</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --light-bg: #f8f9fa;
+            --dark-color: #343a40;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            padding-top: 76px; /* Account for fixed navbar */
+            background-color: #f9f9f9;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 60px 0 40px;
+            margin-bottom: 40px;
+        }
+
+            .page-header h1 {
+                font-size: 2.8rem;
+                margin-bottom: 10px;
+            }
+
+            .page-header .subtitle {
+                font-size: 1.2rem;
+                opacity: 0.9;
+                font-weight: 300;
+            }
+
+        .terms-content {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            padding: 40px;
+            margin-bottom: 50px;
+        }
+
+        .effective-date {
+            background: #e8f4ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+
+        .terms-section {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+            .terms-section:last-child {
+                border-bottom: none;
+            }
+
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .clause-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .clause-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+            .clause-list li {
+                padding: 8px 0;
+                padding-left: 25px;
+                position: relative;
+            }
+
+                .clause-list li:before {
+                    content: '•';
+                    position: absolute;
+                    left: 10px;
+                    color: var(--primary-color);
+                    font-size: 1.2rem;
+                }
+
+        .disclosure-box {
+            background: #fff8e1;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        .contact-info {
+            background: #f0f7ff;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .contact-icon {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-right: 15px;
+            min-width: 24px;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: none;
+        }
+
+            .back-to-top:hover {
+                background: #0056b3;
+                transform: translateY(-3px);
+                color: white;
+            }
+
+        .table-of-contents {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #eaeaea;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+            .toc-list li {
+                padding: 8px 0;
+                border-bottom: 1px solid #eee;
+            }
+
+                .toc-list li:last-child {
+                    border-bottom: none;
+                }
+
+            .toc-list a {
+                color: #333;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+                .toc-list a:hover {
+                    color: var(--primary-color);
+                }
+
+        .liability-list {
+            list-style-type: decimal;
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+
+            .liability-list li {
+                padding: 8px 0;
+            }
+
+       
+
+                .page-header h1 {
+                    font-size: 2.2rem;
+                }
+
+            .terms-content {
+                padding: 20px;
+            }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+   
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1>Terms & Conditions</h1>
+            <p class="subtitle">Insurance Premium Payment Facilitation</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Effective Date -->
+        <div class="effective-date">
+            <h4 class="mb-1"><i class="fas fa-calendar-alt me-2"></i>Effective Date: 1st January 2024</h4>
+            <p class="mb-0">Last Updated: 1st January 2024</p>
+        </div>
+
+        <!-- Introduction -->
+        <div class="clause-box mb-4">
+            <p>Welcome to Insurance by Payman, operated by Payman Fintech Solutions Private Limited. By accessing or using this website, you agree to be bound by the following Terms & Conditions.</p>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="table-of-contents">
+            <h4 class="mb-3"><i class="fas fa-list me-2"></i>Table of Contents</h4>
+            <ul class="toc-list">
+                <li><a href="#section1">1. Nature of Services</a></li>
+                <li><a href="#section2">2. Role of Payman</a></li>
+                <li><a href="#section3">3. User Responsibility</a></li>
+                <li><a href="#section4">4. Payments</a></li>
+                <li><a href="#section5">5. Payment Confirmation</a></li>
+                <li><a href="#section6">6. Limitation of Liability</a></li>
+                <li><a href="#section7">7. Prohibited Use</a></li>
+                <li><a href="#section8">8. Governing Law</a></li>
+            </ul>
+        </div>
+
+        <!-- Terms Content -->
+        <div class="terms-content">
+            <!-- Section 1: Nature of Services -->
+            <div class="terms-section" id="section1">
+                <h2 class="section-title">1. Nature of Services</h2>
+                <p>Insurance by Payman provides a technology platform solely for facilitating insurance premium payments for existing insurance policies issued by IRDAI-registered insurance companies.</p>
+
+                <div class="clause-box">
+                    <h5>What Payman Does NOT Do:</h5>
+                    <ul class="clause-list">
+                        <li>Does not sell insurance policies</li>
+                        <li>Does not issue or underwrite insurance</li>
+                        <li>Does not provide insurance advice</li>
+                        <li>Is not an insurance company, broker, corporate agent, or web aggregator</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Section 2: Role of Payman -->
+            <div class="terms-section" id="section2">
+                <h2 class="section-title">2. Role of Payman</h2>
+                <div class="clause-box">
+                    <p>Payman's role is strictly limited to payment facilitation.</p>
+                    <p class="mb-0"><strong>Important:</strong> All matters related to policy coverage, benefits, claims, renewals, cancellations, and refunds are governed exclusively by the respective insurance company.</p>
+                </div>
+            </div>
+
+            <!-- Section 3: User Responsibility -->
+            <div class="terms-section" id="section3">
+                <h2 class="section-title">3. User Responsibility</h2>
+                <p>Users must ensure that all details entered, including policy number, insurer name, and customer details, are accurate.</p>
+
+                <div class="clause-box">
+                    <h5><i class="fas fa-exclamation-triangle me-2"></i>Important Notice</h5>
+                    <p class="mb-0">Payman shall not be responsible for failures arising from incorrect information provided by the user.</p>
+                </div>
+            </div>
+
+            <!-- Section 4: Payments -->
+            <div class="terms-section" id="section4">
+                <h2 class="section-title">4. Payments</h2>
+
+                <ul class="clause-list">
+                    <li>Payments are processed through RBI-authorized payment gateways and BBPS infrastructure</li>
+                    <li>Payman does not store card, UPI, or banking credentials</li>
+                    <li>Successful payment confirmation does not constitute policy issuance or renewal unless confirmed by the insurer</li>
+                </ul>
+
+                <div class="clause-box mt-3">
+                    <h5><i class="fas fa-shield-alt me-2"></i>Security Note</h5>
+                    <p class="mb-0">All payment transactions are processed through secure, RBI-compliant channels. We do not have access to or store your complete payment credentials.</p>
+                </div>
+            </div>
+
+            <!-- Section 5: Payment Confirmation -->
+            <div class="terms-section" id="section5">
+                <h2 class="section-title">5. Payment Confirmation</h2>
+                <div class="clause-box">
+                    <p>Payman provides payment acknowledgment only. Final policy status and premium credit confirmation are subject to insurer processing.</p>
+                    <p class="mb-0 fw-bold">Users should verify policy status directly with their insurance company after making premium payments through our platform.</p>
+                </div>
+            </div>
+
+            <!-- Section 6: Limitation of Liability -->
+            <div class="terms-section" id="section6">
+                <h2 class="section-title">6. Limitation of Liability</h2>
+                <p>Payman shall not be liable for:</p>
+
+                <ol class="liability-list">
+                    <li>Insurer system downtime</li>
+                    <li>Delayed or failed policy updates</li>
+                    <li>Claim disputes</li>
+                    <li>Policy cancellation or rejection by insurer</li>
+                </ol>
+
+                <div class="clause-box mt-3">
+                    <h5><i class="fas fa-balance-scale me-2"></i>Legal Limitation</h5>
+                    <p class="mb-0">As a payment facilitator, Payman's liability is limited to the successful processing of premium payments to the designated insurance company. All insurance-related matters are between the policyholder and the insurance company.</p>
+                </div>
+            </div>
+
+            <!-- Section 7: Prohibited Use -->
+            <div class="terms-section" id="section7">
+                <h2 class="section-title">7. Prohibited Use</h2>
+                <div class="clause-box">
+                    <p>Any misuse of the platform for fraudulent or unlawful activity may result in suspension and reporting to appropriate authorities.</p>
+                    <p class="mb-0 fw-bold">Payman reserves the right to suspend or terminate accounts involved in suspicious or unauthorized activities without prior notice.</p>
+                </div>
+            </div>
+
+            <!-- Section 8: Governing Law -->
+            <div class="terms-section" id="section8">
+                <h2 class="section-title">8. Governing Law</h2>
+                <div class="clause-box">
+                    <p>These Terms & Conditions shall be governed by the laws of India, with courts at Hyderabad, Telangana, having exclusive jurisdiction.</p>
+                </div>
+            </div>
+
+            <!-- Mandatory Disclosure -->
+            <div class="disclosure-box">
+                <h5 class="text-warning"><i class="fas fa-exclamation-triangle me-2"></i>Mandatory Disclosure</h5>
+                <p class="mb-0">Payman is not an insurance company or broker. Insurance policies are issued by IRDAI-registered insurers. Payman only facilitates insurance premium payments.</p>
+            </div>
+
+            <!-- Acceptance Note -->
+            <div class="clause-box mt-4">
+                <h5><i class="fas fa-check-circle me-2 text-success"></i>Acceptance of Terms</h5>
+                <p class="mb-0">By using the Insurance by Payman platform, you acknowledge that you have read, understood, and agree to be bound by these Terms & Conditions. If you do not agree to these terms, please do not use our services.</p>
+            </div>
+        </div>
+
+        <!-- Back to Top Button -->
+        <a href="#" class="back-to-top" id="backToTop">
+            <i class="fas fa-chevron-up"></i>
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Insurance by Payman</h5>
+                    <p>Secure insurance premium payment facilitation platform.</p>
+                    <p class="mb-0 small">Operated by Payman Fintech Solutions Private Limited</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1">&copy; 2026 Payman Fintech Solutions Private Limited. All rights reserved.</p>
+                    <p class="mb-0">Operated under RBI and IRDAI guidelines.</p>
+                    <div class="mt-3">
+                        <a asp-controller="Insurance" asp-action="Terms" class="text-white me-3">Terms & Conditions</a>
+                        <a asp-controller="Insurance" asp-action="Privacy" class="text-white me-3">Privacy Policy</a>
+                        <a asp-controller="Insurance" asp-action="RefundPolcy" class="text-white me-3">Refund Policy</a>
+                        <a asp-controller="Insurance" asp-action="ContactUs" class="text-white">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Script -->
+    <script>
+        // Update navbar for logged in state
+        // function updateNavbarForLoggedIn() {
+        //     const navbar = document.querySelector('#navbarNav .navbar-nav');
+        //     if (navbar) {
+        //         // Remove login/signup buttons
+        //         const loginBtn = navbar.querySelector('button[data-bs-target="#loginModal"]');
+        //         const signupLink = navbar.querySelector('a[data-bs-target="#signupModal"]');
+        //         const termsItem = navbar.querySelector('.nav-item .nav-link[href="/terms.html"]').parentElement;
+
+        //         if (loginBtn) loginBtn.parentElement.remove();
+        //         if (signupLink) signupLink.parentElement.remove();
+        //         if (termsItem) termsItem.remove();
+
+        //         // Add user info
+        //         const userLi = document.createElement('li');
+        //         userLi.className = 'nav-item ms-2';
+        //         userLi.innerHTML = `
+        //             <div class="d-flex align-items-center">
+        //                 <i class="fas fa-user-circle me-2 text-primary"></i>
+        //                 <span class="fw-bold">Ajay Ajay</span>
+        //             </div>
+        //         `;
+        //         navbar.appendChild(userLi);
+        //     }
+        // }
+
+        // Back to Top Button
+        const backToTopButton = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopButton.style.display = 'flex';
+            } else {
+                backToTopButton.style.display = 'none';
+            }
+        });
+
+        backToTopButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Smooth scrolling for table of contents links
+        document.querySelectorAll('.toc-list a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Initialize tooltips (if any)
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Auto-update the effective date to current year
+            const currentYear = new Date().getFullYear();
+            document.querySelectorAll('.effective-date h4').forEach(el => {
+                el.textContent = el.textContent.replace('2024', currentYear);
+            });
+            document.querySelectorAll('.effective-date p').forEach(el => {
+                el.textContent = el.textContent.replace('2024', currentYear);
+            });
+
+            // Update footer year
+            document.querySelectorAll('footer p.mb-1').forEach(el => {
+                el.textContent = el.textContent.replace('2026', currentYear);
+            });
+        });
+    </script>
+</body>
+</html>

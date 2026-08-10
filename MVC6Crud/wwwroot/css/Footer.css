@@ -1,0 +1,34 @@
+﻿/* Footer.css – subtle footer */
+footer {
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    color: #6c757d;
+}
+/* Simple footer for non‑landing pages */
+.simple-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+    .simple-footer p {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+/* Optional: if you want the footer to stick to bottom */
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+.simple-footer {
+    flex-shrink: 0;
+}

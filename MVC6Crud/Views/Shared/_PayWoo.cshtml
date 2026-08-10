@@ -1,0 +1,530 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - PAYMOVE</title>
+    <!-- Tailwind + Font Awesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .hover-lift {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .hover-lift:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 15px 25px -8px rgba(0,60,120,0.15);
+            }
+
+        .testimonial-carousel {
+            position: relative;
+            min-height: 300px;
+        }
+
+        .testimonial-slide {
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            pointer-events: none;
+        }
+
+            .testimonial-slide.active {
+                opacity: 1;
+                pointer-events: auto;
+                position: relative;
+            }
+
+        .stat-pill {
+            background: #f0f7ff;
+            border: 1px solid #dce9f5;
+            border-radius: 40px;
+            padding: 0.5rem 1.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            font-weight: 600;
+            color: #1d3a5c;
+        }
+    </style>
+</head>
+<body class="bg-white font-sans antialiased text-gray-800 overflow-x-hidden">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 md:px-12 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="/" class="text-3xl font-bold text-[#1f3a5f] tracking-tight flex items-center gap-2">
+                <i class="fas fa-bus-simple text-[#1f4a7a]"></i>PAYMOVE
+            </a>
+            <nav class="hidden md:flex space-x-8 font-medium text-gray-700">
+                <a href="/" class="hover:text-[#1f3a5f] border-b-2 border-transparent hover:border-[#1f3a5f] pb-1">Home</a>
+                <a asp-controller="Paywoo" asp-action="about" class="hover:text-[#1f3a5f] border-b-2 border-transparent hover:border-[#1f3a5f] pb-1">About Us</a>
+                <a asp-controller="Paywoo" asp-action="Services" class="hover:text-[#1f3a5f] border-b-2 border-transparent hover:border-[#1f3a5f] pb-1">Services</a>
+                <a asp-controller="Paywoo" asp-action="Contact" class="hover:text-[#1f3a5f] border-b-2 border-transparent hover:border-[#1f3a5f] pb-1">Contact</a>
+            </nav>
+            <!-- Get A Quote Button (opens modal) -->
+            <a href="#" id="getQuoteBtn" class="bg-[#1f3a5f] text-white px-6 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 hover:bg-[#123256] transition shadow-md">
+                <span>Get A Quote</span> <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        @RenderBody()
+    </main>
+
+    <!-- FOOTER -->
+    <!-- FOOTER -->
+    <footer id="contact" class="bg-[#0c1f30] text-white pt-16 pb-8 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+            <div>
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-address-card text-[#7aa5c2]"></i> CONTECT US</h3>
+                <p class="text-gray-300 mb-2"><i class="fas fa-phone-alt mr-2 text-[#7aa5c2]"></i> +91 9652724937</p>
+                <p class="text-gray-300 mb-4"><i class="fas fa-envelope mr-2 text-[#7aa5c2]"></i> support@paymanfintech.in</p>
+                <p class="text-gray-300">
+                    <i class="fas fa-map-pin mr-2 text-[#7aa5c2]"></i>  9-12 STREET NO 1, H M T NAGAR,NACHARAM, PIN CODE - 500076, CIRCLE 1,HYDERABAD
+                </p>
+                <!-- TGSRTC partnership line -->
+                <p class="text-gray-300 mt-2">
+                    <i class="fas fa-handshake mr-2 text-[#7aa5c2]"></i> Service Partner:
+                    <span class="font-semibold text-amber-200">Telangana State Road Transport Corporation (TGSRTC)</span>
+                </p>
+                <div class="mt-6 flex gap-3">
+                    <span class="bg-white/20 px-4 py-2 rounded-full text-sm">1.5+ Years</span>
+                    <span class="bg-white/20 px-4 py-2 rounded-full text-sm">1k+ Vehicles</span>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-semibold text-lg mb-4">Quick Links</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="/" class="hover:text-white hover:translate-x-1 inline-block transition">Home</a></li>
+                    <li><a asp-controller="Paywoo" asp-action="about" class="hover:text-white hover:translate-x-1 inline-block transition">About Us</a></li>
+                    <li><a asp-controller="Paywoo" asp-action="Services" class="hover:text-white hover:translate-x-1 inline-block transition">Services</a></li>
+                    <li><a asp-controller="Paywoo" asp-action="Contact" class="hover:text-white hover:translate-x-1 inline-block transition">Contact Us</a></li>
+                    <li><a asp-controller="Paywoo" asp-action="Privacy" class="hover:text-white hover:translate-x-1 inline-block transition">Privacy Policy</a></li>
+                    <li><a asp-controller="Paywoo" asp-action="Terms" class="hover:text-white hover:translate-x-1 inline-block transition">Terms & Conditions</a></li>
+                    <li><a asp-controller="Paywoo" asp-action="RefundPolicy" class="hover:text-white hover:translate-x-1 inline-block transition">Refund & Cancellation</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-semibold text-lg mb-4">Connect</h4>
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <!-- Replace # with your official social media URLs -->
+                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#2c5a8c] transition"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#2c5a8c] transition"><i class="fab fa-twitter"></i></a>
+                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#2c5a8c] transition"><i class="fab fa-instagram"></i></a>
+                    <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#2c5a8c] transition"><i class="fab fa-youtube"></i></a>
+                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#2c5a8c] transition"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+                <p class="text-sm text-gray-400 border-t border-gray-700 pt-4 mt-4">Powered By PAYMAN FINTECH SOLUTIONS PVT LTD</p>
+            </div>
+            <div>
+                <h4 class="font-semibold text-lg mb-2">Visit Our Office</h4>
+                <p class="text-gray-300 text-sm">
+                    9-12 STREET NO 1, H M T NAGAR,NACHARAM, PIN CODE - 500076, CIRCLE 1,HYDERABAD
+                </p>
+                <img src="https://placehold.co/400x200/1f4a7a/white?text=Map+Location" alt="map" class="w-full mt-4 rounded-xl">
+                <p class="mt-4 text-2xl font-light text-gray-300 flex items-center gap-2"><i class="fas fa-map-marker-alt text-[#7aa5c2]"></i> HYDERABAD, INDIA</p>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 mt-12 pt-6 text-center text-gray-500 text-sm">© 2025 PAYMOVE – sustainable commute & advertising. All rights reserved.</div>
+    </footer>
+    <!-- QUOTE MODAL -->
+    <div id="quoteModal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6 hidden" aria-modal="true" role="dialog">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" id="modalOverlay"></div>
+        <div class="relative bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" id="modalContent">
+            <!-- Content injected by JavaScript -->
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // Auto-scrolling testimonial carousel (unchanged)
+        (function() {
+            const slides = document.querySelectorAll('.testimonial-slide');
+            const dots = document.querySelectorAll('.testimonial-dot');
+            if (!slides.length) return;
+            let current = 0;
+            const total = slides.length;
+
+            function showSlide(index) {
+                slides.forEach((s, i) => {
+                    s.classList.toggle('active', i === index);
+                });
+                dots.forEach((d, i) => {
+                    d.classList.toggle('bg-[#1f4a7a]', i === index);
+                    d.classList.toggle('bg-gray-300', i !== index);
+                });
+            }
+
+            function nextSlide() {
+                current = (current + 1) % total;
+                showSlide(current);
+            }
+
+            let interval = setInterval(nextSlide, 5000);
+
+            dots.forEach((dot, i) => {
+                dot.addEventListener('click', () => {
+                    clearInterval(interval);
+                    current = i;
+                    showSlide(current);
+                    interval = setInterval(nextSlide, 5000);
+                });
+            });
+        })();
+
+        // ========== BOOKING FLOW FOR GET A QUOTE ==========
+        (function() {
+            // Complete list of Telangana districts
+            const telanganaDistricts = [
+                "Adilabad", "Bhadradri Kothagudem", "Hanamkonda", "Hyderabad", "Jagitial",
+                "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy",
+                "Karimnagar", "Khammam", "Kumuram Bheem", "Mahabubabad", "Mahabubnagar",
+                "Mancherial", "Medak", "Medchal–Malkajgiri", "Mulugu", "Nagarkurnool",
+                "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad", "Peddapalli", "Rajanna Sircilla",
+                "Rangareddy", "Sangareddy", "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy",
+                "Warangal", "Yadadri Bhuvanagiri"
+            ];
+
+            // Helper: generate random bus numbers (5-10)
+            function generateRandomBuses() {
+                const count = Math.floor(Math.random() * 6) + 5;
+                const buses = [];
+                const prefixes = ["TS", "HYD", "WGL", "KMM", "NZB", "KNR", "MDCL", "RNR", "ADB", "NLM"];
+                for (let i = 0; i < count; i++) {
+                    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+                    const number = Math.floor(Math.random() * 9000 + 1000);
+                    buses.push(`${prefix}-${number}`);
+                }
+                return buses;
+            }
+
+            // Helper: random amount between 300 and 800
+            function randomAmount() {
+                return Math.floor(Math.random() * 500 + 300);
+            }
+
+            // State
+            let currentStep = 1;
+            let pickupDistrict = '';
+            let dropoffDistrict = '';
+            let travelDate = '';
+            let travelTime = '';
+            let availableBuses = [];
+            let selectedBus = '';
+            let amount = 0;
+            let bookingData = { name: '', mobile: '', email: '' };
+
+            const modal = document.getElementById('quoteModal');
+            const modalContent = document.getElementById('modalContent');
+            const openModalBtn = document.getElementById('getQuoteBtn');
+            const overlay = document.getElementById('modalOverlay');
+
+            if (!openModalBtn || !modal) return;
+
+            // Close modal function
+            function closeModal() {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            // Reset state
+            function resetState() {
+                currentStep = 1;
+                pickupDistrict = '';
+                dropoffDistrict = '';
+                travelDate = '';
+                travelTime = '';
+                availableBuses = [];
+                selectedBus = '';
+                amount = 0;
+                bookingData = { name: '', mobile: '', email: '' };
+            }
+
+            // Open modal and start booking flow
+            openModalBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                resetState();
+                renderStep1();
+            });
+
+            if (overlay) overlay.addEventListener('click', closeModal);
+
+            // ---------- Step 1: Pickup, Dropoff, Date, Time ----------
+            function renderStep1() {
+                const districtOptions = telanganaDistricts.map(d => `<option value="${d}">${d}</option>`).join('');
+                const today = new Date().toISOString().split('T')[0];
+
+                const html = `
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold text-[#0a2942]">Plan Your Journey</h2>
+                            <button type="button" class="close-modal text-gray-400 hover:text-gray-600 transition">
+                                <i class="fas fa-times text-2xl"></i>
+                            </button>
+                        </div>
+                        <form id="searchForm" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Pickup District <span class="text-red-500">*</span></label>
+                                    <select id="pickupSelect" required class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition bg-white">
+                                        <option value="">Select pickup</option>
+                                        ${districtOptions}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Dropoff District <span class="text-red-500">*</span></label>
+                                    <select id="dropoffSelect" required class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition bg-white">
+                                        <option value="">Select dropoff</option>
+                                        ${districtOptions}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Travel Date <span class="text-red-500">*</span></label>
+                                    <input type="date" id="dateInput" min="${today}" required class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Travel Time <span class="text-red-500">*</span></label>
+                                    <select id="timeSelect" required class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition bg-white">
+                                        <option value="">Select time</option>
+                                        <option value="07:20">07:20</option>
+                                        <option value="08:40">08:40</option>
+                                        <option value="09:00">09:00</option>
+                                        <option value="10:21">10:21</option>
+                                        <option value="16:30">16:30</option>
+                                        <option value="18:45">18:45</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex justify-end mt-6">
+                                <button type="submit" class="bg-[#1f3a5f] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#123256] transition">
+                                    Search Buses <i class="fas fa-search ml-2"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+
+                modalContent.innerHTML = html;
+
+                // Close button
+                document.querySelector('.close-modal').addEventListener('click', closeModal);
+
+                // Handle form submit
+                document.getElementById('searchForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    pickupDistrict = document.getElementById('pickupSelect').value;
+                    dropoffDistrict = document.getElementById('dropoffSelect').value;
+                    travelDate = document.getElementById('dateInput').value;
+                    travelTime = document.getElementById('timeSelect').value;
+
+                    if (!pickupDistrict || !dropoffDistrict || !travelDate || !travelTime) {
+                        alert('Please fill all fields');
+                        return;
+                    }
+                    if (pickupDistrict === dropoffDistrict) {
+                        alert('Pickup and dropoff districts cannot be the same');
+                        return;
+                    }
+
+                    availableBuses = generateRandomBuses();
+                    currentStep = 2;
+                    renderStep2();
+                });
+            }
+
+            // ---------- Step 2: Bus Selection ----------
+            function renderStep2() {
+                const busesHtml = availableBuses.map(bus => `
+                    <button class="bus-option p-4 rounded-xl border border-gray-200 hover:border-[#1f4a7a] hover:bg-[#f0f7ff] transition-all text-left ${selectedBus === bus ? 'bg-[#1f4a7a] text-white border-[#1f4a7a]' : 'bg-white'}"
+                            data-bus="${bus}">
+                        <div class="font-bold text-lg">${bus}</div>
+                        <div class="text-xs opacity-75">AC Sleeper • 40 seats</div>
+                        <div class="text-sm mt-1">Fare: ₹${randomAmount()}</div>
+                    </button>
+                `).join('');
+
+                const html = `
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold text-[#0a2942]">Available Buses</h2>
+                            <button type="button" class="close-modal text-gray-400 hover:text-gray-600 transition">
+                                <i class="fas fa-times text-2xl"></i>
+                            </button>
+                        </div>
+                        <p class="text-gray-600 mb-2">${pickupDistrict} → ${dropoffDistrict}</p>
+                        <p class="text-gray-600 mb-4">${travelDate} at ${travelTime}</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-80 overflow-y-auto p-1">
+                            ${busesHtml}
+                        </div>
+                        <div class="flex justify-between mt-6">
+                            <button type="button" id="backToSearchBtn" class="border border-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-50 transition">
+                                <i class="fas fa-arrow-left mr-2"></i> Back
+                            </button>
+                            <button type="button" id="nextToDetailsBtn" class="bg-[#1f3a5f] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#123256] transition ${!selectedBus ? 'opacity-50 cursor-not-allowed' : ''}" ${!selectedBus ? 'disabled' : ''}>
+                                Next: Your Details <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                modalContent.innerHTML = html;
+
+                // Bus selection
+                document.querySelectorAll('.bus-option').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        selectedBus = this.dataset.bus;
+                        const fareText = this.querySelector('.text-sm.mt-1').innerText;
+                        amount = parseInt(fareText.replace('Fare: ₹', ''));
+                        renderStep2(); // re-render to update selected state
+                    });
+                });
+
+                document.querySelector('.close-modal').addEventListener('click', closeModal);
+
+                document.getElementById('backToSearchBtn').addEventListener('click', () => {
+                    currentStep = 1;
+                    renderStep1();
+                });
+
+                const nextBtn = document.getElementById('nextToDetailsBtn');
+                if (nextBtn && selectedBus) {
+                    nextBtn.disabled = false;
+                    nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    nextBtn.addEventListener('click', () => {
+                        currentStep = 3;
+                        renderStep3();
+                    });
+                }
+            }
+
+            // ---------- Step 3: Personal Details ----------
+            function renderStep3() {
+                const html = `
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold text-[#0a2942]">Your Details</h2>
+                            <button type="button" class="close-modal text-gray-400 hover:text-gray-600 transition">
+                                <i class="fas fa-times text-2xl"></i>
+                            </button>
+                        </div>
+                        <p class="text-gray-600 mb-2">Route: <span class="font-semibold text-[#1f4a7a]">${pickupDistrict} → ${dropoffDistrict}</span></p>
+                        <p class="text-gray-600 mb-2">Bus: <span class="font-semibold text-[#1f4a7a]">${selectedBus}</span></p>
+                        <p class="text-gray-600 mb-4">Amount: <span class="font-semibold text-[#1f4a7a]">₹${amount}</span></p>
+
+                        <form id="detailsForm" class="space-y-4">
+                            <input type="hidden" name="__RequestVerificationToken" value="${document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''}">
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
+                                <input type="text" name="Name" required value="${bookingData.name}"
+                                       class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition"
+                                       placeholder="Your full name">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mobile Number <span class="text-red-500">*</span></label>
+                                <input type="tel" name="Mobile" required pattern="[0-9]{10}" maxlength="10" value="${bookingData.mobile}"
+                                       class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition"
+                                       placeholder="10 digit mobile number">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                                <input type="email" name="Email" required value="${bookingData.email}"
+                                       class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition"
+                                       placeholder="your@email.com">
+                            </div>
+
+                            <div class="flex justify-between items-center mt-6">
+                                <button type="button" id="backToBusesBtn" class="border border-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-50 transition">
+                                    <i class="fas fa-arrow-left mr-2"></i> Back
+                                </button>
+                                <button type="submit" class="bg-[#1f3a5f] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#123256] transition">
+                                    Confirm Booking <i class="fas fa-check-circle ml-2"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+
+                modalContent.innerHTML = html;
+
+                document.querySelector('.close-modal').addEventListener('click', closeModal);
+
+                document.getElementById('backToBusesBtn').addEventListener('click', () => {
+                    currentStep = 2;
+                    renderStep2();
+                });
+
+                document.getElementById('detailsForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    bookingData.name = formData.get('Name');
+                    bookingData.mobile = formData.get('Mobile');
+                    bookingData.email = formData.get('Email');
+
+                    if (!bookingData.name || !bookingData.mobile || !bookingData.email) {
+                        alert('Please fill all fields');
+                        return;
+                    }
+                    if (!/^\d{10}$/.test(bookingData.mobile)) {
+                        alert('Please enter a valid 10-digit mobile number');
+                        return;
+                    }
+
+                    currentStep = 4;
+                    renderStep4();
+                });
+            }
+
+            // ---------- Step 4: Success ----------
+            function renderStep4() {
+                const bookingId = 'TXN' + Math.floor(Math.random() * 1000000);
+
+                const html = `
+                    <div class="p-6 text-center">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl text-green-600 mx-auto mb-4">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-[#0a2942] mb-2">Booking Confirmed!</h2>
+                        <p class="text-lg text-gray-600 mb-4">Thank you, <span class="font-semibold text-[#1f4a7a]">${bookingData.name}</span>!</p>
+                        <div class="bg-[#f0f7ff] p-4 rounded-2xl inline-block mb-4">
+                            <p class="text-xl font-mono font-bold text-[#1f4a7a]">Booking ID: ${bookingId}</p>
+                        </div>
+                        <p class="text-lg font-semibold text-[#0a2942] mb-2">Route: <span class="text-[#1f4a7a]">${pickupDistrict} → ${dropoffDistrict}</span></p>
+                        <p class="text-lg font-semibold text-[#0a2942] mb-2">Bus: <span class="text-[#1f4a7a]">${selectedBus}</span></p>
+                        <p class="text-lg font-semibold text-[#0a2942] mb-2">Date & Time: <span class="text-[#1f4a7a]">${travelDate} at ${travelTime}</span></p>
+                        <p class="text-lg font-semibold text-[#0a2942] mb-3">Amount Paid: <span class="text-[#1f4a7a]">₹${amount}</span></p>
+                        <p class="text-gray-600 text-sm max-w-md mx-auto mb-4">We've sent the details to your email and SMS. Our team will contact you shortly to confirm.</p>
+                        <div class="flex justify-center gap-3">
+                            <button type="button" id="closeSuccessBtn" class="bg-[#1f3a5f] text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#123256] transition">Close</button>
+                            <button type="button" id="bookAnotherBtn" class="border border-[#1f3a5f] text-[#1f3a5f] px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#f0f7ff] transition">Book Another</button>
+                        </div>
+                    </div>
+                `;
+
+                modalContent.innerHTML = html;
+
+                document.getElementById('closeSuccessBtn').addEventListener('click', closeModal);
+                document.getElementById('bookAnotherBtn').addEventListener('click', () => {
+                    resetState();
+                    renderStep1();
+                });
+            }
+        })();
+        // ========== END BOOKING FLOW ==========
+    </script>
+    <!-- Razorpay Checkout Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

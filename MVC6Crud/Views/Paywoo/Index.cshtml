@@ -1,0 +1,901 @@
+﻿@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_PayWoo.cshtml";
+}
+
+<!-- HERO section -->
+<section class="relative bg-gradient-to-br from-[#0a253b] to-[#1d4a72] text-white py-20 md:py-28 px-6 overflow-hidden">
+    <div class="absolute inset-0 z-0 opacity-20">
+        <img src="~/images/paywoo/ts1.webp" alt="hero background placeholder" class="w-full h-full object-cover">
+    </div>
+    <div class="max-w-7xl mx-auto relative z-10">
+        <div class="max-w-3xl">
+            <span class="text-sm uppercase tracking-[0.2em] font-semibold bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30"><i class="fas fa-bus mr-2"></i>RECLAIM YOUR COMMUTE</span>
+            <h1 class="text-5xl md:text-7xl font-bold mt-8 leading-tight">FLEXIBLE TRANSPORT <span class="text-amber-200">& MOBILITY SOLUTIONS</span></h1>
+            <p class="text-xl text-gray-100 my-8 max-w-2xl">Smart, safe, and reliable daily commute solutions designed for modern cities, businesses, and professionals.</p>
+            <div class="flex flex-wrap gap-4">
+                <a href="#" id="bookSeatBtn" class="bg-white text-[#1f3a5f] px-8 py-4 rounded-full font-bold flex items-center gap-3 hover:bg-gray-100 transition shadow-xl hover:shadow-2xl"><span>Book Your Seat</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="#" class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold flex items-center gap-3 hover:bg-white hover:text-[#1f3a5f] transition"><span>Explore routes</span> <i class="fas fa-map"></i></a>
+            </div>
+            <div class="flex flex-wrap gap-3 mt-12">
+                <span class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-sm"><i class="fas fa-satellite-dish mr-1"></i> GPS-Enabled Smart Buses</span>
+                <span class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-sm"><i class="fas fa-clock mr-1"></i> Fixed Routes & Timings</span>
+                <span class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-sm"><i class="fas fa-wind mr-1"></i> AC, Comfortable Seating</span>
+                <span class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-sm"><i class="fas fa-id-card mr-1"></i> Professional Drivers</span>
+                <span class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-sm"><i class="fas fa-check-circle mr-1"></i> On-Time Guarantee</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- LET'S FIND YOU A BUS - Telangana Focused -->
+<section class="max-w-7xl mx-auto px-6 py-20">
+    <div class="text-center mb-12">
+        <span class="stat-pill"><i class="fas fa-search-location text-[#1f4a7a]"></i> FIND YOUR ROUTE</span>
+        <h2 class="text-4xl font-bold text-[#0a2942] mt-4">Let's find you a bus across Telangana</h2>
+        <p class="text-gray-600 text-lg mt-2">We are available in all <span class="font-semibold text-[#1f4a7a]">33 districts of Telangana</span> with convenient routes.</p>
+    </div>
+
+    <!-- Feature grid -->
+    <div class="grid md:grid-cols-3 gap-6 mb-12">
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-start gap-4">
+            <div class="w-12 h-12 bg-[#e7f0fa] rounded-full flex items-center justify-center text-xl text-[#1f4a7a] flex-shrink-0"><i class="fas fa-chair"></i></div>
+            <div><h3 class="font-bold text-lg">Reserve a seat of your choice</h3><p class="text-gray-500 text-sm">Choose your preferred seat in advance.</p></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-start gap-4">
+            <div class="w-12 h-12 bg-[#e7f0fa] rounded-full flex items-center justify-center text-xl text-[#1f4a7a] flex-shrink-0"><i class="fas fa-calendar-alt"></i></div>
+            <div><h3 class="font-bold text-lg">Reschedule your ride anytime</h3><p class="text-gray-500 text-sm">Change your plans with ease.</p></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-start gap-4">
+            <div class="w-12 h-12 bg-[#e7f0fa] rounded-full flex items-center justify-center text-xl text-[#1f4a7a] flex-shrink-0"><i class="fas fa-undo-alt"></i></div>
+            <div><h3 class="font-bold text-lg">Refund on ride cancellations</h3><p class="text-gray-500 text-sm">Hassle-free refunds as per policy.</p></div>
+        </div>
+    </div>
+
+    <!-- Interactive location cards -->
+    <div class="grid md:grid-cols-2 gap-6 mb-12">
+        <div id="pickup-card" class="location-card group cursor-pointer bg-white p-6 rounded-2xl border-2 border-gray-100 hover:border-[#1f4a7a] hover:shadow-xl transition-all duration-300 flex items-center gap-4" data-type="pickup">
+            <div class="w-14 h-14 bg-[#e7f0fa] rounded-2xl flex items-center justify-center text-2xl text-[#1f4a7a] group-hover:scale-110 transition-transform">
+                <i class="fas fa-circle-dot"></i>
+            </div>
+            <div class="flex-1">
+                <div class="text-sm font-medium text-gray-500 uppercase tracking-wide">Pickup location</div>
+                <div class="text-lg font-semibold text-gray-800 group-hover:text-[#1f4a7a] transition-colors flex items-center gap-2">
+                    <span id="pickup-location-display" class="location-display">Enter exact pickup location</span>
+                    <i class="fas fa-chevron-right text-sm text-gray-400 group-hover:text-[#1f4a7a] transition-all group-hover:translate-x-1"></i>
+                </div>
+            </div>
+        </div>
+
+        <div id="dropoff-card" class="location-card group cursor-pointer bg-white p-6 rounded-2xl border-2 border-gray-100 hover:border-[#1f4a7a] hover:shadow-xl transition-all duration-300 flex items-center gap-4" data-type="dropoff">
+            <div class="w-14 h-14 bg-[#e7f0fa] rounded-2xl flex items-center justify-center text-2xl text-[#1f4a7a] group-hover:scale-110 transition-transform">
+                <i class="fas fa-location-dot"></i>
+            </div>
+            <div class="flex-1">
+                <div class="text-sm font-medium text-gray-500 uppercase tracking-wide">Dropoff location</div>
+                <div class="text-lg font-semibold text-gray-800 group-hover:text-[#1f4a7a] transition-colors flex items-center gap-2">
+                    <span id="dropoff-location-display" class="location-display">Enter exact dropoff location</span>
+                    <i class="fas fa-chevron-right text-sm text-gray-400 group-hover:text-[#1f4a7a] transition-all group-hover:translate-x-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Routes (Telangana-wide) -->
+    <h3 class="text-2xl font-bold text-[#0a2942] mb-6">Popular Telangana Routes</h3>
+    <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-md">
+            <h4 class="text-xl font-bold text-[#1f4a7a] mb-4">HYDERABAD ↔ WARANGAL</h4>
+            <div class="space-y-2 text-gray-600">
+                <p><span class="font-semibold">Via:</span> Hyderabad, Warangal Highway</p>
+                <p><span class="font-semibold">Frequency:</span> Every 30 mins</p>
+            </div>
+        </div>
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-md">
+            <h4 class="text-xl font-bold text-[#1f4a7a] mb-4">NIZAMABAD ↔ KARIMNAGAR</h4>
+            <div class="space-y-2 text-gray-600">
+                <p><span class="font-semibold">Via:</span> Armoor, Jagitial</p>
+                <p><span class="font-semibold">Frequency:</span> Every 45 mins</p>
+            </div>
+        </div>
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-md">
+            <h4 class="text-xl font-bold text-[#1f4a7a] mb-4">KHAMMAM ↔ BHADRADRI</h4>
+            <div class="space-y-2 text-gray-600">
+                <p><span class="font-semibold">Via:</span> Kothagudem, Palvancha</p>
+                <p><span class="font-semibold">Frequency:</span> Every 60 mins</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bus frequency -->
+    <div class="grid md:grid-cols-2 gap-6 mt-12">
+        <div class="bg-gradient-to-r from-[#0a253b] to-[#1d4a72] text-white p-6 rounded-2xl shadow-lg">
+            <i class="fas fa-clock text-3xl mb-2"></i>
+            <p class="text-lg font-semibold">Buses every 20 minutes between 08:40 AM – 12:31 PM</p>
+        </div>
+        <div class="bg-gradient-to-r from-[#0a253b] to-[#1d4a72] text-white p-6 rounded-2xl shadow-lg">
+            <i class="fas fa-clock text-3xl mb-2"></i>
+            <p class="text-lg font-semibold">Buses every 30 minutes between 07:20 AM – 10:21 AM</p>
+        </div>
+    </div>
+
+    <!-- Location Selection Modal (Hyderabad areas) -->
+    <div id="locationModal" class="fixed inset-0 z-[200] flex items-center justify-center px-4 py-6 hidden" aria-modal="true" role="dialog">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" id="modalOverlay"></div>
+        <div class="relative bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modalTitle" class="text-2xl font-bold text-[#0a2942]">Select Pickup Location</h3>
+                <button type="button" id="closeLocationModal" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto p-1">
+                <!-- Hyderabad areas -->
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Hitech City">Hitech City</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Gachibowli">Gachibowli</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Madhapur">Madhapur</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Kukatpally">Kukatpally</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Ameerpet">Ameerpet</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Secunderabad">Secunderabad</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Banjara Hills">Banjara Hills</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Jubilee Hills">Jubilee Hills</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Dilsukhnagar">Dilsukhnagar</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Uppal">Uppal</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Miyapur">Miyapur</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="L B Nagar">L B Nagar</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Koti">Koti</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Abids">Abids</div>
+                <div class="location-option bg-gray-50 hover:bg-[#e7f0fa] hover:text-[#1f4a7a] p-3 rounded-xl text-center cursor-pointer transition-all" data-location="Begumpet">Begumpet</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BOOKING MODAL -->
+<div id="bookingModal" class="fixed inset-0 z-[300] flex items-center justify-center px-4 py-6 hidden" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" id="bookingModalOverlay"></div>
+    <div class="relative bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" id="bookingModalContent">
+        <!-- Dynamic content will be loaded via JavaScript -->
+    </div>
+</div>
+
+<!-- ABOUT US (summary) -->
+<section id="about" class="max-w-7xl mx-auto px-6 py-20">
+    <div class="flex flex-col md:flex-row gap-12 items-center">
+        <div class="md:w-1/2">
+            <span class="stat-pill mb-4 inline-block"><i class="fas fa-info-circle text-[#1f4a7a]"></i> ABOUT US</span>
+            <h2 class="text-4xl md:text-5xl font-bold text-[#0a2942] leading-tight">Making daily office commute comfortable, reliable, and stress‑free</h2>
+            <p class="text-gray-600 text-lg mt-6">Smart Daily Commute Solutions for Working Professionals. App-based AC buses with fixed routes, guaranteed seating, and on-time travel.</p>
+            <div class="flex flex-wrap gap-4 mt-8">
+                <div class="stat-pill text-xl px-6 py-3"><i class="fas fa-route text-[#1f4a7a]"></i> 60+ Active Routes</div>
+                <div class="stat-pill text-xl px-6 py-3"><i class="fas fa-headset text-[#1f4a7a]"></i> 24/7 Support</div>
+            </div>
+            <p class="text-gray-700 mt-8">We integrate technology, prioritize safety, and ensure reliability to deliver a superior daily commute experience trusted by professionals and enterprises.</p>
+            <div class="grid grid-cols-2 gap-3 mt-8">
+                <div class="flex items-center gap-2"><i class="fas fa-chair text-[#1f4a7a]"></i> Reserve a seat</div>
+                <div class="flex items-center gap-2"><i class="fas fa-calendar-alt text-[#1f4a7a]"></i> Reschedule anytime</div>
+                <div class="flex items-center gap-2"><i class="fas fa-undo-alt text-[#1f4a7a]"></i> Refund on cancellation</div>
+                <div class="flex items-center gap-2"><i class="fas fa-route text-[#1f4a7a]"></i> Fixed Routes & Timings</div>
+                <div class="flex items-center gap-2 col-span-2"><i class="fas fa-snowflake text-[#1f4a7a]"></i> AC Buses with Guaranteed Seating</div>
+            </div>
+        </div>
+        <div class="md:w-1/2">
+            <img src="~/images/paywoo/img-1.png" alt="about us" class="w-full rounded-3xl shadow-xl hover-lift">
+        </div>
+    </div>
+</section>
+
+<!-- WHY CHOOSE US -->
+<section class="bg-[#f4f9ff] py-20 px-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-14">
+            <span class="stat-pill"><i class="fas fa-check-circle text-[#1f4a7a]"></i> WHY CHOOSE US</span>
+            <h2 class="text-4xl font-bold text-[#0a2942] mt-4">A smarter approach to daily office transportation</h2>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- card 1 -->
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover-lift">
+                <img src="~/images/paywoo/ts8.jpg" alt="clean buses" class="w-full h-32 object-cover rounded-xl mb-4">
+                <h3 class="text-xl font-semibold">Clean, sanitised buses</h3>
+                <p class="text-gray-500 mt-2">Fleet thoroughly cleaned & disinfected before every trip.</p>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover-lift">
+                <img src="~/images/paywoo/ts9.jpg" alt="safe drivers" class="w-full h-32 object-cover rounded-xl mb-4">
+                <h3 class="text-xl font-semibold">Safe, experienced drivers</h3>
+                <p class="text-gray-500 mt-2">Verified drivers trained in highest safety standards.</p>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover-lift">
+                <img src="~/images/paywoo/ts10.jpg" alt="reliability" class="w-full h-32 object-cover rounded-xl mb-4">
+                <h3 class="text-xl font-semibold">High reliability</h3>
+                <p class="text-gray-500 mt-2">Comfortable, well-maintained buses always on time.</p>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover-lift">
+                <img src="~/images/paywoo/ts11.jpg" alt="dedicated support" class="w-full h-32 object-cover rounded-xl mb-4">
+                <h3 class="text-xl font-semibold">Dedicated support</h3>
+                <p class="text-gray-500 mt-2">Trip manager a call away — from booking to return.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ADVERTISING SECTION -->
+<section id="advertising" class="max-w-7xl mx-auto px-6 py-20">
+    <div class="text-center mb-12">
+        <span class="stat-pill"><i class="fas fa-ad text-[#1f4a7a]"></i> ON-BUS ADVERTISING</span>
+        <h2 class="text-4xl font-bold text-[#0a2942] mt-4">Engaging commuters with high-quality, localized on-bus advertising.</h2>
+    </div>
+    <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-md hover-lift flex flex-col sm:flex-row gap-5 items-start">
+            <img src="~/images/paywoo/ts12.jpg" alt="bus wrap" class="w-full sm:w-40 h-28 object-cover rounded-xl">
+            <div><h3 class="text-2xl font-bold text-[#0a2942]">FULL BUS WRAPS</h3><p class="text-gray-600 mt-2">Eye-catching full bus wraps for maximum brand visibility in Hyderabad</p></div>
+        </div>
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-md hover-lift flex flex-col sm:flex-row gap-5 items-start">
+            <img src="~/images/paywoo/ts13.jpg" alt="BRTS station" class="w-full sm:w-40 h-28 object-cover rounded-xl">
+            <div><h3 class="text-2xl font-bold text-[#0a2942]">TRTS INFRASTRUCTURE</h3><p class="text-gray-600 mt-2">Modern TSRTC stations with high footfall for strategic ad placement</p></div>
+        </div>
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-md hover-lift flex flex-col sm:flex-row gap-5 items-start">
+            <img src="~/images/paywoo/ts14.jpg" alt="citilink bus" class="w-full sm:w-40 h-28 object-cover rounded-xl">
+            <div><h3 class="text-2xl font-bold text-[#0a2942]">Hyd CITILINK TRTS</h3><p class="text-gray-600 mt-2">Modern TSRTC buses connecting Hyderabad with premium advertising space</p></div>
+        </div>
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-md hover-lift flex flex-col sm:flex-row gap-5 items-start">
+            <img src="~/images/paywoo/ts16.jpg" alt="GSRTC bus" class="w-full sm:w-40 h-28 object-cover rounded-xl">
+            <div><h3 class="text-2xl font-bold text-[#0a2942]">TSRTC · Hyd State Road Transport</h3><p class="text-gray-600 mt-2">buses reaching every corner – turn daily commutes into high-impact brand impressions</p></div>
+        </div>
+    </div>
+    <div class="mt-12 bg-gradient-to-r from-[#1f3a5f] to-[#2b5580] text-white p-8 rounded-3xl text-center shadow-xl">
+        <p class="text-2xl md:text-3xl font-light"><i class="fas fa-phone-alt mr-3"></i> Turn daily commutes into high-impact brand impressions – <span class="font-bold text-amber-200">Call Us: +91 9652724937</span></p>
+    </div>
+</section>
+
+<!-- SUSTAINABLE STATS -->
+<section class="bg-[#0f2a3f] text-white py-20 px-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row gap-12 items-center">
+            <div class="md:w-1/2">
+                <h2 class="text-5xl md:text-7xl font-bold leading-tight">
+                    <span class="block text-amber-200">SUSTAINABLE</span>
+                    <span class="block">TRANSFERT FOR A</span>
+                    <span class="block text-green-300">GREENER Hyderabad</span>
+                </h2>
+            </div>
+            <div class="md:w-1/2 grid grid-cols-2 gap-6">
+                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-3xl border border-white/20 text-center hover:scale-105 transition">
+                    <div class="text-5xl font-black text-green-300">14L</div>
+                    <p class="text-sm uppercase tracking-wide mt-2">car trips avoided in 2023</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-3xl border border-white/20 text-center hover:scale-105 transition">
+                    <div class="text-5xl font-black text-green-300">53.1 kg</div>
+                    <p class="text-sm uppercase tracking-wide mt-2">CO2 reduced</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-3xl border border-white/20 text-center hover:scale-105 transition">
+                    <div class="text-5xl font-black text-green-300">63%</div>
+                    <p class="text-sm uppercase tracking-wide mt-2">reduced stress</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-3xl border border-white/20 text-center hover:scale-105 transition">
+                    <div class="text-5xl font-black text-green-300">41L</div>
+                    <p class="text-sm uppercase tracking-wide mt-2">hours reclaimed</p>
+                </div>
+            </div>
+        </div>
+        <img src="~/images/paywoo/ts3.webp" alt="sustainability" class="w-full mt-12 rounded-3xl opacity-80">
+    </div>
+</section>
+
+<!-- HOW IT WORK -->
+<section class="max-w-7xl mx-auto px-6 py-20">
+    <div class="text-center mb-10">
+        <span class="stat-pill"><i class="fas fa-play-circle"></i> HOW IT WORK</span>
+        <h2 class="text-4xl font-bold text-[#0a2942] mt-4">It's simple to take a ride. Just search, select and it's done!</h2>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-[#f7fafd] p-6 rounded-3xl text-center hover-lift">
+            <img src="~/images/paywoo/ts4.jpg" alt="step1" class="w-full h-32 object-cover rounded-2xl mb-4">
+            <div class="w-12 h-12 rounded-full bg-[#1f4a7a] text-white text-xl flex items-center justify-center mx-auto -mt-10 border-4 border-white">1</div>
+            <h3 class="font-bold text-lg mt-4">Select your ride</h3>
+            <p class="text-gray-500">Pickup, dropoff & preferred seat.</p>
+        </div>
+        <div class="bg-[#f7fafd] p-6 rounded-3xl text-center hover-lift">
+            <img src="~/images/paywoo/ts5.jpg" alt="step2" class="w-full h-32 object-cover rounded-2xl mb-4">
+            <div class="w-12 h-12 rounded-full bg-[#1f4a7a] text-white text-xl flex items-center justify-center mx-auto -mt-10 border-4 border-white">2</div>
+            <h3 class="font-bold text-lg mt-4">Track your bus</h3>
+            <p class="text-gray-500">Live location, stop details.</p>
+        </div>
+        <div class="bg-[#f7fafd] p-6 rounded-3xl text-center hover-lift">
+            <img src="~/images/paywoo/ts7.jpg" alt="step3" class="w-full h-32 object-cover rounded-2xl mb-4">
+            <div class="w-12 h-12 rounded-full bg-[#1f4a7a] text-white text-xl flex items-center justify-center mx-auto -mt-10 border-4 border-white">3</div>
+            <h3 class="font-bold text-lg mt-4">Reschedule easily</h3>
+            <p class="text-gray-500">Change plans? Cancel or reschedule.</p>
+        </div>
+        <div class="bg-[#f7fafd] p-6 rounded-3xl text-center hover-lift">
+            <img src="~/images/paywoo/ts3.webp" alt="step4" class="w-full h-32 object-cover rounded-2xl mb-4">
+            <div class="w-12 h-12 rounded-full bg-[#1f4a7a] text-white text-xl flex items-center justify-center mx-auto -mt-10 border-4 border-white">4</div>
+            <h3 class="font-bold text-lg mt-4">Book flexi pass</h3>
+            <p class="text-gray-500">Save up to 30%, free cancellations.</p>
+        </div>
+    </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="bg-[#f3f8fd] py-20 px-6">
+    <div class="max-w-5xl mx-auto">
+        <span class="stat-pill mx-auto block w-fit"><i class="fas fa-quote-right"></i> TESTIMONIALS</span>
+        <h2 class="text-4xl font-bold text-center text-[#0a2942] mt-4 mb-12">What our riders say</h2>
+        <div class="testimonial-carousel relative" id="testimonialCarousel">
+            <!-- slide 1 -->
+            <div class="testimonial-slide active text-center">
+                <div class="bg-white p-10 rounded-3xl shadow-lg max-w-3xl mx-auto">
+                    <div class="flex justify-center mb-4">
+                        <img src="https://placehold.co/100x100/1f4a7a/white?text=Aparna" alt="Aparna" class="w-20 h-20 rounded-full object-cover border-4 border-white shadow">
+                    </div>
+                    <div class="text-yellow-400 text-2xl mb-4">★★★★★</div>
+                    <p class="text-2xl italic text-gray-700">“Ridiculously on time”</p>
+                    <p class="text-gray-600 mt-4 text-lg">"Appreciate the service and the driver for his smooth, timely driving and courteous manners. Seriously.. your rides are ridiculously on time!"</p>
+                    <div class="mt-6 font-bold text-[#1f4a7a]">Aparna <span class="font-normal text-gray-500">Global Trade Inc.</span></div>
+                </div>
+            </div>
+            <!-- slide 2 -->
+            <div class="testimonial-slide text-center">
+                <div class="bg-white p-10 rounded-3xl shadow-lg max-w-3xl mx-auto">
+                    <div class="flex justify-center mb-4">
+                        <img src="https://placehold.co/100x100/1f4a7a/white?text=Manjiri" alt="Manjiri" class="w-20 h-20 rounded-full object-cover border-4 border-white shadow">
+                    </div>
+                    <div class="text-yellow-400 text-2xl mb-4">★★★★★</div>
+                    <p class="text-2xl italic text-gray-700">“Safe and secure”</p>
+                    <p class="text-gray-600 mt-4 text-lg">"As a woman, I feel safe and secure in a To Pay. The drivers are courteous and very well trained. The entire atmosphere is nice and enjoyable."</p>
+                    <div class="mt-6 font-bold text-[#1f4a7a]">Manjiri Bhalerao <span class="font-normal text-gray-500">Vice principal, Tech Startup</span></div>
+                </div>
+            </div>
+            <!-- slide 3 -->
+            <div class="testimonial-slide text-center">
+                <div class="bg-white p-10 rounded-3xl shadow-lg max-w-3xl mx-auto">
+                    <div class="flex justify-center mb-4">
+                        <img src="https://placehold.co/100x100/1f4a7a/white?text=Gaurav" alt="Gaurav" class="w-20 h-20 rounded-full object-cover border-4 border-white shadow">
+                    </div>
+                    <div class="text-yellow-400 text-2xl mb-4">★★★★★</div>
+                    <p class="text-2xl italic text-gray-700">“Can do so much with my time”</p>
+                    <p class="text-gray-600 mt-4 text-lg">"To Pay has changed my life. I can do so much more on my way — read, rest, finish my work in the evenings. My family is happy that I travel in a safe, secure & hygenic bus everyday."</p>
+                    <div class="mt-6 font-bold text-[#1f4a7a]">Gaurav Arora <span class="font-normal text-gray-500">Fleet Supervisor</span></div>
+                </div>
+            </div>
+            <!-- dots -->
+            <div class="flex justify-center gap-3 mt-8">
+                <button class="w-3 h-3 rounded-full bg-[#1f4a7a] testimonial-dot active-dot" data-index="0"></button>
+                <button class="w-3 h-3 rounded-full bg-gray-300 testimonial-dot" data-index="1"></button>
+                <button class="w-3 h-3 rounded-full bg-gray-300 testimonial-dot" data-index="2"></button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="max-w-4xl mx-auto px-6 py-20">
+    <span class="stat-pill mx-auto block w-fit"><i class="fas fa-question-circle"></i> FAQ's</span>
+    <h2 class="text-4xl font-bold text-center text-[#0a2942] mt-4 mb-12">Answers to your commuting questions</h2>
+    <div class="space-y-4">
+        <div class="bg-white rounded-2xl p-5 border border-gray-200 flex justify-between hover:border-[#1f4a7a] transition"><span><i class="fas fa-clock text-[#1f4a7a] mr-3"></i> Q2. How long will the bus wait at my stop?</span> <i class="fas fa-check-circle text-green-600 text-xl"></i></div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-200 flex justify-between"><span><i class="fas fa-briefcase text-[#1f4a7a] mr-3"></i> Q3. Do we have space for luggage?</span> <i class="fas fa-check-circle text-green-600 text-xl"></i></div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-200 flex justify-between"><span><i class="fas fa-calendar-week text-[#1f4a7a] mr-3"></i> Q4. How many times can I reschedule?</span> <i class="fas fa-check-circle text-green-600 text-xl"></i></div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-200 flex justify-between"><span><i class="fas fa-ticket-alt text-[#1f4a7a] mr-3"></i> Q5. Which Flexi Pass is suitable for regular travel?</span> <i class="fas fa-check-circle text-green-600 text-xl"></i></div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-200 flex justify-between"><span><i class="fas fa-phone-alt text-[#1f4a7a] mr-3"></i> Q6. Can I speak to someone if I have questions?</span> <i class="fas fa-check-circle text-green-600 text-xl"></i></div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Auto-scrolling testimonial carousel (unchanged)
+        (function() {
+            const slides = document.querySelectorAll('.testimonial-slide');
+            const dots = document.querySelectorAll('.testimonial-dot');
+            if (!slides.length) return;
+            let current = 0;
+            const total = slides.length;
+
+            function showSlide(index) {
+                slides.forEach((s, i) => {
+                    s.classList.toggle('active', i === index);
+                });
+                dots.forEach((d, i) => {
+                    d.classList.toggle('bg-[#1f4a7a]', i === index);
+                    d.classList.toggle('bg-gray-300', i !== index);
+                });
+            }
+
+            function nextSlide() {
+                current = (current + 1) % total;
+                showSlide(current);
+            }
+
+            let interval = setInterval(nextSlide, 5000);
+
+            dots.forEach((dot, i) => {
+                dot.addEventListener('click', () => {
+                    clearInterval(interval);
+                    current = i;
+                    showSlide(current);
+                    interval = setInterval(nextSlide, 5000);
+                });
+            });
+        })();
+
+        // Location selection modal functionality (unchanged)
+        (function() {
+            const pickupCard = document.getElementById('pickup-card');
+            const dropoffCard = document.getElementById('dropoff-card');
+            const modal = document.getElementById('locationModal');
+            const overlay = document.getElementById('modalOverlay');
+            const closeBtn = document.getElementById('closeLocationModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const locationOptions = document.querySelectorAll('.location-option');
+
+            let currentType = 'pickup';
+
+            function openModal(type) {
+                currentType = type;
+                modalTitle.innerText = type === 'pickup' ? 'Select Pickup Location' : 'Select Dropoff Location';
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            if (pickupCard) pickupCard.addEventListener('click', () => openModal('pickup'));
+            if (dropoffCard) dropoffCard.addEventListener('click', () => openModal('dropoff'));
+
+            if (overlay) overlay.addEventListener('click', closeModal);
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+            locationOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const location = this.dataset.location;
+                    const displayElement = document.getElementById(currentType === 'pickup' ? 'pickup-location-display' : 'dropoff-location-display');
+
+                    if (displayElement) {
+                        displayElement.innerText = location;
+                        displayElement.classList.add('text-[#1f4a7a]', 'font-semibold');
+                    }
+
+                    const parentCard = document.getElementById(currentType === 'pickup' ? 'pickup-card' : 'dropoff-card');
+                    if (parentCard) {
+                        parentCard.classList.add('border-[#1f4a7a]', 'bg-[#f0f7ff]');
+                    }
+
+                    closeModal();
+                });
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+                    closeModal();
+                }
+            });
+        })();
+
+        // ========== BOOKING MODAL WITH RAZORPAY (SERVER ORDER) ==========
+        (function() {
+            const bookBtn = document.getElementById('bookSeatBtn');
+            const bookingModal = document.getElementById('bookingModal');
+            const bookingOverlay = document.getElementById('bookingModalOverlay');
+            const bookingContent = document.getElementById('bookingModalContent');
+
+            if (!bookBtn || !bookingModal) return;
+
+            // Razorpay key (as provided)
+            const RAZORPAY_KEY = 'rzp_test_lGsdswJA3Wc7jY';
+
+            // Complete list of Telangana districts
+            const telanganaDistricts = [
+                "Adilabad", "Bhadradri Kothagudem", "Hanamkonda", "Hyderabad", "Jagitial",
+                "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy",
+                "Karimnagar", "Khammam", "Kumuram Bheem", "Mahabubabad", "Mahabubnagar",
+                "Mancherial", "Medak", "Medchal–Malkajgiri", "Mulugu", "Nagarkurnool",
+                "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad", "Peddapalli", "Rajanna Sircilla",
+                "Rangareddy", "Sangareddy", "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy",
+                "Warangal", "Yadadri Bhuvanagiri"
+            ];
+
+            function generateRandomBuses() {
+                const count = Math.floor(Math.random() * 6) + 5;
+                const buses = [];
+                const prefixes = ["TS", "HYD", "WGL", "KMM", "NZB", "KNR", "MDCL", "RNR", "ADB", "NLM"];
+                for (let i = 0; i < count; i++) {
+                    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+                    const number = Math.floor(Math.random() * 9000 + 1000);
+                    buses.push(`${prefix}-${number}`);
+                }
+                return buses;
+            }
+
+            function randomAmount() {
+                return Math.floor(Math.random() * 500 + 300);
+            }
+
+            let currentStep = 1;
+            let pickupDistrict = '';
+            let dropoffDistrict = '';
+            let travelDate = '';
+            let travelTime = '';
+            let availableBuses = [];
+            let selectedBus = '';
+            let amount = 0;
+            let bookingData = { name: '', mobile: '', email: '' };
+
+            function openBookingModal() {
+                bookingModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                resetState();
+                renderStep1();
+            }
+
+            function closeBookingModal() {
+                bookingModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            function resetState() {
+                currentStep = 1;
+                pickupDistrict = '';
+                dropoffDistrict = '';
+                travelDate = '';
+                travelTime = '';
+                availableBuses = [];
+                selectedBus = '';
+                amount = 0;
+                bookingData = { name: '', mobile: '', email: '' };
+            }
+
+            // Step 1
+            function renderStep1() {
+                const pickupDisplay = document.getElementById('pickup-location-display');
+                const dropoffDisplay = document.getElementById('dropoff-location-display');
+                const initialPickup = (pickupDisplay && telanganaDistricts.includes(pickupDisplay.innerText)) ? pickupDisplay.innerText : '';
+                const initialDropoff = (dropoffDisplay && telanganaDistricts.includes(dropoffDisplay.innerText)) ? dropoffDisplay.innerText : '';
+
+                if (!pickupDistrict && initialPickup) pickupDistrict = initialPickup;
+                if (!dropoffDistrict && initialDropoff) dropoffDistrict = initialDropoff;
+
+                const districtOptions = telanganaDistricts.map(d => `<option value="${d}">${d}</option>`).join('');
+                const today = new Date().toISOString().split('T')[0];
+
+                const html = `
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold text-[#0a2942]">Plan Your Journey</h2>
+                            <button type="button" class="close-modal text-gray-400 hover:text-gray-600 transition">
+                                <i class="fas fa-times text-2xl"></i>
+                            </button>
+                        </div>
+                        <form id="searchForm" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Pickup District <span class="text-red-500">*</span></label>
+                                    <select id="pickupSelect" required class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition bg-white">
+                                        <option value="">Select pickup</option>
+                                        ${districtOptions}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Dropoff District <span class="text-red-500">*</span></label>
+                                    <select id="dropoffSelect" required class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition bg-white">
+                                        <option value="">Select dropoff</option>
+                                        ${districtOptions}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Travel Date <span class="text-red-500">*</span></label>
+                                    <input type="date" id="dateInput" min="${today}" required class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Travel Time <span class="text-red-500">*</span></label>
+                                    <select id="timeSelect" required class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition bg-white">
+                                        <option value="">Select time</option>
+                                        <option value="07:20">07:20</option>
+                                        <option value="08:40">08:40</option>
+                                        <option value="09:00">09:00</option>
+                                        <option value="10:21">10:21</option>
+                                        <option value="16:30">16:30</option>
+                                        <option value="18:45">18:45</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex justify-end mt-6">
+                                <button type="submit" class="bg-[#1f3a5f] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#123256] transition">
+                                    Search Buses <i class="fas fa-search ml-2"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+
+                bookingContent.innerHTML = html;
+
+                if (pickupDistrict) document.getElementById('pickupSelect').value = pickupDistrict;
+                if (dropoffDistrict) document.getElementById('dropoffSelect').value = dropoffDistrict;
+                if (travelDate) document.getElementById('dateInput').value = travelDate;
+                if (travelTime) document.getElementById('timeSelect').value = travelTime;
+
+                document.querySelector('.close-modal').addEventListener('click', closeBookingModal);
+
+                document.getElementById('searchForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    pickupDistrict = document.getElementById('pickupSelect').value;
+                    dropoffDistrict = document.getElementById('dropoffSelect').value;
+                    travelDate = document.getElementById('dateInput').value;
+                    travelTime = document.getElementById('timeSelect').value;
+
+                    if (!pickupDistrict || !dropoffDistrict || !travelDate || !travelTime) {
+                        alert('Please fill all fields');
+                        return;
+                    }
+                    if (pickupDistrict === dropoffDistrict) {
+                        alert('Pickup and dropoff districts cannot be the same');
+                        return;
+                    }
+
+                    availableBuses = generateRandomBuses();
+                    currentStep = 2;
+                    renderStep2();
+                });
+            }
+
+            // Step 2
+            function renderStep2() {
+                const busesHtml = availableBuses.map(bus => `
+                    <button class="bus-option p-4 rounded-xl border border-gray-200 hover:border-[#1f4a7a] hover:bg-[#f0f7ff] transition-all text-left ${selectedBus === bus ? 'bg-[#1f4a7a] text-white border-[#1f4a7a]' : 'bg-white'}"
+                            data-bus="${bus}">
+                        <div class="font-bold text-lg">${bus}</div>
+                        <div class="text-xs opacity-75">AC Sleeper • 40 seats</div>
+                        <div class="text-sm mt-1">Fare: ₹${randomAmount()}</div>
+                    </button>
+                `).join('');
+
+                const html = `
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold text-[#0a2942]">Available Buses</h2>
+                            <button type="button" class="close-modal text-gray-400 hover:text-gray-600 transition">
+                                <i class="fas fa-times text-2xl"></i>
+                            </button>
+                        </div>
+                        <p class="text-gray-600 mb-2">${pickupDistrict} → ${dropoffDistrict}</p>
+                        <p class="text-gray-600 mb-4">${travelDate} at ${travelTime}</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-80 overflow-y-auto p-1">
+                            ${busesHtml}
+                        </div>
+                        <div class="flex justify-between mt-6">
+                            <button type="button" id="backToSearchBtn" class="border border-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-50 transition">
+                                <i class="fas fa-arrow-left mr-2"></i> Back
+                            </button>
+                            <button type="button" id="nextToDetailsBtn" class="bg-[#1f3a5f] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#123256] transition ${!selectedBus ? 'opacity-50 cursor-not-allowed' : ''}" ${!selectedBus ? 'disabled' : ''}>
+                                Next: Your Details <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                bookingContent.innerHTML = html;
+
+                document.querySelectorAll('.bus-option').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        selectedBus = this.dataset.bus;
+                        const fareText = this.querySelector('.text-sm.mt-1').innerText;
+                        amount = parseInt(fareText.replace('Fare: ₹', ''));
+                        renderStep2();
+                    });
+                });
+
+                document.querySelector('.close-modal').addEventListener('click', closeBookingModal);
+
+                document.getElementById('backToSearchBtn').addEventListener('click', () => {
+                    currentStep = 1;
+                    renderStep1();
+                });
+
+                const nextBtn = document.getElementById('nextToDetailsBtn');
+                if (nextBtn && selectedBus) {
+                    nextBtn.disabled = false;
+                    nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    nextBtn.addEventListener('click', () => {
+                        currentStep = 3;
+                        renderStep3();
+                    });
+                }
+            }
+
+            // Step 3: Personal details + Razorpay integration (using fetch)
+            function renderStep3() {
+                const html = `
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold text-[#0a2942]">Your Details</h2>
+                            <button type="button" class="close-modal text-gray-400 hover:text-gray-600 transition">
+                                <i class="fas fa-times text-2xl"></i>
+                            </button>
+                        </div>
+                        <p class="text-gray-600 mb-2">Route: <span class="font-semibold text-[#1f4a7a]">${pickupDistrict} → ${dropoffDistrict}</span></p>
+                        <p class="text-gray-600 mb-2">Bus: <span class="font-semibold text-[#1f4a7a]">${selectedBus}</span></p>
+                        <p class="text-gray-600 mb-4">Amount: <span class="font-semibold text-[#1f4a7a]">₹${amount}</span></p>
+
+                        <form id="detailsForm" class="space-y-4">
+                            <input type="hidden" name="__RequestVerificationToken" value="${document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''}">
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
+                                <input type="text" name="Name" required value="${bookingData.name}"
+                                       class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition"
+                                       placeholder="Your full name">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mobile Number <span class="text-red-500">*</span></label>
+                                <input type="tel" name="Mobile" required pattern="[0-9]{10}" maxlength="10" value="${bookingData.mobile}"
+                                       class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition"
+                                       placeholder="10 digit mobile number">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                                <input type="email" name="Email" required value="${bookingData.email}"
+                                       class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:border-[#1f4a7a] focus:ring-1 focus:ring-[#1f4a7a] outline-none transition"
+                                       placeholder="your@email.com">
+                            </div>
+
+                            <div class="flex justify-between items-center mt-6">
+                                <button type="button" id="backToBusesBtn" class="border border-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-50 transition">
+                                    <i class="fas fa-arrow-left mr-2"></i> Back
+                                </button>
+                                <button type="submit" id="paymentSubmitBtn" class="bg-[#1f3a5f] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#123256] transition">
+                                    Proceed to Payment <i class="fas fa-credit-card ml-2"></i>
+                                </button>
+                            </div>
+                        </form>
+                        <div id="paymentLoader" class="hidden text-center mt-4">
+                            <i class="fas fa-spinner fa-spin text-2xl text-[#1f4a7a]"></i>
+                            <p class="text-sm text-gray-600 mt-2">Creating your order...</p>
+                        </div>
+                    </div>
+                `;
+
+                bookingContent.innerHTML = html;
+
+                document.querySelector('.close-modal').addEventListener('click', closeBookingModal);
+                document.getElementById('backToBusesBtn').addEventListener('click', () => {
+                    currentStep = 2;
+                    renderStep2();
+                });
+
+                // Handle payment submission using fetch
+        document.getElementById('detailsForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            const bookingData = {
+                name: formData.get('Name'),
+                mobile: formData.get('Mobile'),
+                email: formData.get('Email')
+            };
+
+            if (!bookingData.name || !bookingData.mobile || !bookingData.email) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            if (!/^\d{10}$/.test(bookingData.mobile)) {
+                alert('Please enter valid mobile number');
+                return;
+            }
+
+            const loader = document.getElementById('paymentLoader');
+            const submitBtn = document.getElementById('paymentSubmitBtn');
+
+            loader.classList.remove('hidden');
+            submitBtn.disabled = true;
+
+            // ✅ Generate Order ID
+            const dd = new Date();
+            let orderId = 'PAYMAN' + dd.getTime();
+
+            // ✅ Prepare request body
+            const requestBody = new URLSearchParams();
+            requestBody.append('orderId', orderId);
+            requestBody.append('amount', parseFloat(amount));
+            requestBody.append('actionType', 1);
+            requestBody.append('email', bookingData.email);
+            requestBody.append('phone', '9849800697');
+            requestBody.append('custmobile', bookingData.mobile);
+            requestBody.append('custcard', '4222222222222222' || '');
+            requestBody.append('custname', bookingData.name);
+            requestBody.append('divice', 'web');
+
+            // ✅ Call Payment API
+            fetch('https://paymove.payman.in/Paymove/Initiate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: requestBody
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network error');
+                }
+                return response.json();
+            })
+            .then(res => {
+                loader.classList.add('hidden');
+                submitBtn.disabled = false;
+
+                if (res.success && res.url) {
+                    // ✅ Redirect to payment page
+                    window.location.href = res.url;
+                } else {
+                    alert(res.message || 'Payment initiation failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+
+                loader.classList.add('hidden');
+                submitBtn.disabled = false;
+
+                alert('Gateway error (601 possible). Please try again.');
+            });
+        });
+    }
+
+            // Step 4: Success
+            function renderStep4(paymentId) {
+                const bookingId = paymentId || ('TXN' + Math.floor(Math.random() * 1000000));
+
+                const html = `
+                    <div class="p-6 text-center">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl text-green-600 mx-auto mb-4">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-[#0a2942] mb-2">Booking Confirmed!</h2>
+                        <p class="text-lg text-gray-600 mb-4">Thank you, <span class="font-semibold text-[#1f4a7a]">${bookingData.name}</span>!</p>
+                        <div class="bg-[#f0f7ff] p-4 rounded-2xl inline-block mb-4">
+                            <p class="text-xl font-mono font-bold text-[#1f4a7a]">Payment ID: ${bookingId}</p>
+                        </div>
+                        <p class="text-lg font-semibold text-[#0a2942] mb-2">Route: <span class="text-[#1f4a7a]">${pickupDistrict} → ${dropoffDistrict}</span></p>
+                        <p class="text-lg font-semibold text-[#0a2942] mb-2">Bus: <span class="text-[#1f4a7a]">${selectedBus}</span></p>
+                        <p class="text-lg font-semibold text-[#0a2942] mb-2">Date & Time: <span class="text-[#1f4a7a]">${travelDate} at ${travelTime}</span></p>
+                        <p class="text-lg font-semibold text-[#0a2942] mb-3">Amount Paid: <span class="text-[#1f4a7a]">₹${amount}</span></p>
+                        <p class="text-gray-600 text-sm max-w-md mx-auto mb-4">We've sent the details to your email and SMS. Our team will contact you shortly to confirm.</p>
+                        <div class="flex justify-center gap-3">
+                            <button type="button" id="closeSuccessBtn" class="bg-[#1f3a5f] text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#123256] transition">Close</button>
+                            <button type="button" id="bookAnotherBtn" class="border border-[#1f3a5f] text-[#1f3a5f] px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#f0f7ff] transition">Book Another</button>
+                        </div>
+                    </div>
+                `;
+
+                bookingContent.innerHTML = html;
+
+                document.getElementById('closeSuccessBtn').addEventListener('click', closeBookingModal);
+                document.getElementById('bookAnotherBtn').addEventListener('click', () => {
+                    resetState();
+                    renderStep1();
+                });
+            }
+
+            bookBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openBookingModal();
+            });
+
+            bookingOverlay.addEventListener('click', closeBookingModal);
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && !bookingModal.classList.contains('hidden')) {
+                    closeBookingModal();
+                }
+            });
+        })();
+        // ========== END BOOKING MODAL WITH RAZORPAY ==========
+    </script>
+}

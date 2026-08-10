@@ -1,0 +1,1436 @@
+﻿@model MVC6Crud.Models.PaymanWeb.DashboardViewModelWeb
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/css/dashboard1.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+
+<div class="dashboard-container">
+    @*   @if (Model.CustomerType != "new")
+    {
+        <div class="scrolling-note">
+            <span>Payout will work 6AM to 11PM</span>
+        </div>
+    } *@
+
+    <!-- Profile Section -->
+    <div class="main-section">
+        <div class="profile-container glass-card">
+            <div class="profile-section">
+                <div class="profile-image-container">
+                    <img src="@Model.ProfileImageUrl" class="profile-image" alt="Profile" />
+                </div>
+                <div class="profile-content">
+                    <div class="profile-header">
+                        <h2>
+                            Profile
+                            @if (Model.IsAdmin == true)
+                            {
+                                <a asp-area="" asp-controller="Home" asp-action="AdminDashboard" class="admin-icon">
+                                    <i class="bi bi-person-gear"></i>
+                                </a>
+                            }
+                        </h2>
+                        <div class="header-actions">
+                            <div class="payment-options">
+                                @foreach (var toggle in Model.PaymentToggles)
+                                {
+                                    <label class="payment-toggle">
+                                        <input type="checkbox"
+                                               class="toggle-checkbox"
+                                               data-label="@toggle.Label"
+                                               @(toggle.IsChecked ? "checked" : "") />
+                                        <span class="slider"></span>
+                                        <span class="toggle-label">@toggle.Label</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Name:</span>
+                            <span class="detail-value">@Model.UserName</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Phone:</span>
+                            <span class="detail-value">@Model.UserPhone</span>
+                        </div>
+                    </div>
+
+                    <div class="balance-cards">
+                        @foreach (var card in Model.BalanceCards)
+                        {
+                            <div class="balance-card @(card.IsHighlighted ? "highlight" : "")">
+                                @Html.Raw(card.IconSvg)
+                                <div class="balance-info">
+                                    <span class="balance-label">@card.Label</span>
+                                    <span class="balance-amount">@card.Amount</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Grid -->
+        <div class="services-modern">
+            <h2 class="section-header">Our Services</h2>
+            <p class="section-subtext">
+                At PayMan, we deliver legendary satisfaction to our customers through seamless service.
+            </p>
+
+            <div class="service-grid-modern">
+                @if (Model.CustomerType != "new")
+                {
+                    @if (Model.PayIn == true)
+                    {
+                        <div class="service-card-modern" onclick="openNewBalanceTopUpModal()">
+                            <div class="service-icon-wrapper">
+                                <i class="bi bi-cash-stack service-icon"></i>
+                            </div>
+                            <h4>Balance TopUp</h4>
+                            <p>Recharge balance instantly</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="service-card-modern disabled" onclick="alert('Access disabled. Please contact admin.')">
+                            <div class="service-icon-wrapper">
+                                <i class="bi bi-cash-stack service-icon"></i>
+                            </div>
+                            <h4>Balance TopUp</h4>
+                            <p>Recharge balance instantly</p>
+                        </div>
+                    }
+                }
+
+                @if (Model.CustomerType != "new")
+                {
+                    @if (Model.PayOutEnable == true)
+                    {
+                        <a asp-area="" asp-controller="Home" asp-action="BeneficiaryList" class="text-decoration-none">
+                            <div class="service-card-modern">
+                                <div class="service-icon-wrapper">
+                                    <i class="bi bi-credit-card-2-front service-icon"></i>
+                                </div>
+                                <h4>PAYMENT</h4>
+                                <p>Track PayOut transactions</p>
+                            </div>
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="service-card-modern disabled" onclick="alert('Access disabled. Please contact admin.')">
+                            <div class="service-icon-wrapper">
+                                <i class="bi bi-credit-card-2-front service-icon"></i>
+                            </div>
+                            <h4>PAYMENT</h4>
+                            <p>Track PayOut transactions</p>
+                        </div>
+                    }
+                }
+
+                @if (Model.CCBill == true)
+                {
+                    <a asp-area="" asp-controller="Home" asp-action="CreditCardBillPay" class="text-decoration-none">
+                        <div class="service-card-modern">
+                            <div class="service-icon-wrapper">
+                                <i class="bi bi-credit-card service-icon"></i>
+                            </div>
+                            <h4>Credit Card Bill Pay</h4>
+                            <p>Pay CC bills on time</p>
+                        </div>
+                    </a>
+                }
+                else
+                {
+                    <div class="service-card-modern disabled" onclick="alert('Access disabled. Please contact admin.')">
+                        <div class="service-icon-wrapper">
+                            <i class="bi bi-credit-card service-icon"></i>
+                        </div>
+                        <h4>Credit Card Bill Pay</h4>
+                        <p>Pay CC bills on time</p>
+                    </div>
+                }
+
+                <a asp-area="" asp-controller="FasTag" asp-action="FastTrackPay" class="text-decoration-none">
+                    <div class="service-card-modern">
+                        <div class="service-icon-wrapper">
+                            <i class="bi bi-truck service-icon"></i>
+                        </div>
+                        <h4>Fast Tag</h4>
+                        <p>Pay FastTag bills on time</p>
+                    </div>
+                </a>
+
+                <a asp-area="" asp-controller="EducationFee" asp-action="EducationFeePay" class="text-decoration-none">
+                    <div class="service-card-modern">
+                        <div class="service-icon-wrapper">
+                            <i class="bi bi-truck service-icon"></i>
+                        </div>
+                        <h4>Education Fee</h4>
+                        <p>Education Fee on time</p>
+                    </div>
+                </a>
+
+                <a asp-area="" asp-controller="Home" asp-action="ElectricityPayBill" asp-route-billerName="Electricity" class="text-decoration-none">
+                    <div class="service-card-modern">
+                        <div class="service-icon-wrapper">
+                            <i class="bi bi-credit-card service-icon"></i>
+                        </div>
+                        <h4>Electricity Bill Pay</h4>
+                        <p>Pay CC bills on time</p>
+                    </div>
+                </a>
+
+                <a asp-area="" asp-controller="Home" asp-action="FasTagPayBill" asp-route-billerName="Fastag" class="text-decoration-none">
+                    <div class="service-card-modern">
+                        <div class="service-icon-wrapper">
+                            <i class="bi bi-credit-card service-icon"></i>
+                        </div>
+                        <h4>FasTag Bill Avenue Pay</h4>
+                        <p>Pay CC bills on time</p>
+                    </div>
+                </a>
+
+                <div class="service-card-modern" onclick="alert('Service Coming Soon.')">
+                    <div class="service-icon-wrapper">
+                        <i class="bi bi-fuel-pump service-icon"></i>
+                    </div>
+                    <h4>Gas Bill</h4>
+                    <p>Pay your gas bills easily</p>
+                </div>
+
+                <div class="service-card-modern" onclick="alert('Service Coming Soon.')">
+                    <div class="service-icon-wrapper">
+                        <i class="bi bi-phone service-icon"></i>
+                    </div>
+                    <h4>Mobile Recharge</h4>
+                    <p>Recharge your mobile instantly</p>
+                </div>
+
+                @if (Model.CustomerType != "new")
+                {
+                    <a asp-area="" asp-controller="Home" asp-action="PayInHistory" class="text-decoration-none">
+                        <div class="service-card-modern">
+                            <div class="service-icon-wrapper">
+                                <i class="bi bi-arrow-down-circle service-icon"></i>
+                            </div>
+                            <h4>My PayIns</h4>
+                            <p>PayIn bills on time</p>
+                        </div>
+                    </a>
+
+                    <a asp-area="" asp-controller="Home" asp-action="PayOutHistory" class="text-decoration-none">
+                        <div class="service-card-modern">
+                            <div class="service-icon-wrapper">
+                                <i class="bi bi-arrow-up-circle service-icon"></i>
+                            </div>
+                            <h4>My PayOuts</h4>
+                            <p>PayOut bills on time</p>
+                        </div>
+                    </a>
+
+                    <a asp-area="" asp-controller="Home" asp-action="Passbook" class="text-decoration-none">
+                        <div class="service-card-modern">
+                            <div class="service-icon-wrapper">
+                                <i class="bi bi-journal-text service-icon"></i>
+                            </div>
+                            <h4>PassBook</h4>
+                            <p>Passbook bills on time</p>
+                        </div>
+                    </a>
+                }
+                else
+                {
+                    <a asp-area="" asp-controller="Home" asp-action="PayOutHistory" class="text-decoration-none">
+                        <div class="service-card-modern">
+                            <div class="service-icon-wrapper">
+                                <i class="bi bi-arrow-up-circle service-icon"></i>
+                            </div>
+                            <h4>Transaction History</h4>
+                            <p>bills on time</p>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== NEW ENHANCED BALANCE TOPUP MODAL ========== -->
+    <!-- ========== NEW ENHANCED BALANCE TOPUP MODAL ========== -->
+    <div class="modal fade" id="balanceTopUpModalNew" tabindex="-1" aria-labelledby="topupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <form id="topUpFormNew" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">Balance TopUp</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <!-- Three-column input fields -->
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="fullName" placeholder="Enter full name" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" placeholder="Enter email" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Mobile Number</label>
+                                <input type="text" class="form-control" id="mobileNumber" maxlength="10" placeholder="10-digit mobile" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Credit Card</label>
+                                <input type="text" class="form-control" id="customerCardNew" maxlength="16" placeholder="Enter card number" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Amount</label>
+                                <input type="number" class="form-control" id="amountNew" min="1" placeholder="Enter amount" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Gateway</label>
+                                <select class="form-select" id="gatewayNew" required>
+                                    <option value="">-- Select Gateway --</option>
+                                    <!-- Options populated by API -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Validation Error -->
+                        <div id="formErrorNew" class="alert alert-warning mt-2" style="display:none;"></div>
+
+                        <!-- Action Buttons (Pay & Cancel) -->
+                        <div class="d-flex gap-2 justify-content-end mt-4">
+                            <button type="submit" id="payButtonNew" class="btn btn-primary px-5" disabled>Pay</button>
+                            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+
+                        <!-- Recent Payments Section (enhanced UI) -->
+                        <div class="recent-payments-section mt-4" id="recentPaymentsSection" style="display:none;">
+                            <hr class="my-4" />
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold text-navy mb-0">Recent Payments</h6>
+                                <div class="search-wrapper" style="width: 250px;">
+                                    <i class="bi bi-search search-icon-small"></i>
+                                    <input type="text" class="form-control form-control-sm" id="paymentSearch" placeholder="Search by name..." />
+                                </div>
+                            </div>
+                            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Amount</th>
+                                            <th>Card</th>
+                                            <th>Name</th>
+                                            <th>Mobile</th>
+                                            <th>Status</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentPaymentsBody">
+                                        <tr><td colspan="6" class="text-center text-muted py-4">No recent payments</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Balance TopUp Modal -->
+    <div class="modal fade" id="balanceTopUpModal" tabindex="-1" aria-labelledby="topupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <form id="topUpForm" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">Balance TopUp</h5>
+                        <div class="ms-auto d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#addProfileModal">
+                                + Add Profile
+                            </button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="col-12 mb-4">
+                            <label class="form-label">Customer Mobile</label>
+                            <input type="text" class="form-control" id="customerMobile" maxlength="10" required placeholder="Enter customer mobile">
+                            <div class="invalid-feedback">Mobile number is required.</div>
+                        </div>
+
+                        <div class="row g-4">
+                            <!-- Profile Card -->
+                            <div class="col-12 col-md-5">
+                                <div class="card profile-card h-100" id="profileSection" style="display:none;">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Profile Details</h6>
+                                        <p><i class="bi bi-person-fill me-2"></i> <strong>Name:</strong> <span id="profileName"></span></p>
+                                        <p><i class="bi bi-telephone-fill me-2"></i> <strong>Mobile:</strong> <span id="profileMobile"></span></p>
+                                        <p><i class="bi bi-envelope-fill me-2"></i> <strong>Email:</strong> <span id="profileEmail"></span></p>
+                                    </div>
+                                </div>
+                                <div id="profileError" class="alert alert-danger mt-2" style="display:none;"></div>
+                            </div>
+
+                            <!-- Payment Card -->
+                            <div class="col-12 col-md-7">
+                                <div class="card payment-card h-100" id="paymentSection" style="display:none;">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Credit Card</label>
+                                            <div class="input-group">
+                                                <select class="form-select" id="customerCardSelect" required></select>
+                                                <button type="button" class="btn btn-outline-primary" id="addCardBtn">Add</button>
+                                            </div>
+                                            <input type="text" class="form-control mt-2 d-none" id="customerCardInput" maxlength="16" placeholder="Enter new card">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Amount</label>
+                                            <input type="number" class="form-control" id="amount" min="1" required disabled placeholder="Enter amount">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Gateway</label>
+                                            <select class="form-select" id="gateway" required disabled>
+                                                <option value="">-- Select Gateway --</option>
+                                                @if (((Model.Easebuzz1 == true || Model.Easebuzz2 == true) && Model.UserEasebuzz == true) || Model.IsAdmin == true)
+                                                {
+                                                    <option value="1">Easebuzz</option>
+                                                }
+                                                @if (Model.IsAdmin || (Model.EduCashfree == true && Model.EduGateway == true))
+                                                {
+                                                    <option value="4">Travel PG</option>
+                                                }
+                                                @if (Model.IsAdmin == true || (Model.OpenMoney == true && Model.RozorpayEdu == true))
+                                                {
+                                                    <option value="6">JioPay Edu</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div id="formError" class="alert alert-warning mt-2" style="display:none;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" id="payButton" class="btn btn-primary" disabled>Pay</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Profile Modal -->
+    <div class="modal fade" id="addProfileModal" tabindex="-1" aria-labelledby="addProfileLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="addProfileForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addProfileLabel">Add Profile</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="newProfileMobile" class="form-label">Mobile</label>
+                            <input type="text" class="form-control" id="newProfileMobile" maxlength="10" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="newProfileName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="newProfileName" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="newProfileEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="newProfileEmail" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="saveProfileBtn" class="btn btn-success">Save</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Loader -->
+    <div id="Loader1" class="global-loader" style="display:none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Success Message Toast -->
+    <div id="successMessage" class="alert alert-success toast-message" style="display:none;">
+        Toggle updated successfully!
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <!-- Paytm Script -->
+    <script src="https://secure.paytmpayments.com/merchantpgpui/checkoutjs/merchants/TvEYNH13757085326682.js"></script>
+
+
+    <script id="context" type="text/javascript" src="https://payments.open.money/layer"></script>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    <script>
+        // Your original JavaScript remains exactly the same – untouched.
+        function startKYC() {
+            fetch('/DigiLocker/StartDigiLocker', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    verificationId: 'ABC00123kkk',
+                    redirectUrl: 'https://localhost:44384/DigiLocker/Callback',
+                    documents: ['AADHAAR', 'PAN']
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.url) window.location.href = data.url;
+                else alert('Failed to initiate KYC process.');
+            })
+            .catch(error => {
+                console.error('Error initiating KYC:', error);
+                alert('An error occurred. Please try again later.');
+            });
+        }
+
+        function openBalanceTopUpModal() {
+            const modalEl = document.getElementById('balanceTopUpModal');
+            const form = document.getElementById('topUpForm');
+            form.reset();
+            form.classList.remove('was-validated');
+            $('#customerMobile').val('');
+            $("#profileSection, #paymentSection").hide();
+            $("#formError").hide();
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+
+        $(document).ready(function () {
+            $('#Loader1').hide(); // ensure loader starts hidden
+            var loginUser = '@Model.UserPhone';
+
+            $('.toggle-checkbox').change(function () {
+                var isChecked = $(this).is(':checked');
+                var label = $(this).data('label');
+                $.ajax({
+                    url: '/Auth/UpdateToggle',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ label: label, isChecked: isChecked }),
+                    success: function () {
+                        $('#successMessage').fadeIn(300).delay(1500).fadeOut(300);
+                    },
+                    error: function () {
+                        alert("Failed to update toggle.");
+                    }
+                });
+            });
+
+            let profileLoaded = false;
+
+            $("#customerMobile").on("input", function () {
+                let mobile = $(this).val().trim();
+                if (/^\d{10}$/.test(mobile)) fetchProfile(mobile);
+                else resetProfile();
+            });
+
+            $("#addCardBtn").on("click", function () {
+                $("#customerCardSelect").addClass("d-none");
+                $("#customerCardInput").removeClass("d-none").prop("disabled", false).val("").focus();
+                $(this).addClass("d-none");
+                validateForm();
+            });
+
+            $("#customerCardSelect, #customerCardInput, #amount, #gateway").on("input change blur", validateForm);
+
+            function fetchProfile(mobile) {
+                $.ajax({
+                    url: "/Home/GetCustomerDetails",
+                    type: "GET",
+                    data: { mobileNumber: mobile, loginuserphone: loginUser },
+                    beforeSend: function () {
+                        $("#profileError").hide();
+                        $("#profileSection, #paymentSection").hide();
+                    },
+                    success: function (res) {
+                        if (res.success && res.data.length > 0) {
+                            const profile = res.data[0];
+                            $("#profileName").text(profile.cardHolderName);
+                            $("#profileMobile").text(mobile);
+                            $("#profileEmail").text(profile.cardHolderEmail);
+
+                            let select = $("#customerCardSelect");
+                            select.empty().append(`<option value="">-- Select Card --</option>`);
+                            res.data.forEach(c => {
+                                if (c.creditCardNum != null) {
+                                    select.append(`<option value="${c.creditCardNum}">${c.creditCardNum}</option>`);
+                                }
+                            });
+                            $("#customerCardSelect").val("");
+                            $("#profileSection, #paymentSection").show();
+                            $("#customerCardSelect").removeClass("d-none").prop("disabled", false);
+                            $("#customerCardInput").addClass("d-none").prop("disabled", true);
+                            $("#amount, #gateway").prop("disabled", false);
+                            profileLoaded = true;
+                            validateForm();
+                        } else {
+                            resetProfile(res.message || "Profile not found");
+                        }
+                    },
+                    error: function () {
+                        resetProfile("Error fetching profile");
+                    }
+                });
+            }
+
+            function resetProfile(msg = "") {
+                profileLoaded = false;
+                $("#profileSection, #paymentSection").hide();
+                $("#customerCardSelect, #customerCardInput, #amount, #gateway").prop("disabled", true);
+                $("#customerCardSelect").removeClass("d-none");
+                $("#customerCardInput").addClass("d-none").val("");
+                $("#payButton").prop("disabled", true);
+                $("#formError").hide();
+                if (msg) $("#profileError").text(msg).show();
+            }
+
+            function validateForm() {
+                const cardVal = $("#customerCardInput").is(":visible")
+                    ? $("#customerCardInput").val().trim()
+                    : $("#customerCardSelect").val();
+                const amountVal = parseFloat($("#amount").val());
+                const gatewayVal = $("#gateway").val();
+
+                let isValid = true;
+                let message = "";
+
+                if (!cardVal || !/^\d{12,16}$/.test(cardVal)) {
+                    isValid = false;
+                    message = "Please enter a valid 12–16 digit card number.";
+                } else if (isNaN(amountVal) || amountVal <= 0) {
+                    isValid = false;
+                    message = "Please enter a valid amount greater than 0.";
+                } else if (amountVal > 99999) {
+                    isValid = false;
+                    message = "Amount cannot exceed 99,999.";
+                } else if (!gatewayVal) {
+                    isValid = false;
+                    message = "Please select a payment gateway.";
+                } else if (!profileLoaded) {
+                    isValid = false;
+                    message = "Please load a valid profile by entering a 10-digit mobile number.";
+                } else if (gatewayVal == 4 && amountVal > 99999) {
+                    isValid = false;
+                    message = "Amount cannot exceed 99,999 for Travel PG.";
+                }
+
+                $("#payButton").prop("disabled", !isValid);
+                if (!isValid && message) {
+                    $("#formError").text(message).show();
+                } else {
+                    $("#formError").hide();
+                }
+            }
+
+            function isValidEmail(email) {
+                var regex = /^[^\s]+[^\s]+\.[^\s]+$/;
+                return regex.test(email);
+            }
+
+            $("#saveProfileBtn").click(function () {
+                var profile = {
+                    Mobile: $("#newProfileMobile").val(),
+                    Name: $("#newProfileName").val(),
+                    Email: $("#newProfileEmail").val(),
+                    UserPhone: loginUser
+                };
+
+                if (!profile.Name) {
+                    showToast("Please enter a valid Name.", 'warning'); return;
+                }
+                if (!/^\d{10}$/.test(profile.Mobile)) {
+                    showToast("Please enter a valid Mobile Number.", 'warning'); return;
+                }
+                if (!isValidEmail(profile.Email)) {
+                    showToast("Please enter a valid Email.", 'warning'); return;
+                }
+
+                $.ajax({
+                    url: "/Home/AddProfile",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(profile),
+                    success: function (res) {
+                        if (res.success) {
+                            showToast("Profile saved successfully!", 'success');
+                            $("#balanceTopUpModal").modal("show");
+                            $("#addProfileModal").modal("hide");
+                            $("#customerMobile").val(profile.Mobile).trigger("input");
+                        } else {
+                            showToast(res.message, 'warning');
+                        }
+                    },
+                    error: function () {
+                        showToast("Error saving profile!", 'warning');
+                    }
+                });
+            });
+
+            function updateCardDetailsDB(mobilenum, card) {
+                var profile = {
+                    Mobile: mobilenum,
+                    CardNumber: card,
+                    UserPhone: loginUser
+                };
+                $.ajax({
+                    url: "/Home/UpdateCardDetailsinProfile",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(profile),
+                    success: function (res) {
+                        if (res.success) showToast("Profile updated successfully!", 'success');
+                        else showToast(res.message, 'warning');
+                    },
+                    error: function () {
+                        showToast("Error saving profile!", 'warning');
+                    }
+                });
+            }
+
+
+
+
+            $('#topUpForm').on('submit', function (e) {
+                e.preventDefault();
+                if ($("#payButton").is(":disabled")) return;
+
+                const payload = {
+                    mobile: $("#profileMobile").text(),
+                    card: $("#customerCardInput").is(":visible") ? $("#customerCardInput").val().trim() : $("#customerCardSelect").val(),
+                    amount: $("#amount").val(),
+                    gateway: $("#gateway").val(),
+                    name: $("#profileName").text(),
+                    email: $("#profileEmail").text()
+                };
+
+                updateCardDetailsDB(payload.mobile, payload.card);
+
+                const amount = parseFloat(payload.amount);
+                const gateway = payload.gateway;
+                const userphone = '@Model.UserPhone';
+
+                const $payBtn = $("#payButton");
+                $payBtn.prop("disabled", true).text("Processing...");
+                $("#Loader1").show();
+
+                if (gateway == 1) {
+                    const data = {
+                        amount: amount,
+                        cardnumber: payload.email,
+                        selectedgateway: $('#gateway').val(),
+                        phone: '@Model.UserPhone',
+                        cardHolderName: payload.name,
+                        cardHolderNumber: payload.mobile,
+                        critCardNumber: payload.card
+                    };
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        url: 'https://srredu.in/Home/EbuzzIntiatePayment',
+                        data: data,
+                        success: function (recData) {
+                            if (recData.success && recData.paymenturl?.trim()) {
+                                window.location.replace(recData.paymenturl);
+                            } else {
+                                alert(recData.message);
+                            }
+                        },
+                        error: function () {
+                            alert("An error occurred while initiating the payment.");
+                        },
+                        complete: function () {
+                            $('#Loader1').hide();
+                            $payBtn.prop('disabled', false).text('Pay');
+                        }
+                    });
+                } else if (gateway == 2) {
+                    $.ajax({
+                        url: '/OpenMoneyPayment/CreatePaymentToken',
+                        type: 'POST',
+                        data: { Amount: amount, Email: payload.email, mobile: payload.mobile },
+                        success: function (res) {
+                            startLayerCheckout(res.payment.id, res.accesstoken, payload);
+                        },
+                        error: function () {
+                            alert("AJAX Error");
+                            $('#Loader1').hide();
+                            $payBtn.prop('disabled', false).text('Pay');
+                        }
+                    });
+                } else if (gateway == 3) {
+                    const d = new Date();
+                    let orderid = 'PAYMAN' + d.getTime();
+                    let custId = 'Cust' + d.getTime();
+
+                    var orderData = {
+                        order_id: orderid,
+                        order_amount: amount,
+                        order_currency: "INR",
+                        order_note: "Sample Order test",
+                        order_meta: {
+                            return_url: `https://edu.paymanfintech.in/Edu/Return?order_id=${encodeURIComponent(orderid)}&loginmobile=${encodeURIComponent(userphone)}&email=${encodeURIComponent(payload.email)}&cardnum=${encodeURIComponent(payload.card)}&holderphone=${encodeURIComponent(payload.mobile)}&holdername=${encodeURIComponent(payload.name)}`,
+                            notify_url: "https://edu.paymanfintech.in/Edu/Notify"
+                        },
+                        customer_details: {
+                            customer_id: custId,
+                            customer_name: payload.name,
+                            customer_email: payload.email,
+                            customer_phone: payload.mobile
+                        }
+                    };
+
+                    $.ajax({
+                        url: 'https://edu.paymanfintech.in/Edu/CreateOrder',
+                        type: 'POST',
+                        data: JSON.stringify(orderData),
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        success: function (res) {
+                            if (res.paymentSessionId) {
+                                window.location.href = `https://edu.paymanfintech.in/Edu/StartCheckout?sessionId=${res.paymentSessionId}`;
+                            } else {
+                                alert("Failed to get session ID.");
+                            }
+                        },
+                        error: function (xhr) {
+                            console.error(xhr.responseText);
+                            alert("Error creating order: " + xhr.responseText);
+                        }
+                    });
+                } else if (gateway == 4) {
+                    var pphone = '@Model.UserPhone';
+                    const dd = new Date();
+                    var actionType = 1;
+                    let orderId = 'PAYMAN' + dd.getTime();
+                    $.ajax({
+                        url: "https://fastag.paymanfintech.in/FasTag/Initiate",
+                        type: "POST",
+                        data: { 'orderId': orderId, 'amount': amount, 'actionType': actionType, 'email': payload.email, 'phone': pphone, 'custmobile': payload.mobile, 'custcard': payload.card, 'custname': payload.name, 'divice': 'web' },
+                        success: function (res) {
+                            if (res.success) window.location.href = res.url;
+                            else alert(res.message);
+                        }
+                    });
+                } else if (gateway == 5) {
+                    var loginphone = '@Model.UserPhone';
+                    $('#Loader1').show();
+                    window.location.href = `https://edu.payman.in/Edu/RazorpayInit?amount=${encodeURIComponent(amount)}&mobile=${encodeURIComponent(payload.mobile)}&email=${encodeURIComponent(payload.email)}&name=${encodeURIComponent(payload.name)}&logonphone=${encodeURIComponent(loginphone)}&card=${encodeURIComponent(payload.card)}`;
+                } else if (gateway == 6) {
+                    var pphoneJio = '@Model.UserPhone';
+                    const amoushhsnt = parseFloat(payload.amount);
+                    $.ajax({
+                        url: "https://edu.paymanfintech.in/JioPay/CreateOrder",
+                        type: "POST",
+                        data: { amount: amoushhsnt, userPhone: pphoneJio, cName: payload.name, cMobile: payload.mobile, cCard: payload.card, cemail: payload.email, divice: 'web' },
+                        success: function (response) {
+                            if (response.success) window.location.href = response.redirectUrl;
+                            else alert("Error: " + response.message);
+                        },
+                        error: function () {
+                            alert("Something went wrong.");
+                        }
+                    });
+                } else {
+                    alert("Please select valid gateway");
+                    $('#Loader1').hide();
+                    $payBtn.prop('disabled', false).text('Pay');
+                }
+            });
+
+            $('#Loader1').hide();
+        });
+
+        function startLayerCheckout(paymentToken, accessKey, payload) {
+            const cardNumber1 = payload.card;
+            const cardHolderName1 = payload.name;
+            const cardHolderNumber1 = payload.mobile;
+
+            Layer.checkout({
+                token: paymentToken,
+                accesskey: accessKey,
+                theme: {
+                    logo: "https://paymanfintech.in/images/Finalicon.png",
+                    color: "#4787ed",
+                    error_color: "#ff2b2b"
+                },
+                prefill: {
+                    name: cardHolderName1,
+                    email: payload.email,
+                    contact: cardHolderNumber1
+                }
+            },
+            function (response) {
+                if (response.status === "captured") {
+                    window.location.href = "/OpenMoneyPayment/CheckStatus?paymentId=" +
+                        response.payment_id +
+                        "&paymentTokenId=" + response.payment_token_id +
+                        "&cardNumber=" + cardNumber1 +
+                        "&cardHolderName=" + encodeURIComponent(cardHolderName1) +
+                        "&cardHolderNumber=" + cardHolderNumber1;
+                } else if (response.status === "failed") {
+                    window.location.href = "/OpenMoneyPayment/Failure";
+                } else if (response.status === "cancelled") {
+                    window.location.href = "/OpenMoneyPayment/Cancelled";
+                } else {
+                    console.log("Unhandled status:", response.status, response);
+                }
+            },
+            function (err) {
+                console.error("Layer integration error:", err);
+                alert("Something went wrong. Please try again.");
+            });
+        }
+
+        // Carousel (if used)
+        let currentIndex = 0;
+        function showSlide(index) {
+            const slides = document.querySelectorAll(".carousel-slide");
+            slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+        }
+        function nextSlide() {
+            const slides = document.querySelectorAll(".carousel-slide");
+            currentIndex = (currentIndex + 1) % slides.length;
+            showSlide(currentIndex);
+        }
+        function prevSlide() {
+            const slides = document.querySelectorAll(".carousel-slide");
+            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+            showSlide(currentIndex);
+        }
+        setInterval(() => nextSlide(), 5000);
+
+
+
+
+
+        // New popup for recent payments
+
+         // ========== NEW MODAL OPEN FUNCTION ==========
+         function openNewBalanceTopUpModal() {
+             $('#Loader1').show();
+             var userloginphone = '@Model.UserPhone';
+             const modalEl = document.getElementById('balanceTopUpModalNew');
+             const form = document.getElementById('topUpFormNew');
+             form.reset();
+             $('#payButtonNew').prop('disabled', true);
+             $('#formErrorNew').hide();
+             $('#recentPaymentsSection').hide();
+             // Load gateway options from API
+             loadGateways();
+             loadRecentPayments(userloginphone);
+             const modal = new bootstrap.Modal(modalEl);
+             $('#Loader1').hide();
+             modal.show();
+         }
+         // ========== LOAD GATEWAYS FROM API ==========
+         function loadGateways() {
+             $('#Loader1').show();
+             var userloginphone12 = '@Model.UserPhone';
+             $.ajax({
+                 url: '/Auth/GetGateways',
+                 type: 'GET',
+                 data: {
+                     mobile: userloginphone12
+                 },
+                 success: function(res) {
+                     const $gateway = $('#gatewayNew');
+                     $gateway.empty().append('<option value="">-- Select Gateway --</option>');
+                     if (res) {
+                         res.forEach(g => {
+                             $gateway.append(`<option value="${g.storeName}">${g.gatewayName}</option>`);
+                         });
+                     }
+                     $('#Loader1').hide();
+                 },
+                 error: function() {
+                 $('#Loader1').hide();}
+             });
+         }
+         // ========== VALIDATION ==========
+         $('#fullName, #email, #mobileNumber, #amountNew, #gatewayNew, #customerCardNew').on('input change blur', validateNewForm);
+
+         function validateNewForm() {
+             const name = $('#fullName').val().trim();
+             const email = $('#email').val().trim();
+             const mobile = $('#mobileNumber').val().trim();
+             const amountVal = parseFloat($('#amountNew').val());
+             const gatewayVal = $('#gatewayNew').val();
+             const cardVal = $('#customerCardNew').val().trim();
+             let isValid = true;
+             let message = "";
+             if (!name) {
+                 isValid = false;
+                 message = "Please enter full name.";
+             } else if (!email || !/^[^\s]+[^\s]+\.[^\s]+$/.test(email)) {
+                 isValid = false;
+                 message = "Please enter a valid email.";
+             } else if (!mobile || !/^\d{10}$/.test(mobile)) {
+                 isValid = false;
+                 message = "Please enter a valid 10-digit mobile number.";
+             } else if (!cardVal || !/^\d{12,16}$/.test(cardVal)) {
+                 isValid = false;
+                 message = "Please enter a valid 12–16 digit card number.";
+             } else if (isNaN(amountVal) || amountVal <= 0) {
+                 isValid = false;
+                 message = "Please enter a valid amount greater than 0.";
+                 } else if (amountVal > 49999 && gatewayVal == "CoreVegaah") {
+                 isValid = false;
+                 message = "Amount cannot exceed 99,999.";
+                 } else if (amountVal > 70000 && gatewayVal != "CoreVegaah") {
+                     isValid = false;
+                     message = "Amount cannot exceed 99,999.";
+                 }
+             else if (!gatewayVal) {
+                 isValid = false;
+                 message = "Please select a payment gateway.";
+             }
+             $('#payButtonNew').prop('disabled', !isValid);
+             if (!isValid && message) {
+                 $('#formErrorNew').text(message).show();
+             } else {
+                 $('#formErrorNew').hide();
+             }
+         }
+         // ========== LOAD RECENT PAYMENTS ==========
+         function loadRecentPayments(mobile) {
+             $('#Loader1').show();
+             $.ajax({
+                 url: '/Auth/GetRecentPayments',
+                 type: 'GET',
+                 data: {
+                     mobile: mobile
+                 },
+                 success: function(res) {
+                     if (res && Array.isArray(res) && res.length > 0) {
+                         recentPaymentsData = res;
+                         renderRecentPayments(res);
+                         $('#Loader1').hide();
+                         $('#recentPaymentsSection').show();
+                     } else {
+                         $('#Loader1').hide();
+                         $('#recentPaymentsSection').hide();
+                     }
+                 },
+                 error: function() {
+                     $('#Loader1').hide();
+                     $('#recentPaymentsSection').hide();
+                 }
+             });
+         }
+         let recentPaymentsData = [];
+
+         function renderRecentPayments(payments) {
+             let html = '';
+             payments.forEach(p => {
+                 const statusClass = p.status === true ? 'badge-success' : 'badge-danger';
+                 html += `
+                    <tr>
+                        <td>${formatDate(p.created)}</td>
+                        <td>₹${p.amount}</td>
+                        <td>${p.creditCardHolderNum}</td>
+                        <td>${p.creditCardHolderName}</td>
+                        <td>${p.cardholderMobileNo}</td>
+                        <td><span class="${statusClass}">${p.status ? 'Success' : 'Failed'}</span></td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-primary repay-btn"
+                                    data-card="${p.creditCardHolderNum}"
+                                    data-amount="${p.amount}"
+                                    data-name="${p.creditCardHolderName}"
+                                    data-email="${p.email}"
+                                    data-mobile="${p.cardholderMobileNo}">
+                                Repay
+                            </button>
+                        </td>
+                    </tr>`;
+             });
+             $('#recentPaymentsBody').html(html);
+         }
+
+         function formatDate(dateStr) {
+             if (!dateStr) return 'NA';
+             const d = new Date(dateStr);
+             return d.toLocaleDateString('en-IN', {
+                 day: '2-digit',
+                 month: 'short',
+                 year: 'numeric'
+             });
+         }
+         // ========== SEARCH PAYMENTS ==========
+         $('#paymentSearch').on('input', function() {
+             var userloginphone1 = '@Model.UserPhone';
+             const query = $(this).val().toLowerCase();
+             if (query.length < 4) {
+                 renderRecentPayments(recentPaymentsData);
+                 return;
+             }
+             $('#Loader1').show();
+             // Optional: server-side search
+             $.ajax({
+                 url: '/Auth/SearchPayments',
+                 type: 'GET',
+                 data: {
+                     mobile: userloginphone1,
+                     name: query
+                 },
+                 success: function(res) {
+                     $('#Loader1').hide();
+                     if (res && res.length > 0) renderRecentPayments(res);
+                 },
+                 error: function() {
+                     $('#Loader1').hide();
+                     // client-side fallback
+                     const filtered = recentPaymentsData.filter(p => p.creditCardHolderName && p.creditCardHolderName.toLowerCase().includes(query));
+                     renderRecentPayments(filtered);
+                 }
+             });
+         });
+         // ========== REPAY BUTTON ==========
+         $(document).on('click', '.repay-btn', function() {
+             const card = $(this).data('card');
+             const amount = $(this).data('amount');
+             const name = $(this).data('name');
+             const email = $(this).data('email');
+             const mobile = $(this).data('mobile');
+             const phone = $(this).data('phone') || mobile;
+             $('#fullName').val(name);
+             $('#email').val(email);
+             $('#mobileNumber').val(mobile);
+             $('#phoneNumber').val(phone);
+             $('#amountNew').val(amount);
+             $('#customerCardNew').val(card);
+             validateNewForm();
+         });
+         $('#topUpFormNew').on('submit', function(e) {
+             $('#Loader1').show();
+             e.preventDefault();
+             if ($("#payButtonNew").is(":disabled")) return;
+             const payloadnew = {
+                 mobile: $("#mobileNumber").val().trim(),
+                 card: $("#customerCardNew").val().trim(),
+                 amount: $("#amountNew").val(),
+                 gatewayValue: $("#gatewayNew").val(),
+                 gatewayText: $("#gatewayNew option:selected").text().trim(),
+                 gatewayText1: $("#gatewayNew option:selected").val().trim(),
+                 name: $("#fullName").val().trim(),
+                 email: $("#email").val().trim()
+             };
+             // EDU PG (JioPay)
+                 if (payloadnew.gatewayText1 === "JioPay") {
+                 var pphoneJio = '@Model.UserPhone';
+                 const amoushhsnt = parseFloat(payloadnew.amount);
+                 window.location.href = `https://edu.paymanfintech.in/JioPay/JiopayInit?amount=${encodeURIComponent(amoushhsnt)}&userPhone=${encodeURIComponent(pphoneJio)}&cName=${encodeURIComponent(payloadnew.name)}&cMobile=${encodeURIComponent(payloadnew.mobile)}&cCard=${encodeURIComponent(payloadnew.card)}&cemail=${encodeURIComponent(payloadnew.email)}&gateway=${encodeURIComponent(payloadnew.gatewayText1)}`;
+                 } 
+                 else if (payloadnew.gatewayText1 === "JioPayFasTag") {
+                     var pphoneJio = '@Model.UserPhone';
+                     const amoushhsnt = parseFloat(payloadnew.amount);
+                             window.location.href = `https://fastag.payman.in/JioPay/JiopayInit?amount=${encodeURIComponent(amoushhsnt)}&userPhone=${encodeURIComponent(pphoneJio)}&cName=${encodeURIComponent(payloadnew.name)}&cMobile=${encodeURIComponent(payloadnew.mobile)}&cCard=${encodeURIComponent(payloadnew.card)}&cemail=${encodeURIComponent(payloadnew.email)}&gateway=${encodeURIComponent(payloadnew.gatewayText1)}`;
+                 }
+             // Travel PG
+                 else if (payloadnew.gatewayText1 === "Vegaah") {
+                 var pphone = '@Model.UserPhone';
+                 const dd = new Date();
+                 let orderId = 'PAYMAN' + dd.getTime();
+                 $.ajax({
+                     url: "https://fastag.paymanfintech.in/FasTag/Initiate",
+                     type: "POST",
+                     data: {
+                         orderId: orderId,
+                         amount: parseFloat(payloadnew.amount),
+                         actionType: 1,
+                         email: payloadnew.email,
+                         phone: pphone,
+                         custmobile: payloadnew.mobile,
+                         custcard: payloadnew.card,
+                         custname: payloadnew.name,
+                         divice: 'web'
+                     },
+                     success: function(res) {
+                         if (res.success) window.location.href = res.url;
+                         else alert(res.message);
+                     },
+                     error: function() {
+                         $('#Loader1').hide();
+                         alert("Something went wrong.");
+                     }
+                 });
+             }
+                 else if (payloadnew.gatewayText1 === "CoreVegaah") {
+                     var pphone = '@Model.UserPhone';
+                     const dd = new Date();
+                     let orderId = 'PAYMAN' + dd.getTime();
+                     $.ajax({
+                             url: "https://paymove.payman.in/Paymove/Initiate",
+                         type: "POST",
+                         data: {
+                             orderId: orderId,
+                             amount: parseFloat(payloadnew.amount),
+                             actionType: 1,
+                             email: payloadnew.email,
+                             phone: pphone,
+                             custmobile: payloadnew.mobile,
+                             custcard: payloadnew.card,
+                             custname: payloadnew.name,
+                             divice: 'web'
+                         },
+                         success: function(res) {
+                             if (res.success) window.location.href = res.url;
+                             else alert(res.message);
+                         },
+                         error: function() {
+                             $('#Loader1').hide();
+                             alert("Something went wrong.");
+                         }
+                     });
+                 }
+                else if (payloadnew.gatewayText1 === "CashfreeEdu") {
+                    const d = new Date();
+                    let orderid = 'PAYMAN' + d.getTime();
+                    let custId = 'Cust' + d.getTime();
+                    var userphone = '@Model.UserPhone';
+                    var device = 'Web';
+
+                    var orderData = {
+                        order_id: orderid,
+                        order_amount: parseFloat(payloadnew.amount),
+                        order_currency: "INR",
+                        order_note: "Order Id:"+ orderid,
+                        order_meta: {
+                            return_url: `https://edu.paymanfintech.in/Edu/Return?order_id=${encodeURIComponent(orderid)}&loginmobile=${encodeURIComponent(userphone)}&email=${encodeURIComponent(payloadnew.email)}&cardnum=${encodeURIComponent(payloadnew.card)}&holderphone=${encodeURIComponent(payloadnew.mobile)}&holdername=${encodeURIComponent(payloadnew.name)}&device=${encodeURIComponent(device)}`,
+                            notify_url: "https://edu.paymanfintech.in/Edu/Notify"
+                        },
+                        customer_details: {
+                            customer_id: custId,
+                            customer_name: payloadnew.name,
+                            customer_email: payloadnew.email,
+                            customer_phone: payloadnew.mobile
+                        }
+                    };
+                    debugger;
+
+                    $.ajax({
+                        url: 'https://edu.paymanfintech.in/Edu/CreateOrder',
+                        type: 'POST',
+                        data: JSON.stringify(orderData),
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        success: function (res) {
+                            if (res.paymentSessionId) {
+                                window.location.href = `https://edu.paymanfintech.in/Edu/StartCheckout?sessionId=${res.paymentSessionId}`;
+                            } else {
+                                alert("Failed to get session ID.");
+                            }
+                        },
+                        error: function (xhr) {
+                            console.error(xhr.responseText);
+                            alert("Error creating order: " + xhr.responseText);
+                        }
+                    });
+                }
+             else if (payloadnew.gatewayText1 === "PaytmEdu") {
+                          const d = new Date();
+    let orderid = 'PAYMAN' + d.getTime();
+
+    $.ajax({
+        url: 'https://edu.payman.in/Paytm/CreateOrder',
+        type: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({
+            orderId: orderid,
+            amount: parseFloat(payloadnew.amount),
+                userphone: '@Model.UserPhone',
+                    cName: payloadnew.name,
+                             cMobile: payloadnew.mobile,
+                             cCard: payloadnew.card,
+                             cemail: payloadnew.email,
+                             divice: 'web'
+        }),
+        success: function (res) {
+
+            console.log("PAYTM RESPONSE:", res);
+
+            // 🔥 IMPORTANT: token is inside body
+            const txnToken = res.body.txnToken;
+
+            if (!txnToken) {
+                alert("Token not received");
+                return;
+            }
+
+            // 🔥 Check script loaded
+            if (!window.Paytm || !window.Paytm.CheckoutJS) {
+                alert("Paytm SDK not loaded");
+                return;
+            }
+
+            var config = {
+                root: "",
+                flow: "DEFAULT",
+                data: {
+                    mid: "xlmtpp73588911306296",   // ✅ YOUR MID
+                    orderId: orderid,
+                    token: txnToken,
+                    tokenType: "TXN_TOKEN",
+                    amount: parseFloat(payloadnew.amount)
+                },
+                handler: {
+                    notifyMerchant: function (eventName, data) {
+                        console.log("EVENT:", eventName, data);
+
+                        // ✅ SUCCESS / FAILURE HANDLING
+                        if (eventName === "PAYMENT_SUCCESS") {
+                            alert("Payment Success");
+                            console.log("SUCCESS DATA:", data);
+                        }
+
+                        if (eventName === "PAYMENT_FAILURE") {
+                            alert("Payment Failed");
+                            console.log("FAIL DATA:", data);
+                        }
+                    }
+                }
+            };
+
+            // 🔥 INIT + INVOKE IMMEDIATELY
+            window.Paytm.CheckoutJS.init(config)
+                .then(function () {
+                    console.log("Checkout Init Success");
+                    window.Paytm.CheckoutJS.invoke();
+                })
+                .catch(function (err) {
+                    console.log("Checkout Init Error:", err);
+                });
+        },
+        error: function (err) {
+            console.error("API ERROR:", err);
+            alert("Error creating Paytm order");
+        }
+    });
+         }else if(payloadnew.gatewayText1 === "PayuEdu"){
+             payUIntegration();
+ 
+
+     }
+             
+
+             // Add other gateway conditions here...
+         });
+        async function payUIntegration() {
+
+                const firstName = $("#fullName").val().trim();
+                const amount = $("#amountNew").val();
+                const productInfo = "Software course traning";
+                const email = $("#email").val().trim();
+                const phone = $("#mobileNumber").val().trim();
+
+            const surl = "https://localhost:44384/PayMan/Return";
+            const furl = "https://localhost:44384/PayMan/Return";
+
+            const key = "46yIgi";
+            const salt = "LVppnjLWrPGK67pOt2T2oOBw2oqDyshm";
+
+            const txnid = await generateTxnid();
+
+            // IMPORTANT:
+            // Exact PayU hash format
+            const hashString =
+                `${key}|${txnid}|${amount}|${productInfo}|${firstName}|${email}|||||||||||${salt}`;
+
+            const hash = await generateHash512(hashString);
+
+            console.log("Hash String:", hashString);
+            console.log("Hash:", hash);
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+
+            // TEST URL
+            // form.action = 'https://test.payu.in/_payment';
+
+            // PRODUCTION URL
+            form.action = 'https://secure.payu.in/_payment';
+
+            addInput(form, 'key', key);
+            addInput(form, 'txnid', txnid);
+            addInput(form, 'amount', amount);
+            addInput(form, 'productinfo', productInfo);
+            addInput(form, 'firstname', firstName);
+            addInput(form, 'phone', phone);
+            addInput(form, 'email', email);
+            addInput(form, 'surl', surl);
+            addInput(form, 'furl', furl);
+            addInput(form, 'service_provider', 'payu_paisa');
+            addInput(form, 'hash', hash);
+
+            document.body.appendChild(form);
+
+            form.submit();
+        }
+
+        function addInput(form, name, value) {
+
+            const input = document.createElement('input');
+
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+
+            form.appendChild(input);
+        }
+
+        async function generateTxnid() {
+
+            const randomStr = `${Math.random()}${Date.now()}`;
+
+            const hash = await generateHash512(randomStr);
+
+            return hash.substring(0, 20);
+        }
+
+        async function generateHash512(text) {
+
+            const encoder = new TextEncoder();
+
+            const data = encoder.encode(text);
+
+            const hashBuffer = await crypto.subtle.digest('SHA-512', data);
+
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+            const hashHex = hashArray
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+
+            return hashHex;
+        }
+    </script>
+}

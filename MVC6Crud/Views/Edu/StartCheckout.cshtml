@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Start Checkout";
+}
+<h3>Redirecting to Cashfree Checkout...</h3>
+
+
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+<script>
+    const sessionId = "@ViewBag.SessionId";
+    const dashboardUrl = "https://paymanfintech.in/Home/Dashboard"; // <-- change to your dashboard URL
+
+    if (sessionId) {
+        const cf = Cashfree({ mode: "production" }); // or "sandbox"
+
+        // Start Cashfree Checkout
+        cf.checkout({
+            paymentSessionId: sessionId,
+            redirectTarget: "_self"
+        });
+
+        // 🕒 Set timer to auto-redirect after 2 minutes (120000 ms)
+        setTimeout(() => {
+           // alert("Session expired due to inactivity. Redirecting to Dashboard...");
+            window.location.href = dashboardUrl;
+        }, 300000); // 2 minutes
+    } else {
+        document.body.innerHTML = "<h4>Invalid session ID.</h4>";
+    }
+</script>
+
+@* <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+<script>
+    const sessionId = "@ViewBag.SessionId";
+
+    if (sessionId) {
+        const cf = Cashfree({ mode: "production" }); // or "sandbox" for testing
+        cf.checkout({
+            paymentSessionId: sessionId,
+            redirectTarget: "_self"
+        });
+    } else {
+        document.body.innerHTML = "<h4>Invalid session ID.</h4>";
+    }
+</script> *@

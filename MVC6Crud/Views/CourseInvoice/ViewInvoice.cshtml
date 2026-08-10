@@ -1,0 +1,243 @@
+﻿@model dynamic
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Invoice - Payman Fintech</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .invoice-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: #fff;
+            border: 5px solid #000; /* Outer border */
+            position: relative;
+            padding: 10mm;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 3%;
+            opacity: 0.05;
+            font-size: 80px;
+            font-weight: bold;
+            transform: rotate(-30deg);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            height: 60px;
+        }
+
+        .title {
+            text-align: center;
+            flex-grow: 1;
+            font-size: 20pt;
+            font-weight: bold;
+        }
+
+        .qr-code img {
+            width: 120px;
+            height: 120px;
+        }
+
+        .address-box {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+            .address-box > div {
+                width: 48%;
+                border: 1px solid #000;
+                padding: 12px;
+            }
+
+        .details {
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid #000;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 13pt;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 13pt;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 10px;
+        }
+
+        th {
+            background: #f5f5f5;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .totals-box {
+            width: 45%;
+            border: 1px solid #000;
+            padding: 15px;
+            font-size: 14pt;
+            margin-left: auto;
+            margin-bottom: 30px;
+        }
+
+        .declaration {
+            font-size: 12pt;
+            margin-top: 40px;
+        }
+
+        @@media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+
+            .invoice-container {
+                margin: 0;
+                border: none;
+                padding: 0;
+                width: 100%;
+            }
+
+            .print-btn {
+                display: none;
+            }
+        }
+
+        .print-btn {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .print-btn button {
+                padding: 10px 20px;
+                background: #0a2540;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="watermark">PAYMAN FINTECH</div>
+        <div class="header">
+            <img class="logo" src="/images/FinalIcon.png" alt="Logo" />
+            <div class="title">TAX INVOICE</div>
+            <div class="qr-code">
+                <img crossorigin="anonymous"
+                     src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https%3A%2F%2Fpaymanfintech.in%2FCourseInvoice%2FViewInvoice%3Ftxn%3D@Model.TransactionId%26InvoiceNo%3D@Model.InvoiceNo"
+                     alt="QR Code" />
+            </div>
+        </div>
+
+        <div class="address-box">
+            <div>
+                <h3>From:</h3>
+                <strong>@Model.From.Name</strong><br />
+                @Model.From.Address<br />
+                GSTIN: @Model.From.GSTIN
+            </div>
+            <div>
+                <h3>To:</h3>
+                <strong>@Model.To.Name</strong><br />
+                @Model.To.Address<br />
+                Email: @Model.To.Email<br />
+                Mobile: @Model.To.Mobile
+            </div>
+        </div>
+
+        <div class="details">
+            <div>
+                <p><strong>Invoice No:</strong> @Model.InvoiceNo</p>
+                <p><strong>Payment Mode:</strong> Online Payment</p>
+            </div>
+            <div style="text-align:right">
+                <p><strong>Date:</strong> @Model.Date</p>
+                <p><strong>Transaction ID:</strong> @Model.TransactionId</p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Service</th>
+                    <th>HSN/SAC</th>
+                    <th>Qty</th>
+                    <th>Unit Price (excl. GST)</th>
+                    <th>Amount (incl. GST)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.LineItems)
+                {
+                    <tr>
+                        <td style="text-align:center">@item.SNo</td>
+                        <td>@item.Service</td>
+                        <td style="text-align:center">@item.HsnSac</td>
+                        <td style="text-align:center">@item.Qty</td>
+                        <td class="text-right">₹@item.UnitPrice.ToString("F2")</td>
+                        <td class="text-right">₹@item.Amount.ToString("F2")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Totals Section -->
+        <div class="totals-box">
+            <p>CGST (9%): <strong>₹@Model.CGST.ToString("F2")</strong></p>
+            <p>SGST (9%): <strong>₹@Model.SGST.ToString("F2")</strong></p>
+            <p><strong>Total GST:</strong> ₹@((Model.CGST + Model.SGST).ToString("F2"))</p>
+            <hr />
+            <h2 style="margin-top:10px;">Grand Total: ₹@Model.Total.ToString("F2")</h2>
+        </div>
+
+        <div class="declaration">
+            <strong>Declaration:</strong> This is a system-generated invoice for the purchase of @Model.LineItems[0].Service.
+        </div>
+    </div>
+
+    <div class="print-btn">
+        <button onclick="window.print()">Print Invoice</button>
+    </div>
+</body>
+</html>

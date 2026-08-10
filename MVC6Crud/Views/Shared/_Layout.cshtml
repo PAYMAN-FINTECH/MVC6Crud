@@ -1,0 +1,434 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = null;
+    var userName = Context.Session.GetString("UserName");
+    bool isLoggedIn = !string.IsNullOrEmpty(userName);
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>PAYMAN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap + Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/Navbar2.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Footer.css" asp-append-version="true" />
+</head>
+<body>
+
+    <!-- Loader Partial -->
+    @await Html.PartialAsync("_LoaderPartial")
+
+    <!-- Navbar – full width, modern white design -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-2 fixed-top">
+        <div class="container-fluid px-4">
+            <!-- edge-to-edge with horizontal padding -->
+            @if (isLoggedIn)
+            {
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Dashboard">
+                    <img src="~/images/finalicon.png" width="44" height="44" class="me-2" alt="Payman Logo" />
+                    <span class="fw-bold fs-4 text-primary">PAYMAN</span>
+                </a>
+            }
+            else
+            {
+                <a class="navbar-brand d-flex align-items-center" asp-controller="LogIn" asp-action="WebLogout">
+                    <img src="~/images/finalicon.png" width="44" height="44" class="me-2" alt="Payman Logo" />
+                    <span class="fw-bold fs-4 text-primary">PAYMAN</span>
+                </a>
+            }
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-end" id="navbarScroll">
+                <ul class="navbar-nav align-items-center gap-2">
+                    @if (isLoggedIn)
+                    {
+                        <li class="nav-item">
+                            <span class="nav-link text-dark fw-medium">Welcome, @userName</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-primary rounded-pill px-4" asp-controller="LogIn" asp-action="WebLogout">Logout</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-medium" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-medium" asp-controller="Home" asp-action="AboutUs">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-medium" asp-controller="Home" asp-action="Services">Services</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-medium d-inline-flex align-items-center" asp-controller="Home" asp-action="FasTag">
+                                FastTag
+                                <span class="badge bg-warning text-dark ms-2 small-badge">New</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-medium" asp-controller="Home" asp-action="ContactUs">Contact Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    @inject Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper HtmlHelper
+    @{
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    }
+
+    <!-- Main Content – push down because navbar is fixed -->
+    <main style="padding-top: 80px;">
+        <div class="container py-3">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- Footer only on selected pages -->
+    @if (currentController == "Home" && (currentAction == "Index" || currentAction == "FasTag"))
+    {
+        @await Html.PartialAsync("_Footer")
+    }  else
+        {
+            <footer class="simple-footer py-3 mt-auto">
+                <div class="container text-center">
+                    <p class="mb-0 small text-muted">
+                        &copy; @DateTime.Now.Year Payman Fintech. All rights reserved.
+                    </p>
+                </div>
+            </footer>
+        }
+
+    <!-- Login Modal – refined design -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Welcome Back</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="loginPhone" class="form-label fw-medium">User Name</label>
+                        <input type="text" id="loginPhone" class="form-control rounded-3" placeholder="Enter your username" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="loginPin" class="form-label fw-medium">Password</label>
+                        <input type="password" id="loginPin" class="form-control rounded-3" placeholder="••••••••" />
+                    </div>
+                    <div id="loginError" class="text-danger small mt-1"></div>
+                    <div class="text-end mt-2">
+                        <a href="#" class="text-decoration-none" onclick="openForgotPasswordModal()">Forgot password?</a>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-primary w-100 rounded-pill py-2" onclick="submitLogin()">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Reset Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label fw-medium">Registered Email</label>
+                    <input type="text" id="forgotMobile" class="form-control rounded-3" placeholder="Enter your email" />
+                    <div id="forgotError" class="text-danger small mt-1"></div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button class="btn btn-primary w-100 rounded-pill py-2" onclick="submitForgotPassword()">Send OTP</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Set New Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="resetPhone" />
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">OTP</label>
+                        <input type="text" id="resetOtp" class="form-control rounded-3" placeholder="Enter OTP" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">New Password</label>
+                        <input type="password" id="resetNewPass" class="form-control rounded-3" placeholder="••••••••" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Confirm Password</label>
+                        <input type="password" id="resetConfirmPass" class="form-control rounded-3" placeholder="••••••••" />
+                    </div>
+                    <div id="resetError" class="text-danger small mt-1"></div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button class="btn btn-success w-100 rounded-pill py-2" onclick="submitResetPassword()">Reset Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Modal -->
+    <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Verify OTP</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="otpInput" class="form-label fw-medium">Enter the 6‑digit OTP sent to your email</label>
+                        <input type="text" id="otpInput" class="form-control rounded-3" maxlength="6" placeholder="123456" />
+                        <div id="otpError" class="text-danger small mt-1"></div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-primary w-100 rounded-pill py-2" onclick="verifyOtp()">Verify OTP</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+        <div id="liveToast" class="toast align-items-center text-white bg-danger border-0 rounded-3" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toastMessage">Something went wrong</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+        // Your existing JavaScript – unchanged
+        function showToast(message, type = 'danger') {
+            const toastEl = document.getElementById('liveToast');
+            const toastBody = document.getElementById('toastMessage');
+            toastBody.textContent = message;
+            toastEl.className = `toast align-items-center text-white bg-${type} border-0 rounded-3`;
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+        function openForgotPasswordModal() {
+            $('#loginModal').modal('hide');
+            $('#forgotMobile').val('');
+            $('#forgotError').text('');
+            new bootstrap.Modal(document.getElementById('forgotPasswordModal')).show();
+        }
+
+        function submitForgotPassword() {
+            $('#Loader1').show();
+            const mobile = $('#forgotMobile').val().trim();
+            if (mobile == '' || mobile == null) {
+                $('#Loader1').hide();
+                $('#forgotError').text("Enter valid email address.");
+                return;
+            }
+            $.ajax({
+                url: 'https://srredu.in/Users/SendResetPinMail',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ phone: mobile, divice: "Web" }),
+                success: function (res) {
+                    $('#Loader1').hide();
+                    if (res.status == "success") {
+                        $('#resetPhone').val(mobile);
+                        $('#forgotPasswordModal').modal('hide');
+                        new bootstrap.Modal(document.getElementById('resetPasswordModal')).show();
+                        showToast("Reset mail sent successfully.", 'warning');
+                    } else {
+                        $('#forgotError').text(res.message || "Failed to send OTP.");
+                    }
+                },
+                error: function () {
+                    $('#Loader1').hide();
+                    $('#forgotError').text("Server error.");
+                }
+            });
+        }
+
+        function submitResetPassword() {
+            $('#Loader1').show();
+            const phone = $('#resetPhone').val();
+            const otp = $('#resetOtp').val().trim();
+            const newPass = $('#resetNewPass').val().trim();
+            const confirmPass = $('#resetConfirmPass').val().trim();
+
+            if (!otp || !newPass || !confirmPass) {
+                $('#Loader1').hide();
+                $('#resetError').text("All fields are required.");
+                return;
+            }
+            if (newPass !== confirmPass) {
+                $('#Loader1').hide();
+                $('#resetError').text("Passwords do not match.");
+                return;
+            }
+
+            $.ajax({
+                url: 'https://srredu.in/Users/ResetPassword',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ mobile: phone, otp: otp, newPassword: newPass }),
+                success: function (res) {
+                    if (res.success) {
+                        $('#Loader1').hide();
+                        showToast("Password updated successfully!", 'warning');
+                        $('#resetPasswordModal').modal('hide');
+                        new bootstrap.Modal(document.getElementById('loginModal')).show();
+                    } else {
+                        $('#Loader1').hide();
+                        $('#resetError').text(res.message || "Reset failed.");
+                    }
+                },
+                error: function () {
+                    $('#Loader1').hide();
+                    $('#resetError').text("Server error.");
+                }
+            });
+        }
+
+               function submitLogin() {
+            $('#Loader1').show();
+            $('#loginError').text('');
+
+            const $loginButton = $('#loginModal .btn-primary');
+            $loginButton.prop('disabled', true).text('Logging in...');
+
+            $.ajax({
+                url: '/LogIn/WebLogIn',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    email: $('#loginPhone').val(),
+                    password: $('#loginPin').val()
+                }),
+
+                success: function (res) {
+                    console.log("Login Response:", res);
+
+                    if (res.success) {
+                        if (res.otpLoginEnabled) {
+                            $('#loginModal').modal('hide');
+                            $('#otpModal').modal('show');
+                            $('#Loader1').hide();
+
+                        } else {
+                            setTimeout(function () {
+                                window.location.href = "/Home/Dashboard";
+                            }, 100);
+                        }
+                    }
+                    else {
+                        $('#loginError').text("Invalid phone or pin.");
+                        $('#Loader1').hide();
+                        $loginButton.prop('disabled', false).text('Login');
+                    }
+                },
+
+                error: function (xhr, status, error) {
+                    console.log("===== AJAX LOGIN ERROR =====");
+                    console.log("Status:", status);
+                    console.log("Error:", error);
+                    console.log("HTTP Status Code:", xhr.status);
+                    console.log("Response Text:", xhr.responseText);
+
+                    let errorMessage = "Something went wrong. Try again.";
+
+                    try {
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.responseText) {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.message) {
+                                errorMessage = response.message;
+                            }
+                        }
+                    } catch (e) {
+                        console.log("Error parsing server response:", e);
+                    }
+
+                    $('#loginError').text(errorMessage);
+                    $('#Loader1').hide();
+                    $loginButton.prop('disabled', false).text('Login');
+                },
+
+                complete: function () {
+                    // Optional cleanup
+                    console.log("Login request completed.");
+                }
+            });
+        }
+        function verifyOtp() {
+            $('#Loader1').show();
+            const otp = $('#otpInput').val();
+            if (!otp) {
+                $('#otpError').text("Please enter the OTP.");
+                return;
+            }
+            $.ajax({
+                url: '/LogIn/VerifyOtpWeb',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ otp: otp }),
+                success: function (res) {
+                    $('#Loader1').hide();
+                    if (res.status) {
+                        showToast("LogIn successfully.", 'success');
+                        window.location.href = "/Home/Dashboard";
+                    } else {
+                        showToast("Invalid or expired OTP.", 'warning');
+                    }
+                },
+                error: function () {
+                    $('#otpError').text("Error verifying OTP.");
+                }
+            });
+        }
+
+        $('#loginPin').keypress(function (e) {
+            if (e.which === 13) {
+                submitLogin();
+            }
+        });
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
