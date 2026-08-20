@@ -157,6 +157,7 @@ namespace MVC6Crud.Models.PaymanApp
 
 
 
+    [XmlRoot("transactionStatusResp")]
     public class ExtBillPayResponse11
     {
         [XmlElement("responseCode")]

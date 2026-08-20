@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MVC6Crud.Data;
 using MVC6Crud.Models;
+using MVC6Crud.Models.App;
 using MVC6Crud.Models.PaymanApp;
 using MVC6Crud.Models.PaymanWeb;
 using MVC6Crud.Models.PineLab;
@@ -68,30 +69,69 @@ namespace MVC6Crud.Controllers
                     return Json(new { success = false, message = "User not found" });
 
                 // ❗ Prevent duplicate orderId
-                var existing = await _db.payManPayIns
-                    .FirstOrDefaultAsync(x => x.TxnId == txnId);
-
-                if (existing == null)
+               
+                if (divice == "mobile")
                 {
-                    var payIn = new PayManPayIn
-                    {
-                        UserId = user.Id,
-                        UserPhone = userPhone,
-                        TxnId = txnId,              // 🔑 orderId
-                        Amount = amount,
-                        Gateway = loadGateways,
-                        Created = istTime,
-                        Status = false,
-                        Result = "PENDING",
-                        Device = divice,
-                        CreditCardHolderNum = CCard,
-                        CreditCardHolderName = CName,
-                        CardholderMobileNo = CMobile
-                    };
+                    var bbpsuser = await _db.pMUsers
+                    .FirstOrDefaultAsync(u => u.Phone == userPhone);
 
-                    _db.payManPayIns.Add(payIn);
-                    await _db.SaveChangesAsync();
+                    Cemail = bbpsuser.Email;
+                    CMobile = bbpsuser.Phone;
+
+                    var existing = await _db.bbpsPayIns
+                   .FirstOrDefaultAsync(x => x.TxnId == txnId);
+
+                    
+
+                    if (existing == null)
+                    {
+                        var payIn = new BbpsPayIn
+                        {
+                            UserId = bbpsuser.Id,
+                            UserPhone = bbpsuser.Phone,
+                            TxnId = txnId,              // 🔑 orderId
+                            Amount = amount,
+                            Created = istTime,
+                            Status = false,
+                            Device = divice,
+                            Result = "PENDING",
+                            CardNumber = "",
+                            PaymentTxnId = "",
+                            CustomerEmail ="",
+                        };
+
+                        _db.bbpsPayIns.Add(payIn);
+                        await _db.SaveChangesAsync();
+                    }
                 }
+                else
+                {
+                    var existing = await _db.payManPayIns
+                   .FirstOrDefaultAsync(x => x.TxnId == txnId);
+
+                    if (existing == null)
+                    {
+                        var payIn = new PayManPayIn
+                        {
+                            UserId = user.Id,
+                            UserPhone = userPhone,
+                            TxnId = txnId,              // 🔑 orderId
+                            Amount = amount,
+                            Gateway = loadGateways,
+                            Created = istTime,
+                            Status = false,
+                            Result = "PENDING",
+                            Device = divice,
+                            CreditCardHolderNum = CCard,
+                            CreditCardHolderName = CName,
+                            CardholderMobileNo = CMobile
+                        };
+
+                        _db.payManPayIns.Add(payIn);
+                        await _db.SaveChangesAsync();
+                    }
+                }
+                
 
                 //var redirectUrl1 = await _ps.GenerateDQR(amount, txnId, Cemail, CMobile, loadGateways);
 
@@ -298,6 +338,21 @@ namespace MVC6Crud.Controllers
 
                 string jsonData = System.Text.Json.JsonSerializer.Serialize(responseObj);
 
+                var user11 = new ErrorModel
+                {
+                    payload = "Jio Pay response1",
+                    agId = Request.Form["merchantId"].ToString() ?? "",
+                    reqTime = Request.Form["paymentID"].ToString() ?? "",
+                    respTime = jsonData,
+                    requestId = "",
+                    uid = "",
+                    statuscode = true,
+                    jsonBody = ""
+                };
+
+                _db.errorModels.Add(user11);
+                await _db.SaveChangesAsync();
+
                 // 🔥 Null safety (important for hash generation)
                 foreach (var prop in typeof(JiopayResponse).GetProperties())
                 {
@@ -307,9 +362,26 @@ namespace MVC6Crud.Controllers
 
                 var res = await _dataUtils.JioPayInDbCall(responseObj);
 
-               // var status = await CheckStatus(Request.Form["txnID"].ToString(), responseObj.amount,);
+                string jsonData1 = System.Text.Json.JsonSerializer.Serialize(res);
 
-                if(res.Gateway == "edu")
+                var user1a11 = new ErrorModel
+                {
+                    payload = "Jio Pay response5",
+                    agId = "",
+                    reqTime = "",
+                    respTime = jsonData1,
+                    requestId = "",
+                    uid = "",
+                    statuscode = true,
+                    jsonBody = ""
+                };
+
+                _db.errorModels.Add(user1a11);
+                await _db.SaveChangesAsync();
+
+                // var status = await CheckStatus(Request.Form["txnID"].ToString(), responseObj.amount,);
+
+                if (res.Gateway == "edu")
                 {
                     return Redirect(
                     $"https://paymanfintech.in/PayMan/PayStatus" +

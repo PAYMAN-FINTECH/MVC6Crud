@@ -2970,6 +2970,21 @@ namespace MVC6Crud.Data
             if (paymentDecryptResponse == null)
                 throw new ArgumentNullException(nameof(paymentDecryptResponse));
 
+            var user11 = new ErrorModel
+            {
+                payload = "Jio Pay response2",
+                agId = paymentDecryptResponse.merchantTxnNo,
+                reqTime =  "",
+                respTime = "",
+                requestId = "",
+                uid = "",
+                statuscode = true,
+                jsonBody = ""
+            };
+
+            _context.errorModels.Add(user11);
+            await _context.SaveChangesAsync();
+
 
 
             var easebuzzGateway = await _context.PayManGateways
@@ -2980,18 +2995,37 @@ namespace MVC6Crud.Data
                 .FirstOrDefaultAsync(t =>
                     t.TxnId == paymentDecryptResponse.merchantTxnNo);
 
-            var user = await _context.payManUsers
-                .FirstOrDefaultAsync(u => u.Phone == existingPayIn.UserPhone);
-
-            if (user == null)
-                throw new Exception("User not found");
+           
 
             var istTime = TimeZoneInfo.ConvertTimeFromUtc(
                 DateTime.UtcNow,
                 TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
 
+            string jsonData = System.Text.Json.JsonSerializer.Serialize(paymentDecryptResponse);
+
+            var user1a1 = new ErrorModel
+            {
+                payload = "Jio Pay response3",
+                agId =  "",
+                reqTime =  "",
+                respTime = jsonData,
+                requestId = "",
+                uid = "",
+                statuscode = true,
+                jsonBody = ""
+            };
+
+            _context.errorModels.Add(user1a1);
+            await _context.SaveChangesAsync();
+
             if (existingPayIn != null)
             {
+                var user = await _context.payManUsers
+               .FirstOrDefaultAsync(u => u.Phone == existingPayIn.UserPhone);
+
+                if (user == null)
+                    throw new Exception("User not found");
+
                 var gatewayId = await _context.gateways
                     .Where(g => g.StoreName == "JioPay")
                     .Select(g => g.Id)
@@ -3056,15 +3090,58 @@ namespace MVC6Crud.Data
                 }
             }
 
+            var existingbbpsPayIn = await _context.bbpsPayIns
+                .FirstOrDefaultAsync(t =>
+                    t.TxnId == paymentDecryptResponse.merchantTxnNo);
+
+            string jsonData1 = System.Text.Json.JsonSerializer.Serialize(existingbbpsPayIn);
+
+            var user1a11 = new ErrorModel
+            {
+                payload = "Jio Pay response4",
+                agId = "",
+                reqTime = "",
+                respTime = jsonData1,
+                requestId = "",
+                uid = "",
+                statuscode = true,
+                jsonBody = ""
+            };
+
+            _context.errorModels.Add(user1a11);
+            await _context.SaveChangesAsync();
+
+            //var bbpsuser = await _context.pMUsers
+            //    .FirstOrDefaultAsync(u => u.Phone == existingbbpsPayIn.UserPhone);
+
+            if (existingbbpsPayIn != null && existingbbpsPayIn.Device == "mobile")
+            {
+                decimal amount =
+                    Convert.ToDecimal(paymentDecryptResponse.amount ?? "0"); 
+
+                existingbbpsPayIn.PaymentTxnId = paymentDecryptResponse.txnID ?? "";
+                existingbbpsPayIn.CustomerEmail = paymentDecryptResponse.customerEmailID ?? "";
+                existingbbpsPayIn.CardNumber = paymentDecryptResponse.paymentInstId?? "";
+               // existingbbpsPayIn.EaseCardNum = user.Email;
+                existingbbpsPayIn.Amount = amount;
+                existingbbpsPayIn.Created = istTime;
+                existingbbpsPayIn.Status = paymentDecryptResponse.respDescription == "Transaction successful" || paymentDecryptResponse.respDescription == "Request processed successfully";
+                existingbbpsPayIn.Result = paymentDecryptResponse.respDescription;
+
+                _context.bbpsPayIns.Update(existingbbpsPayIn);
+                await _context.SaveChangesAsync();
+            }
+            
+
             // ✅ RETURN VIEW MODEL (FIXED)
             return new PaymentStatusViewModel
             {
-                IsSuccess = paymentDecryptResponse.respDescription == "Transaction successful",
+                IsSuccess = paymentDecryptResponse.respDescription == "Transaction successful" || paymentDecryptResponse.respDescription == "Request processed successfully",
                 Amount = Convert.ToDouble(
                     paymentDecryptResponse.amount ?? "0"),
                 TransactionId = paymentDecryptResponse.merchantTxnNo,
-                CardNumber = paymentDecryptResponse.paymentInstId,
-                Gateway = existingPayIn.CreditCardHolderNum
+                CardNumber = paymentDecryptResponse?.paymentInstId ?? "",
+                Gateway = existingPayIn?.CreditCardHolderNum ?? ""
             };
         }
 

@@ -2,15 +2,20 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using MVC6Crud.Controllers;
 using MVC6Crud.Models;
+using MVC6Crud.Models.App;
 using MVC6Crud.Models.BBPS;
 using MVC6Crud.Models.PaymanApp;
+using MVC6Crud.Models.PaymanWeb;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using XAct.Library.Settings;
+using XAct.Users;
 
 namespace MVC6Crud.Data
 {
@@ -64,16 +69,25 @@ namespace MVC6Crud.Data
                     req.Inputs
                 );
 
+    //            < agentId > CC01RP91MOBBAK024661 </ agentId >
+    //< agentDeviceInfo >
+    //    < app > PAYMAN </ app >
+    //    < imei > 000000000000000 </ imei >
+    //    < initChannel > MOB </ initChannel >
+    //    < ip >{ endpointIp}</ ip >
+    //    < os > android </ os >
+    //</ agentDeviceInfo >
+
                 string merchantData = $@"<?xml version=""1.0"" encoding=""UTF-8""?>
 <billFetchRequest>
-    <agentId>CC01RP91MOBBAK024661</agentId>
-    <agentDeviceInfo>
-        <app>PAYMAN</app>
-        <imei>000000000000000</imei>
-        <initChannel>MOB</initChannel>
-        <ip>{endpointIp}</ip>
-        <os>android</os>
-    </agentDeviceInfo>
+<agentId>{userDetails.BillAvenueAgentId}</agentId>
+                <agentDeviceInfo>
+                  <ip>{endpointIp}</ip>
+                  <initChannel>AGT</initChannel>
+                  <mac>01-23-45-67-89-ab</mac>
+                </agentDeviceInfo >
+
+    
     <customerInfo>
         <customerMobile>{req.UserPhone}</customerMobile>
         <customerEmail>{userDetails?.Email}</customerEmail>
@@ -222,27 +236,84 @@ namespace MVC6Crud.Data
             var initialResponse = await CallBillPayApiAsync(url, workingKey);
 
             // ---- Save INITIATED logs ----
-            var initialStatus = await SaveInitialLogsAsync(initialResponse, request, userDetails, accessCode, instituteId, workingKey);
+            //var initialStatus = await SaveInitialLogsAsync(initialResponse, request, userDetails, accessCode, instituteId, workingKey);
 
             // if initial success, return directly
-            if (initialStatus.Success)
+            //if (initialStatus.Success)
+            //{
+            //    return initialStatus;
+            //}
+
+            if (initialResponse != null)
             {
-                return initialStatus;
+
+                var amount = initialResponse.RespAmount / 100;
+                var log = new BbpsTransaction
+                {
+                    UserPhone = userDetails.Phone,
+                    ResponseCode = initialResponse.ResponseCode,
+                    ResponseReason = initialResponse.ResponseReason,
+                    TxnRefId = initialResponse.TxnRefId,
+                    ApprovalRefNumber = initialResponse.ApprovalRefNumber,
+                    TxnRespType = initialResponse.TxnRespType,
+                    CustConvFee = initialResponse.CustConvFee,
+                    RespAmount = amount,
+                    RespBillDate = initialResponse.RespBillDate,
+                    RespCustomerName = initialResponse.RespCustomerName,
+                    RespDueDate = initialResponse.RespDueDate,
+                    InputParamsJson = initialResponse.InputParams != null
+                                          ? JsonSerializer.Serialize(initialResponse.InputParams)
+                                          : null,
+                    CreatedAt = DateTime.Now,
+                    Status = true,
+                    StatusCode= initialResponse.ResponseReason
+                };
+                _context.bbpsTransactions.Add(log);
+                await _context.SaveChangesAsync();
             }
 
-            // ---- Do Status Check (3 attempts) ----
-            var finalResult = await PerformStatusCheckAsync(
-                request.EnquiryReferenceId,
-                initialResponse,
-                accessCode,
-                instituteId,
-                workingKey,
-                request,
-                userDetails,
-                billerDetails
-            );
+            var hh= new PaymentResponseProcess
+            {
+                Success = initialResponse.ResponseReason == "Successful",
+                Status = initialResponse.ResponseReason.ToUpper() ?? "FAILED",
+                Amount = request.Amount.ToString(),
+                OrderId = initialResponse.TxnRefId,
+                BillerName = "",
+                UserPhone = request.UserPhone,
+                UserName = ""
+            };
 
-            return finalResult;
+            string jsonData = System.Text.Json.JsonSerializer.Serialize(hh);
+
+            var user1 = new ErrorModel
+            {
+                payload = "Bill pay1",
+                agId = jsonData,
+                reqTime =  "",
+                respTime = "",
+                requestId = "",
+                uid = "",
+                statuscode = true,
+                jsonBody = ""
+            };
+
+            _context.errorModels.Add(user1);
+            await _context.SaveChangesAsync();
+
+            // ---- Do Status Check (3 attempts) ----
+            //var finalResult = await PerformStatusCheckAsync(
+            //    request.EnquiryReferenceId,
+            //    initialResponse,
+            //    accessCode,
+            //    instituteId,
+            //    workingKey,
+            //    request,
+            //    userDetails,
+            //    billerDetails
+            //);
+
+            // return finalResult;
+            return hh;
         }
 
         /* ----------------------------------------------------
@@ -259,12 +330,12 @@ namespace MVC6Crud.Data
             pmode = "UPI";
             info = @"<info><infoName>VPA</infoName><infoValue>9652724937@kotak</infoValue></info>";
 
-            if (modes.Contains("cash1"))
+            if (modes.Contains("cash")) // cash1 for mobile
             {
                 pmode = "Cash";
                 info = @"<info><infoName>Remarks</infoName><infoValue>CashPayment</infoValue></info>";
             }
-            else if (modes.Contains("wallet1"))
+            else if (modes.Contains("wallet")) // wallet1 for mobile
             {
                 pmode = "Wallet";
                 info = @"
@@ -274,6 +345,18 @@ namespace MVC6Crud.Data
             }
         }
 
+
+
+        // for mobile
+  //      <agentId>CC01RP91MOBBAK024661</agentId>
+  //<agentDeviceInfo>
+  //  <app>tripozo</app>
+  //  <imei>000000000000000</imei>
+  //  <initChannel>MOB</initChannel>
+  //  <ip>{endpointIp
+  //  }</ip>
+  //  <os>android</os>
+  //</agentDeviceInfo>
         private string BuildPaymentRequestXml(
             BBPSPaymentRequest request,
             PayManUsers user,
@@ -286,14 +369,14 @@ namespace MVC6Crud.Data
         {
             return $@"<?xml version=""1.0"" encoding=""UTF-8""?>
 <billPaymentRequest>
-  <agentId>CC01RP91MOBBAK024661</agentId>
-  <agentDeviceInfo>
-    <app>tripozo</app>
-    <imei>000000000000000</imei>
-    <initChannel>MOB</initChannel>
-    <ip>{endpointIp}</ip>
-    <os>android</os>
-  </agentDeviceInfo>
+<agentId>{user.BillAvenueAgentId}</agentId>
+                <agentDeviceInfo>
+                  <ip>{endpointIp}</ip>
+                  <initChannel>AGT</initChannel>
+                  <mac>01-23-45-67-89-ab</mac>
+                </agentDeviceInfo >
+
+  
 
   <customerInfo>
     <REMITTER_NAME>{aadhar.Name}</REMITTER_NAME>
@@ -335,6 +418,23 @@ namespace MVC6Crud.Data
 
             string enc = responseContent.Replace("encResponse=", "");
             string decrypted = Decrypt(enc, workingKey);
+
+            //string jsonData = System.Text.Json.JsonSerializer.Serialize(result);
+
+            var user1 = new ErrorModel
+            {
+                payload = "Bill pay",
+                agId = decrypted,
+                reqTime = "",
+                respTime = "",
+                requestId = "",
+                uid = "",
+                statuscode = true,
+                jsonBody = ""
+            };
+
+            _context.errorModels.Add(user1);
+            await _context.SaveChangesAsync();
 
             var serializer = new XmlSerializer(typeof(ExtBillPayResponse));
             using var reader = new StringReader(decrypted);

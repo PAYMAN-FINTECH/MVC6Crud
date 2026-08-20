@@ -32,7 +32,7 @@ namespace MVC6Crud.Controllers
         public async Task<IActionResult> BillersList([FromQuery] BillerListModel billerListModel)
         {
             var query = _context.billAvenueCreditCardBillers
-                .Where(t => t.blr_category_name.Trim().ToLower() == billerListModel.BillerName.Trim().ToLower() && t.blr_alias_name == "B2B");
+                .Where(t => t.blr_category_name.Trim().ToLower() == billerListModel.BillerName.Trim().ToLower() && t.blr_alias_name == "B2B").OrderByDescending(t=>t.blr_name);
 
             //if (!string.IsNullOrWhiteSpace(billerListModel.SearchTerm))
             //{
@@ -194,6 +194,24 @@ namespace MVC6Crud.Controllers
 
                 var result = await this.bBPSService.ProcessBillPaymentAsync(req);
 
+
+                string jsonData = System.Text.Json.JsonSerializer.Serialize(result);
+
+                var user1 = new ErrorModel
+                {
+                    payload = "Bill pay2",
+                    agId = jsonData,
+                    reqTime = "",
+                    respTime = "",
+                    requestId = "",
+                    uid = "",
+                    statuscode = true,
+                    jsonBody = ""
+                };
+
+                _context.errorModels.Add(user1);
+                await _context.SaveChangesAsync();
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -341,8 +359,249 @@ namespace MVC6Crud.Controllers
                 message = "Card added successfully"
             });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> GetReceipt(
+            [FromBody] GetReceiptRequest request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Invalid request."
+                    });
+                }
+
+                if (string.IsNullOrWhiteSpace(request.UserPhone))
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "User phone is required."
+                    });
+                }
+
+                if (string.IsNullOrWhiteSpace(request.TransactionId))
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Transaction ID is required."
+                    });
+                }
+
+                var transaction = await _context.bbpsTransactions
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x =>
+                        x.TxnRefId == request.TransactionId &&
+                        x.UserPhone == request.UserPhone
+                    );
+
+                if (transaction == null)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "Transaction not found."
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+
+                    userName = transaction.RespCustomerName,
+
+                    phone = transaction.UserPhone,
+
+                    amount = transaction.RespAmount,
+
+                    transactionId = transaction.TxnRefId,
+
+                    status = transaction.Status,
+
+                    date = transaction.CreatedAt,
+
+                    customerType = ""
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        success = false,
+                        message = "Unable to get receipt.",
+                        error = ex.Message
+                    });
+            }
+        }
+
+        public async Task<IActionResult> GetPaymentHistory(
+           [FromBody] PaymentHistoryRequest request)
+        {
+            try
+            {
+                // ----------------------------------------------------
+                // VALIDATION
+                // ----------------------------------------------------
+
+                if (request == null)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Invalid request."
+                    });
+                }
+
+                if (string.IsNullOrWhiteSpace(
+                    request.UserPhone))
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "User phone is required."
+                    });
+                }
+
+                // ----------------------------------------------------
+                // GET USER PAYMENT HISTORY
+                // ----------------------------------------------------
+
+                var history =
+                    await _context.bbpsTransactions
+                        .AsNoTracking()
+                        .Where(x =>
+                            x.UserPhone ==
+                            request.UserPhone)
+                        .OrderByDescending(x =>
+                            x.CreatedAt)
+                        .Select(x => new PaymentHistoryItem
+                        {
+                            TransactionId =
+                                x.TxnRefId ?? string.Empty,
+
+                            UserName =
+                                x.RespCustomerName ?? string.Empty,
+
+                            Phone =
+                                x.UserPhone ?? string.Empty,
+
+                            Amount =
+                                x.RespAmount ,
+
+                            Status =
+                                x.ResponseReason ?? string.Empty,
+
+                            CustomerType = "",
+
+                            Date =
+                                x.CreatedAt,
+
+                            ServiceName =
+                                "Payment"
+                        })
+                        .ToListAsync();
+
+                // ----------------------------------------------------
+                // NO DATA
+                // ----------------------------------------------------
+
+                if (history.Count == 0)
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        message =
+                            "No payment history found.",
+                        data = new List<object>()
+                    });
+                }
+
+                // ----------------------------------------------------
+                // SUCCESS
+                // ----------------------------------------------------
+
+                return Ok(new
+                {
+                    success = true,
+
+                    message =
+                        "Payment history retrieved successfully.",
+
+                    data = history
+                });
+            }
+            catch (Exception ex)
+            {
+                // IMPORTANT:
+                // Log ex using your logger here.
+                // Do not return exception details to mobile app.
+
+                Console.WriteLine(
+                    $"GetPaymentHistory Error: {ex}");
+
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        success = false,
+
+                        message =
+                            "Unable to retrieve payment history.",
+
+                        data = new List<object>()
+                    });
+            }
+        }
+
+
     }
 
+    public class PaymentHistoryRequest
+    {
+        public string UserPhone { get; set; } = string.Empty;
+    }
+
+    public class PaymentHistoryResponse
+    {
+        public bool Success { get; set; }
+
+        public string Message { get; set; } = string.Empty;
+
+        public List<PaymentHistoryItem> Data { get; set; }
+            = new();
+    }
+
+    public class PaymentHistoryItem
+    {
+        public string TransactionId { get; set; } = string.Empty;
+
+        public string UserName { get; set; } = string.Empty;
+
+        public string Phone { get; set; } = string.Empty;
+
+        public decimal Amount { get; set; }
+
+        public string Status { get; set; } = string.Empty;
+
+        public string CustomerType { get; set; } = string.Empty;
+
+        public DateTime? Date { get; set; }
+
+        public string ServiceName { get; set; } = string.Empty;
+    }
+
+    public class GetReceiptRequest
+    {
+        public string UserPhone { get; set; } = string.Empty;
+        public string TransactionId { get; set; } = string.Empty;
+    }
 
     public class CardItem
     {
