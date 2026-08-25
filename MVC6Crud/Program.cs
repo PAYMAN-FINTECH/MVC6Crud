@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MVC6Crud.Controllers;
 using MVC6Crud.Data;
+using MVC6Crud.Models.Airpay;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -82,6 +84,26 @@ builder.Services.AddScoped<JiopayService>();
 builder.Services.AddScoped<PaytmService>();
 builder.Services.AddHttpClient();
 builder.Services.AddTransient<AgreementPdf>();
+
+builder.Services.Configure<AirpaySettings>(
+    builder.Configuration.GetSection("Airpay"));
+
+builder.Services.AddSingleton<
+    AirpayCryptoService>();
+
+builder.Services.AddSingleton<
+    AirpayCrc32>();
+
+builder.Services.AddHttpClient(
+    "Airpay",
+    client =>
+    {
+        client.Timeout =
+            TimeSpan.FromSeconds(60);
+    });
+
+builder.Services.AddScoped<
+    AirpayService>();
 
 var app = builder.Build();
 

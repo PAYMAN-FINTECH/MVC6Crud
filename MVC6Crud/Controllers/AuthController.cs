@@ -18,6 +18,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Serialization;
 using XAct.Library.Settings;
+using XAct.Users;
 using OtpResponse = MVC6Crud.Models.PaymanApp.OtpResponse;
 
 namespace MVC6Crud.Controllers
@@ -67,7 +68,7 @@ namespace MVC6Crud.Controllers
         }
 
         [HttpPost]
-        public IActionResult VerifyOTP([FromBody] OTPRequest request)
+        public IActionResult VerifyOTP1([FromBody] OTPRequest request)
         {
             if (request.Otp != "1234")
             {
@@ -938,5 +939,270 @@ namespace MVC6Crud.Controllers
                 });
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest req)
+        {
+            var istTime = TimeZoneInfo.ConvertTimeFromUtc(
+                DateTime.UtcNow,
+                TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")
+            );
+
+            var otp = await _context.OtpLogs
+                .Where(o => o.Phone == req.Phone && o.Otp == req.Otp && !o.IsUsed)
+                .OrderByDescending(o => o.Id)
+                .FirstOrDefaultAsync();
+
+            if (otp == null || otp.ExpiryTime < DateTime.UtcNow)
+                return Unauthorized("Invalid OTP");
+
+            otp.IsUsed = true;
+
+            var user = await _context.AppUser.FirstOrDefaultAsync(x => x.Phone == req.Phone);
+            var isNewUser = false;
+
+            if (user == null)
+            {
+                user = new AppUser
+                {
+                    Phone = req.Phone,
+                    CreatedAt = DateTime.UtcNow // ✅ store UTC
+                };
+
+                _context.AppUser.Add(user);
+                isNewUser = true;
+            }
+
+            await _context.SaveChangesAsync();
+
+            var token = GenerateToken(user.Id, user.Phone);
+            var refresh = GenerateRefreshToken();
+
+            _context.RefreshToken.Add(new RefreshToken
+            {
+                UserId = user.Id,
+                Token = refresh,
+                ExpiresAt = DateTime.UtcNow.AddDays(7),
+                IsRevoked = false,
+                Created = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+
+            var pmUser = await _context.pMUsers
+                .FirstOrDefaultAsync(t => t.Phone == user.Phone);
+
+            return Ok(new
+            {
+                token,
+                refreshToken = refresh,
+                isNewUser,
+                kycCompleted = pmUser?.IsKycCompleted ?? false,
+                usertype = pmUser?.UserType ?? "",
+                isactive = pmUser?.IsActive ?? false,
+            });
+        }
+
+        /// 🔄 REFRESH TOKEN
+        [HttpPost]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            var istTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
+                           TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+
+            var storedToken = await _context.RefreshToken
+                .FirstOrDefaultAsync(x =>
+                    x.Token == request.RefreshToken &&
+                    !x.IsRevoked &&
+                    x.ExpiresAt > DateTime.UtcNow);
+
+            if (storedToken == null)
+                return Unauthorized(new { message = "Invalid refresh token" });
+
+            var user = await _context.AppUser.FindAsync(storedToken.UserId);
+            if (user == null)
+                return Unauthorized();
+
+            // 🔐 Revoke old token
+            storedToken.IsRevoked = true;
+
+            // 🔑 Generate new tokens
+            var newAccessToken = GenerateToken(user.Id, user.Phone);
+            var newRefreshToken = GenerateRefreshToken();
+
+            _context.RefreshToken.Add(new RefreshToken
+            {
+                UserId = user.Id,
+                Token = newRefreshToken,
+                ExpiresAt = DateTime.UtcNow.AddDays(7),
+                IsRevoked = false,
+                Created = istTime
+            });
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                accessToken = newAccessToken,
+                refreshToken = newRefreshToken
+            });
+        }
+
+        public string GenerateToken(Guid userId, string phone)
+        {
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes("paymanfintechsolutionltd_@1234567890")
+            );
+
+            var token = new JwtSecurityToken(
+                issuer: "https://paymanfintech.in",
+                audience: "https://paymanfintech.in",
+                claims: new[]
+                {
+                    new Claim("uid", userId.ToString()),
+                    new Claim("phone", phone)
+                },
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var randomBytes = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ScannerPayment(
+    [FromBody] ScannerPaymentRequest request)
+        {
+            if (request == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid request."
+                });
+            }
+
+            var user = await _context.payManUsers.FirstOrDefaultAsync(u => u.Phone == request.AgentMobile);
+
+            if (user == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid request."
+                });
+            }
+            // Check if this payment already exists (idempotency)
+            var existing = await _context.payManPayIns
+                .FirstOrDefaultAsync(t => t.EasePayId == request.PaymentTxnId && t.Status == true);
+
+            if (existing == null)
+            {
+                var istTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
+                                 TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+
+                decimal margin = Convert.ToDecimal("1.60" ?? "0");
+
+                //if (model.card.ToLower() == "mastercard")
+                //    margin = user.MasterMarigin ?? margin;
+
+                //if (cardType.ToLower() == "true")
+                //    margin = user.CarporateCardMarigin ?? margin;
+                //else if (model.card.ToLower() == "mastercard")
+                //    margin = user.MasterMarigin ?? margin;
+                //else if (BankName.ToLower().Contains("hdfc"))
+                //    margin = user.HdfcMargin ?? margin;
+
+                var payInApp = new PayManPayIn
+                {
+                    UserId = user.Id,
+                    UserPhone = user.Phone,
+                    TxnId = request.PaymentTxnId,
+                    EasePayId = request.PaymentTxnId,
+                    Email = user.Email,
+                    CardNumber = request.CustomerCardNumber,
+                    EaseCardNum = request.CustomerCardNumber,
+                    Amount = request.Amount,
+                    Gateway = "Scanner",
+                    BankName = request.BankName,
+                    CardBrand = request.CardBrand,
+                    IsCorporate = request.CardType,
+                    PayInCommission = request.Amount * margin / 100,
+                    PaymanCommission = 0,
+                    Created = istTime,
+                    Status = true,
+                    Result = "success",
+                    Device = "Web"
+                };
+
+                _context.payManPayIns.Add(payInApp);
+                await _context.SaveChangesAsync();
+
+                var avlAmount = await GetUserWalletAmount(user.Phone);
+
+                var payInHistory = new PayManHistory
+                {
+                    UserId = user.Id,
+                    UserPhone = user.Phone,
+                    TxnId = request.PaymentTxnId,
+                    Amount = request.Amount,
+                    CardNumber = request.CustomerCardNumber,
+                    Mode = "PayIn",
+                    Status = true,
+                    Created = istTime,
+                    AvlBalance = Convert.ToDecimal(avlAmount),
+                    PayInId = payInApp.Id
+                };
+
+                _context.payManHistories.Add(payInHistory);
+                await _context.SaveChangesAsync();
+            }
+
+                return Json(new
+            {
+                success = true,
+                message = "Payment details saved successfully."
+            });
+        }
+
+    }
+
+    public class RefreshTokenRequest
+    {
+        public string RefreshToken { get; set; }
+    }
+    public class VerifyOtpRequest
+    {
+        public string Phone { get; set; }
+        public string Otp { get; set; }
+    }
+
+    public class ScannerPaymentRequest
+    {
+        public decimal Amount { get; set; }
+
+        public string CustomerMobile { get; set; }
+
+        public string CustomerEmail { get; set; }
+
+        public string CustomerCardNumber { get; set; }
+
+        public string BankName { get; set; }
+
+        public string CardBrand { get; set; }
+
+        public string CardType { get; set; }
+
+        public string AgentMobile { get; set; }
+
+        public string PaymentTxnId { get; set; }
     }
 }

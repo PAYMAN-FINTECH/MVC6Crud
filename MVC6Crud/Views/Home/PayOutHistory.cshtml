@@ -272,7 +272,7 @@
         function loadPayOutData(startDate, endDate) {
             $('#payoutBody').html('<tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
             $.ajax({
-                url: 'https://srredu.in/PayIn/GetPayOutHistory',
+        url: 'https://paymanfintech.in/PayOut/GetPayOutHistory',
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({

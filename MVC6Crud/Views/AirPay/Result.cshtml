@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "Airpay Payment Result";
+}
+
+<div style="
+    max-width:600px;
+    margin:80px auto;
+    text-align:center;
+    font-family:Arial;
+    ">
+
+    @if (ViewBag.Status == "SUCCESS")
+    {
+        <h1 style="color:green;">
+            Payment Successful
+        </h1>
+
+        <p>
+            Your payment was successfully completed.
+        </p>
+    }
+    else
+    {
+        <h1>
+            Payment Status
+        </h1>
+
+        <p>
+            Payment was not successful.
+        </p>
+    }
+
+    <hr />
+
+    <p>
+        <strong>Order ID:</strong>
+        @ViewBag.OrderId
+    </p>
+
+    <p>
+        <strong>Airpay Transaction ID:</strong>
+        @ViewBag.AirpayTransactionId
+    </p>
+
+    <p>
+        <strong>Amount:</strong>
+        ₹@ViewBag.Amount
+    </p>
+
+    <p>
+        <strong>Status:</strong>
+        @ViewBag.Status
+    </p>
+
+    <p>
+        <strong>Message:</strong>
+        @ViewBag.Message
+    </p>
+
+    <br />
+
+    <a href="/"
+       class="btn btn-primary">
+        Back to Payman
+    </a>
+
+</div>

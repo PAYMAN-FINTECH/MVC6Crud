@@ -1107,7 +1107,7 @@ namespace MVC6Crud.Controllers
                 var istTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
                                  TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
 
-                decimal margin = Convert.ToDecimal(user.Margin ?? "0");
+                decimal margin = Convert.ToDecimal("1.6" ?? "0");
 
                 if (model.card.ToLower() == "mastercard")
                     margin = user.MasterMarigin ?? margin;

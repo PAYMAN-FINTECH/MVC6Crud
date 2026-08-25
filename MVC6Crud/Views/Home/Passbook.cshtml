@@ -416,7 +416,7 @@
 
         function loadPassbook(start, end) {
             $('#txnBody').html('<tr><td colspan="8" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
-            $.get(`https://srredu.in/PayIn/GetPassbook?phone=${phone}&startDate=${start}&endDate=${end}`, function (res) {
+        $.get(`https://paymanfintech.in/PayOut/GetPassbook?phone=${phone}&startDate=${start}&endDate=${end}`, function (res) {
                 if (!res.transactions || res.transactions.length === 0) {
                     $('#txnBody').html('<tr><td colspan="8" class="text-center text-muted py-4">No records found</td></tr>');
                     return;

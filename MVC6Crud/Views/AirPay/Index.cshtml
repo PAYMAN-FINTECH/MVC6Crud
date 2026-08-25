@@ -1,0 +1,375 @@
+﻿@{
+    ViewData["Title"] = "AirPay Payment";
+}
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1" />
+
+    <title>AirPay Payment</title>
+
+    <style>
+
+            body {
+                font-family: Arial, sans-serif;
+                background: #f5f7fb;
+                margin: 0;
+                padding: 40px;
+            }
+
+            .payment-container {
+                max-width: 500px;
+                margin: auto;
+                background: white;
+                padding: 30px;
+                border-radius: 12px;
+                box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+            }
+
+            h2 {
+                margin-bottom: 25px;
+            }
+
+            label {
+                display: block;
+                margin-top: 15px;
+                margin-bottom: 5px;
+            }
+
+            input {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 12px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+            }
+
+            button {
+                width: 100%;
+                margin-top: 25px;
+                padding: 13px;
+                background: #2563eb;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+                button:hover {
+                    background: #1d4ed8;
+                }
+
+            #loader {
+                display: none;
+                text-align: center;
+                margin-top: 20px;
+            }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="payment-container">
+
+        <h2>
+            AirPay Payment
+        </h2>
+
+
+        <label>
+            Amount
+        </label>
+
+        <input type="number"
+               id="amount"
+               value="10"
+               step="0.01" />
+
+
+        <label>
+            Mobile Number
+        </label>
+
+        <input type="text"
+               id="phone"
+               placeholder="9876543210" />
+
+
+        <label>
+            Email
+        </label>
+
+        <input type="email"
+               id="email"
+               placeholder="customer@example.com" />
+
+
+        <label>
+            First Name
+        </label>
+
+        <input type="text"
+               id="firstName"
+               value="Test" />
+
+
+        <label>
+            Last Name
+        </label>
+
+        <input type="text"
+               id="lastName"
+               value="Customer" />
+
+
+        <button type="button"
+                onclick="startAirPay()">
+
+            Pay with AirPay
+
+        </button>
+
+
+        <div id="loader">
+
+            Processing...
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+            async function startAirPay() {
+
+                const amount =
+                    parseFloat(
+                        document.getElementById(
+                            "amount"
+                        ).value
+                    );
+
+                const phone =
+                    document.getElementById(
+                        "phone"
+                    ).value;
+
+                const email =
+                    document.getElementById(
+                        "email"
+                    ).value;
+
+                const firstName =
+                    document.getElementById(
+                        "firstName"
+                    ).value;
+
+                const lastName =
+                    document.getElementById(
+                        "lastName"
+                    ).value;
+
+
+                if (!amount || amount <= 0) {
+
+                    alert("Enter valid amount.");
+
+                    return;
+                }
+
+
+                if (!phone) {
+
+                    alert("Enter mobile number.");
+
+                    return;
+                }
+
+
+                document.getElementById(
+                    "loader"
+                ).style.display = "block";
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "/AirPay/InitiatePayment",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body: JSON.stringify({
+
+                                    amount: amount,
+
+                                    customerPhone:
+                                        phone,
+
+                                    customerEmail:
+                                        email,
+
+                                    customerFirstName:
+                                        firstName,
+
+                                    customerLastName:
+                                        lastName,
+
+                                    customVar:
+                                        "PAYMAN_TEST"
+
+                                })
+                            }
+                        );
+
+
+                    const result =
+                        await response.json();
+
+
+                    console.log(
+                        "AirPay:",
+                        result
+                    );
+
+
+                    if (!response.ok ||
+                        !result.success) {
+
+                        alert(
+                            result.message ||
+                            "AirPay initiation failed."
+                        );
+
+                        return;
+                    }
+
+
+                    /*
+                     * POST payment information
+                     * to our Payment View.
+                     */
+
+                    const form =
+                        document.createElement(
+                            "form"
+                        );
+
+
+                    form.method =
+                        "POST";
+
+                    form.action =
+                        "/AirPay/Payment";
+
+
+                    addInput(
+                        form,
+                        "paymentUrl",
+                        result.paymentUrl
+                    );
+
+
+                    addInput(
+                        form,
+                        "merchantId",
+                        result.merchantId
+                    );
+
+
+                    addInput(
+                        form,
+                        "privateKey",
+                        result.privateKey
+                    );
+
+
+                    addInput(
+                        form,
+                        "encdata",
+                        result.encdata
+                    );
+
+
+                    addInput(
+                        form,
+                        "checksum",
+                        result.checksum
+                    );
+
+
+                    document.body.appendChild(
+                        form
+                    );
+
+
+                    form.submit();
+
+                }
+                catch (error) {
+
+                    console.error(error);
+
+                    alert(
+                        "Unable to connect to server."
+                    );
+
+                }
+                finally {
+
+                    document.getElementById(
+                        "loader"
+                    ).style.display = "none";
+
+                }
+            }
+
+
+            function addInput(
+                form,
+                name,
+                value
+            ) {
+
+                const input =
+                    document.createElement(
+                        "input"
+                    );
+
+                input.type =
+                    "hidden";
+
+                input.name =
+                    name;
+
+                input.value =
+                    value || "";
+
+
+                form.appendChild(
+                    input
+                );
+            }
+
+    </script>
+
+</body>
+
+</html>

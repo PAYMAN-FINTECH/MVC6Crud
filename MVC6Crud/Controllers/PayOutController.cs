@@ -840,8 +840,196 @@ namespace MVC6Crud.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetPassbook(string phone, string? startDate, string? endDate)
+        {
+            // 🔸 Fake user lookup by phone
+            var user = await GetUserByPhone(phone);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // 🔸 Fake transaction list (replace with DB query)
+            var allTransactions = await GetTransactionsForPhone(phone);
+
+            // 🔸 Optional filtering by date range
+            DateTime? start = string.IsNullOrWhiteSpace(startDate) ? null : DateTime.Parse(startDate).Date;
+            DateTime? end = string.IsNullOrWhiteSpace(endDate) ? null : DateTime.Parse(endDate).Date;
+
+            var filtered = allTransactions
+                .Where(t => (!start.HasValue || t.DateTime?.Date >= start.Value) &&
+                            (!end.HasValue || t.DateTime?.Date <= end.Value))
+                .OrderByDescending(t => t.DateTime)
+                .ToList();
 
 
+            // 🔸 Totals
+            decimal totalPaid = (decimal)filtered.Where(t => !t.IsCredit).Sum(t => t.Amount);
+            decimal totalReceived = (decimal)filtered.Where(t => t.IsCredit).Sum(t => t.Amount);
+            int paidCount = filtered.Count(t => !t.IsCredit);
+            int receivedCount = filtered.Count(t => t.IsCredit);
+
+            return Ok(new
+            {
+                user,
+                transactions = filtered,
+                totalPaid,
+                totalReceived,
+                totalPaidCount = paidCount,
+                totalReceivedCount = receivedCount
+            });
+        }
+
+
+        [HttpPost]
+        public IActionResult GetPayInHistory([FromBody] PayInHistoryRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Phone))
+                return BadRequest(new { success = false, message = "Phone number is required" });
+
+            if (request.StartDate == null || request.EndDate == null)
+                return BadRequest(new { success = false, message = "Start and End dates are required" });
+
+            var startDate = request.StartDate.Date;
+            var endDate = request.EndDate.Date;
+
+
+            var transactions = _context.payManPayIns
+                .Where(t =>
+                    t.UserPhone == request.Phone &&
+                    EF.Functions.DateDiffDay(startDate, t.Created) >= 0 &&
+                    EF.Functions.DateDiffDay(t.Created, endDate) >= 0)
+                .OrderByDescending(t => t.Created)
+                        .Select(t => new
+                        {
+                            t.Amount,
+                            t.EasePayId,
+                            t.CardNumber,
+                            t.UserPhone,
+                            t.Email,
+                            t.PayInCommission,
+                            CreatedDate = t.Created.HasValue ? t.Created.Value.ToString("yyyy-MM-ddTHH:mm:ssZ") : "NA",
+                            t.Status,
+                            t.Result
+                        })
+                        .ToList();
+
+            return Ok(new { success = true, data = transactions });
+        }
+
+
+        [HttpPost]
+        public IActionResult GetPayOutHistory([FromBody] PayOutHistoryRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Phone))
+                return BadRequest(new { success = false, message = "Phone number is required" });
+
+            if (request.StartDate == null || request.EndDate == null)
+                return BadRequest(new { success = false, message = "Start and End dates are required" });
+
+            var startDate = request.StartDate.Date;
+            var endDate = request.EndDate.Date;
+
+            var transactions = _context.payManPayOuts
+                .Where(t =>
+                    t.UserPhone == request.Phone &&
+            EF.Functions.DateDiffDay(startDate, t.DateTime) >= 0 &&
+            EF.Functions.DateDiffDay(t.DateTime, endDate) >= 0).OrderByDescending(t => t.DateTime)
+                .Select(t => new
+                {
+                    t.Amount,
+                    t.RefId,
+                    t.AccountNo,
+                    t.UserPhone,
+                    t.Email,
+                    t.AccountHolderName,
+                    t.IfscCode,
+                    t.PayoutCommission,
+                    CreatedDate = t.DateTime.HasValue ? t.DateTime.Value.ToString("yyyy-MM-ddTHH:mm:ssZ") : "NA",
+                    t.Status,
+                    t.Result,
+                    t.PayOutType
+                })
+                .ToList();
+
+            return Ok(new { success = true, data = transactions });
+        }
+
+
+        private async Task<PassBookUserModel> GetUserByPhone(string phone)
+        {
+
+            var userDetails = await _context.payManUsers
+                                            .FirstOrDefaultAsync(t => t.Phone == phone);
+            // Replace with DB logic
+            var users = new List<PassBookUserModel>
+        {
+            new PassBookUserModel { Name = userDetails.FirstName, Phone = userDetails.Phone, Email = userDetails.Email }
+        };
+            return users.FirstOrDefault(u => u.Phone == phone);
+        }
+
+        private async Task<List<PayManPassBook>> GetTransactionsForPhone(string phone)
+        {
+            var payinTransections = _context.payManPayIns
+     .Where(t => t.UserPhone == phone && t.Status == true)
+     .ToList();
+
+            var payOutTransections = _context.payManPayOuts
+                .Where(t => t.UserPhone == phone && t.Status == true)
+                .ToList();
+
+            var histories = _context.payManHistories
+                .Where(t => t.UserPhone == phone && t.Status == true)
+                .ToList();
+
+            var payOutTransections1 = _context.payManPayOuts
+            .Where(t => t.UserPhone == phone)
+            .ToList();
+
+            var payinlist = histories.Select(t =>
+            {
+                var isCredit = t.Mode == "PayIn" || t.Mode == "Refund";
+                var payIn = payinTransections.FirstOrDefault(p => p.EasePayId == t.TxnId);
+                var payOut = t.Mode == "CC Bill" ? payOutTransections.FirstOrDefault(p => p.PayOutId == t.TxnId) : payOutTransections.FirstOrDefault(p => p.RefId == t.TxnId);
+
+                string status;
+                if (t.Mode == "PayIn")
+                {
+                    status = payIn?.Result ?? "";
+                }
+                else
+                {
+                    if (t.TxnId == "00")
+                    {
+                        // Adjust this logic if payinid is an actual property
+                        var ndbjs = payOutTransections1.FirstOrDefault(p => p.Id == t.PayInId);
+                        status = ndbjs?.Result ?? "";
+                    }
+                    else
+                    {
+                        status = payOut?.Result ?? "";
+                    }
+                }
+
+                return new PayManPassBook
+                {
+                    DateTime = t.Created,
+                    Amount = t.Amount,
+                    Details = t.Mode == "PayIn" ? "PAYMAN" : payOut?.AccountHolderName ?? "",
+                    UpiRef = t.TxnId,
+                    AccountName = t.Mode == "PayIn" ? payIn?.BankName ?? "" : payOut?.AccountNo ?? "",
+                    Tag = t.Mode,
+                    IsCredit = isCredit,
+                    AvailableBalance = t.AvlBalance,
+                    Comm = t.Mode == "PayIn" ? payIn?.PayInCommission ?? 0 : payOut?.PayoutCommission ?? 0,
+                    Status = status
+                };
+            }).ToList();
+
+            return payinlist;
+        }
 
 
 
@@ -1048,5 +1236,25 @@ namespace MVC6Crud.Controllers
 
 
 
+    }
+    public class PassBookUserModel
+    {
+        public string Name { get; set; }
+        public string Phone { get; set; }
+        public string Email { get; set; }
+    }
+
+    public class PayOutHistoryRequest
+    {
+        public string Phone { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+    }
+
+    public class PayInHistoryRequest
+    {
+        public string Phone { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }
