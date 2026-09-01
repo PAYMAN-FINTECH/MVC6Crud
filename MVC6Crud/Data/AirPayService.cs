@@ -276,7 +276,9 @@ namespace MVC6Crud.Data
                         request.TxnSubType,
 
                     ["chmod"] =
-                        request.Chmod
+                        request.Chmod,
+
+                    ["return_url"] = request.ReturnUrl
                 };
 
 

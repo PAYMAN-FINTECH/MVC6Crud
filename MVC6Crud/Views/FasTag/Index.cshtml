@@ -345,7 +345,10 @@
 
 
 @section Scripts {
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://secure.paytmpayments.com/merchantpgpui/checkoutjs/merchants/TvEYNH13757085326682.js"></script>
+
     <script>
         $(document).ready(function () {
             fetchFastTagProviders();
@@ -609,63 +612,132 @@
                                      var actionType = 1;
                                      let orderId = 'PAYMAN' + dd.getTime();
 
+            $.ajax({
+            url: 'https://edu.payman.in/Paytm/CreateOrder',
+            type: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({
+            orderId: orderId,
+            amount: amount,
+            userphone: '9849800697',
+            cName: 'jurra',
+            cMobile: '9849800697',
+            cCard: '411111111111111111111',
+            cemail: 'jurrajanardhan@gmail.com',
+            divice: 'web'
+            }),
+            success: function (res) {
+
+            console.log("PAYTM RESPONSE:", res);
+
+            // 🔥 IMPORTANT: token is inside body
+            const txnToken = res.body.txnToken;
+
+            if (!txnToken) {
+            alert("Token not received");
+            return;
+            }
+
+            // 🔥 Check script loaded
+            if (!window.Paytm || !window.Paytm.CheckoutJS) {
+            alert("Paytm SDK not loaded");
+            return;
+            }
+
+            var config = {
+            root: "",
+            flow: "DEFAULT",
+            data: {
+            mid: "xlmtpp73588911306296",   // ✅ YOUR MID
+            orderId: orderId,
+            token: txnToken,
+            tokenType: "TXN_TOKEN",
+            amount: amount
+            },
+             handler: {
+                    notifyMerchant: function (eventName, data) {
+                        console.log("EVENT:", eventName, data);
+
+                        // ✅ SUCCESS / FAILURE HANDLING
+                        window.location.href = "https://fastag.paymanfintech.in";
+                    }
+                }
+            };
+
+            // 🔥 INIT + INVOKE IMMEDIATELY
+            window.Paytm.CheckoutJS.init(config)
+                .then(function () {
+                    console.log("Checkout Init Success");
+                    window.Paytm.CheckoutJS.invoke();
+                })
+                .catch(function (err) {
+                    console.log("Checkout Init Error:", err);
+                });
+            },
+             error: function (err) {
+            console.error("API ERROR:", err);
+            alert("Error creating Paytm order");
+        }
+            });
+
 
 
 
                                        //  payUIntegration();
 
-         $.ajax({
-             type: 'POST',
-             dataType: 'JSON',
-             url: 'https://paymanfintech.in/PayMan/IntiatePayment',
-             data: { amount: amount, cardnumber: "411111111111111" },
+         // $.ajax({
+         //     type: 'POST',
+         //     dataType: 'JSON',
+         //     url: 'https://paymanfintech.in/PayMan/IntiatePayment',
+         //     data: { amount: amount, cardnumber: "411111111111111" },
 
-             success: function (recData) {
-                 $('#Loader1').hide();
-                 if (recData.orderId != null) {
+         //     success: function (recData) {
+         //         $('#Loader1').hide();
+         //         if (recData.orderId != null) {
 
-                     const options = {
-                         key: 'rzp_test_lGsdswJA3Wc7jY',
-                         name: 'PAYMAN',
-                         description: 'Pro Membership',
-                         order_id: recData.orderId,
+         //             const options = {
+         //                 key: 'rzp_test_lGsdswJA3Wc7jY',
+         //                 name: 'PAYMAN',
+         //                 description: 'Pro Membership',
+         //                 order_id: recData.orderId,
 
-                         handler: (response) => {
+         //                 handler: (response) => {
 
-                              window.location.href = "https://fastag.paymanfintech.in";
+         //                      window.location.href = "https://fastag.paymanfintech.in";
 
-                             // var url =
-                             //   "https://paymanfintech.in/PayMan/ConfirmPayment?" +
-                             //   "razorpay_payment_id=" + response.razorpay_payment_id +
-                             //   "&razorpay_order_id=" + response.razorpay_order_id +
-                             //   "&razorpay_signature=" + response.razorpay_signature +
-                             //   "&amount=" + amount +
-                             //   "&enterCustomerNumber=" + shgdmobile;
+         //                     // var url =
+         //                     //   "https://paymanfintech.in/PayMan/ConfirmPayment?" +
+         //                     //   "razorpay_payment_id=" + response.razorpay_payment_id +
+         //                     //   "&razorpay_order_id=" + response.razorpay_order_id +
+         //                     //   "&razorpay_signature=" + response.razorpay_signature +
+         //                     //   "&amount=" + amount +
+         //                     //   "&enterCustomerNumber=" + shgdmobile;
 
-                             // $.ajax({
-                             //     url: url,
-                             //     type: 'GET',
-                             //     success: function () {
-                             //         window.location.href = "/Edu/PaymentStatus";
-                             //     }
-                             // });
-                         },
+         //                     // $.ajax({
+         //                     //     url: url,
+         //                     //     type: 'GET',
+         //                     //     success: function () {
+         //                     //         window.location.href = "/Edu/PaymentStatus";
+         //                     //     }
+         //                     // });
+         //                 },
 
-                         // 👉 NEW: Razorpay auto-fill from your form
-                         prefill: {
-                             name: $('#fullName').val(),
-                             email: $('#email').val(),
-                             contact: $('#whatsapp').val()
-                         },
+         //                 // 👉 NEW: Razorpay auto-fill from your form
+         //                 prefill: {
+         //                     name: $('#fullName').val(),
+         //                     email: $('#email').val(),
+         //                     contact: $('#whatsapp').val()
+         //                 },
 
-                         theme: { color: '#2222d6' }
-                     };
+         //                 theme: { color: '#2222d6' }
+         //             };
 
-                     const rzp1 = new window.Razorpay(options);
-                     rzp1.open();
-                 }
-             }
-         });
+         //             const rzp1 = new window.Razorpay(options);
+         //             rzp1.open();
+         //         }
+         //     }
+         // });
 
 
                                        // window.location.href = "https://fastag.payman.in";

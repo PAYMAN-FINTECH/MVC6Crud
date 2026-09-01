@@ -3,5 +3,6 @@
     public class AirpayInitiateRequest
     {
         public decimal Amount { get; set; }
+        public string orderId { get; set; }
     }
 }

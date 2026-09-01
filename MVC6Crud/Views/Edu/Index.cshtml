@@ -6,7 +6,7 @@
     var courses = new List<dynamic>();
 
     // 1. Existing tech courses (Education) – about 40 courses
-    string[] eduNames = { // "Test",
+    string[] eduNames = {  "Test",
         "Generative AI & Machine Learning Engineer",
         "Generative AI Engineer",
         "Data Science With GenAI Interview Prep",
@@ -56,7 +56,7 @@
             Name = name,
             Duration = new Random().Next(4, 16) + " Weeks",
             Students = new Random().Next(2, 9) + "K",
-            Fee =  name == "Test" ? "10" :new Random().Next(45000, 100000).ToString(),
+            Fee =  name == "Test" ? "2" :new Random().Next(45000, 100000).ToString(),
             Action = "GenAI"   // 👈 changed from "GetAI" to "GenAI"
         });
     }

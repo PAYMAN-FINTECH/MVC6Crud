@@ -3247,6 +3247,192 @@ namespace MVC6Crud.Data
         }
 
 
+
+        public async Task<PaymentStatusViewModel> AirPayInDbCall(AirpayResponseModel11 paymentDecryptResponse)
+        {
+            // 🔐 Safety checks
+            if (paymentDecryptResponse == null)
+                throw new ArgumentNullException(nameof(paymentDecryptResponse));
+
+            var user11 = new ErrorModel
+            {
+                payload = "air Pay response2",
+                agId = paymentDecryptResponse.OrderId,
+                reqTime = "",
+                respTime = "",
+                requestId = "",
+                uid = "",
+                statuscode = true,
+                jsonBody = ""
+            };
+
+            _context.errorModels.Add(user11);
+            await _context.SaveChangesAsync();
+
+
+
+            var easebuzzGateway = await _context.PayManGateways
+                .FirstOrDefaultAsync(t => t.GatewayName == "Easebuzz");
+
+            // ✅ Idempotency check
+            var existingPayIn = await _context.payManPayIns
+                .FirstOrDefaultAsync(t =>
+                    t.TxnId == paymentDecryptResponse.OrderId);
+
+
+
+            var istTime = TimeZoneInfo.ConvertTimeFromUtc(
+                DateTime.UtcNow,
+                TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+
+            string jsonData = System.Text.Json.JsonSerializer.Serialize(paymentDecryptResponse);
+
+            var user1a1 = new ErrorModel
+            {
+                payload = "air Pay response3",
+                agId = "",
+                reqTime = "",
+                respTime = jsonData,
+                requestId = "",
+                uid = "",
+                statuscode = true,
+                jsonBody = ""
+            };
+
+            _context.errorModels.Add(user1a1);
+            await _context.SaveChangesAsync();
+
+            if (existingPayIn != null)
+            {
+                var user = await _context.payManUsers
+               .FirstOrDefaultAsync(u => u.Phone == existingPayIn.UserPhone);
+
+                if (user == null)
+                    throw new Exception("User not found");
+
+                var gatewayId = await _context.gateways
+                    .Where(g => g.StoreName == "airpay")
+                    .Select(g => g.Id)
+                    .FirstOrDefaultAsync();
+                var getMargin = await _context.userLookUps
+                    .Where(m => m.GatewayId == gatewayId && m.UserPhone == existingPayIn.UserPhone)
+                    .Select(m => m.GatewayMargin)
+                    .FirstOrDefaultAsync();
+
+                decimal amount =
+                    Convert.ToDecimal(paymentDecryptResponse.Amount ?? "0");
+
+                decimal margin = getMargin > 0 ? getMargin : 0;
+
+                // Card based margin
+                //if (paymentDecryptResponse.cardNetwork?
+                //    .Equals("mastercard", StringComparison.OrdinalIgnoreCase) == true)
+                //{
+                //    margin = user.MasterMarigin ?? margin;
+                //}
+
+                //var mm = 1.50m;
+
+                existingPayIn.EasePayId = paymentDecryptResponse.AirpayTransactionId;
+                existingPayIn.Email = paymentDecryptResponse.CustomerEmail ?? "";
+                existingPayIn.EaseCardNum = user.Email;
+                existingPayIn.Amount = amount;
+                existingPayIn.Gateway = "AirPay";
+                existingPayIn.CardBrand = paymentDecryptResponse.CardScheme ?? "";
+                existingPayIn.CardNumber = paymentDecryptResponse.CardNumber ?? "";
+                existingPayIn.IsCorporate = paymentDecryptResponse.CardType ?? "";
+                existingPayIn.PayInCommission = amount * margin / 100;
+                existingPayIn.PaymanCommission = amount *
+                        Convert.ToDecimal(easebuzzGateway?.PaymanComm ?? 0) / 100;
+                existingPayIn.Created = istTime;
+                existingPayIn.Status = paymentDecryptResponse.BankResponseMessage == "SUCCESS" || paymentDecryptResponse.BankResponseMessage == "CAPTURED";
+                existingPayIn.Result = paymentDecryptResponse.BankResponseMessage;
+
+                _context.payManPayIns.Update(existingPayIn);
+                await _context.SaveChangesAsync();
+
+                // ✅ Wallet & history ONLY if success
+                if (paymentDecryptResponse.BankResponseMessage == "SUCCESS" || paymentDecryptResponse.BankResponseMessage == "CAPTURED")
+                {
+                    var avlAmount = await GetUserWalletAmount(existingPayIn.UserPhone);
+
+                    var payInHistory = new PayManHistory
+                    {
+                        UserId = user.Id,
+                        UserPhone = existingPayIn.UserPhone,
+                        TxnId = paymentDecryptResponse.OrderId,
+                        Amount = amount,
+                        Mode = "PayIn",
+                        Status = paymentDecryptResponse.BankResponseMessage == "SUCCESS" || paymentDecryptResponse.BankResponseMessage == "CAPTURED",
+                        Created = istTime,
+                        AvlBalance = Convert.ToDecimal(avlAmount),
+                        CardNumber = paymentDecryptResponse.CardNumber ?? "",
+                        PayInId = existingPayIn.Id
+                    };
+
+                    _context.payManHistories.Add(payInHistory);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            //var existingbbpsPayIn = await _context.bbpsPayIns
+            //    .FirstOrDefaultAsync(t =>
+            //        t.TxnId == paymentDecryptResponse.merchantTxnNo);
+
+            //string jsonData1 = System.Text.Json.JsonSerializer.Serialize(existingbbpsPayIn);
+
+            //var user1a11 = new ErrorModel
+            //{
+            //    payload = "Jio Pay response4",
+            //    agId = "",
+            //    reqTime = "",
+            //    respTime = jsonData1,
+            //    requestId = "",
+            //    uid = "",
+            //    statuscode = true,
+            //    jsonBody = ""
+            //};
+
+            //_context.errorModels.Add(user1a11);
+            //await _context.SaveChangesAsync();
+
+            //var bbpsuser = await _context.pMUsers
+            //    .FirstOrDefaultAsync(u => u.Phone == existingbbpsPayIn.UserPhone);
+
+            //if (existingbbpsPayIn != null && existingbbpsPayIn.Device == "mobile")
+            //{
+            //    decimal amount =
+            //        Convert.ToDecimal(paymentDecryptResponse.amount ?? "0");
+
+            //    existingbbpsPayIn.PaymentTxnId = paymentDecryptResponse.txnID ?? "";
+            //    existingbbpsPayIn.CustomerEmail = paymentDecryptResponse.customerEmailID ?? "";
+            //    existingbbpsPayIn.CardNumber = paymentDecryptResponse.paymentInstId ?? "";
+            //    // existingbbpsPayIn.EaseCardNum = user.Email;
+            //    existingbbpsPayIn.Amount = amount;
+            //    existingbbpsPayIn.Created = istTime;
+            //    existingbbpsPayIn.Status = paymentDecryptResponse.respDescription == "Transaction successful" || paymentDecryptResponse.respDescription == "Request processed successfully";
+            //    existingbbpsPayIn.Result = paymentDecryptResponse.respDescription;
+
+            //    _context.bbpsPayIns.Update(existingbbpsPayIn);
+            //    await _context.SaveChangesAsync();
+            //}
+
+
+            // ✅ RETURN VIEW MODEL (FIXED)
+            return new PaymentStatusViewModel
+            {
+                IsSuccess = paymentDecryptResponse.BankResponseMessage == "SUCCESS" || paymentDecryptResponse.BankResponseMessage == "CAPTURED",
+                Amount = Convert.ToDouble(
+                    paymentDecryptResponse.Amount ?? "0"),
+                TransactionId = paymentDecryptResponse.OrderId,
+                CardNumber = paymentDecryptResponse?.TransactionPaymentStatus ?? "",
+                Gateway = existingPayIn?.CreditCardHolderNum ?? ""
+            };
+        }
+
+
+
+
         // Fix LogPayOutAsync - DO NOT call SaveChanges here. Just add to context.
         public Task<Guid> LogForPayOutAsync(
      PayManUsers user,

@@ -33,6 +33,7 @@
             public string TxnSubType { get; set; } = string.Empty;
 
             public string Chmod { get; set; } = string.Empty;
-        
+            public string ReturnUrl { get; set; } = "";
+
     }
 }

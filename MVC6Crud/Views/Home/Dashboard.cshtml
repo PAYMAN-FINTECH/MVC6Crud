@@ -1566,7 +1566,10 @@
                              window.location.href = `https://fastag.payman.in/JioPay/JiopayInit?amount=${encodeURIComponent(amoushhsnt)}&userPhone=${encodeURIComponent(pphoneJio)}&cName=${encodeURIComponent(payloadnew.name)}&cMobile=${encodeURIComponent(payloadnew.mobile)}&cCard=${encodeURIComponent(payloadnew.card)}&cemail=${encodeURIComponent(payloadnew.email)}&gateway=${encodeURIComponent(payloadnew.gatewayText1)}`;
                  }
                  else if (payloadnew.gatewayText1 === "airpay") {
-                     payWithAirpay();
+                     var pphoneair = '@Model.UserPhone';
+                     const amoushhsntaa = parseFloat(payloadnew.amount);
+                     window.location.href = `https://edu.paymanfintech.in/Airpay/AirpayInit?amount=${encodeURIComponent(amoushhsntaa)}&userPhone=${encodeURIComponent(pphoneair)}&cName=${encodeURIComponent(payloadnew.name)}&cMobile=${encodeURIComponent(payloadnew.mobile)}&cCard=${encodeURIComponent(payloadnew.card)}&cemail=${encodeURIComponent(payloadnew.email)}&gateway=${encodeURIComponent(payloadnew.gatewayText1)}`;
+                    // payWithAirpay();
                  }
              // Travel PG
                  else if (payloadnew.gatewayText1 === "Vegaah") {
@@ -1848,284 +1851,263 @@
         }
 
         // ========================================================
-        // PAYMAN AIRPAY PAYMENT
-        // ========================================================
-        async function payWithAirpay() {
+// PAYMAN AIRPAY PAYMENT
+// CURRENT TAB ONLY
+// ========================================================
+async function payWithAirpay() {
 
-        const button = document.getElementById("btnAirpay");
-        const amountElement = document.getElementById("paymentAmount");
+    const button =
+        document.getElementById("btnAirpay");
 
-        // if (!amountElement) {
-        // alert("Payment amount element not found.");
-        // return;
-        // }
-
-        // const amount = parseFloat(amountElement.value);
-
-        // if (!amount || amount <= 0) {
-        // alert("Invalid payment amount.");
-        // return;
-        // }
-
-        if (button) {
+    if (button) {
         button.disabled = true;
         button.innerHTML = "Processing...";
-        }
+    }
 
-        // Open popup immediately
-        const paymentWindow = window.open("", "_blank");
-
-        if (!paymentWindow) {
-
-        alert("Please allow popups for Payman.");
-
-        resetAirpayButton();
-
-        return;
-        }
-
-        try {
+    try {
 
         console.log("Calling AirPay Initiate API...");
-        console.log("Amount:", amount);
+        console.log("Amount:", 10);
 
         const response = await fetch(
-        "https://edu.paymanfintech.in/Airpay/Initiate",
-        {
-        method: "POST",
+            "https://edu.paymanfintech.in/Airpay/Initiate",
+            {
+                method: "POST",
 
-        headers: {
-        "Content-Type": "application/json"
-        },
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-        body: JSON.stringify({
-        amount: 10
-        })
-        }
+                body: JSON.stringify({
+                    amount: 10
+                })
+            }
         );
 
         console.log(
-        "AirPay HTTP Status:",
-        response.status
+            "AirPay HTTP Status:",
+            response.status
         );
 
         const responseText =
-        await response.text();
+            await response.text();
 
         console.log(
-        "AirPay Response:",
-        responseText
+            "AirPay Response:",
+            responseText
         );
 
         let result;
 
         try {
 
-        result =
-        JSON.parse(responseText);
+            result =
+                JSON.parse(responseText);
 
-        } catch (e) {
+        }
+        catch (e) {
 
-        console.error(
-        "Invalid JSON:",
-        responseText
-        );
+            console.error(
+                "Invalid JSON:",
+                responseText
+            );
 
-        paymentWindow.close();
+            alert(
+                "Invalid response received from server."
+            );
 
-        alert(
-        "Invalid response received from server."
-        );
+            resetAirpayButton();
 
-        resetAirpayButton();
-
-        return;
+            return;
         }
 
         if (!response.ok || !result.success) {
 
-        paymentWindow.close();
+            alert(
+                result.message ||
+                "Unable to initiate AirPay payment."
+            );
 
-        alert(
-        result.message ||
-        "Unable to initiate AirPay payment."
-        );
+            resetAirpayButton();
 
-        resetAirpayButton();
-
-        return;
+            return;
         }
 
         console.log(
-        "AirPay Order:",
-        result.orderId
+            "AirPay Order:",
+            result.orderId
         );
 
         console.log(
-        "AirPay Payment URL:",
-        result.paymentUrl
+            "AirPay Payment URL:",
+            result.paymentUrl
         );
 
-        submitAirpayForm(
-        paymentWindow,
-        result
-        );
+        // ====================================================
+        // SUBMIT AIRPAY IN CURRENT TAB
+        // ====================================================
 
-        } catch (error) {
+        submitAirpayForm(result);
+
+    }
+    catch (error) {
 
         console.error(
-        "AirPay error:",
-        error
+            "AirPay error:",
+            error
         );
 
-        paymentWindow.close();
-
         alert(
-        "Unable to connect to payment gateway."
+            "Unable to connect to payment gateway."
         );
 
         resetAirpayButton();
-        }
-        }
+    }
+}
 
 
-        // ========================================================
-        // SUBMIT FORM TO AIRPAY
-        // ========================================================
-        function submitAirpayForm(
-        paymentWindow,
-        data
-        ) {
+// ========================================================
+// SUBMIT FORM TO AIRPAY - CURRENT TAB
+// ========================================================
+function submitAirpayForm(data) {
 
-        const paymentDocument =
-        paymentWindow.document;
+    console.log(
+        "Preparing AirPay form..."
+    );
 
-        paymentDocument.open();
+    console.log(
+        "Payment URL:",
+        data.paymentUrl
+    );
 
-        paymentDocument.close();
 
-        const form =
-        paymentDocument.createElement("form");
+    // Remove old form if exists
+    const oldForm =
+        document.getElementById("airpayForm");
 
-        form.id =
+    if (oldForm) {
+        oldForm.remove();
+    }
+
+
+    // Create form in CURRENT PAGE
+    const form =
+        document.createElement("form");
+
+    form.id =
         "airpayForm";
 
-        form.method =
+    form.method =
         "POST";
 
-        form.action =
+    form.action =
         data.paymentUrl;
 
-        paymentDocument.body.innerHTML = "";
+    // VERY IMPORTANT
+    // Force current tab
+    form.target =
+        "_self";
 
-        paymentDocument.body.appendChild(form);
+    form.style.display =
+        "none";
 
 
-        // ====================================================
-        // AIRPAY PARAMETERS
-        // ====================================================
+    // ====================================================
+    // AIRPAY PARAMETERS
+    // ====================================================
 
-        addHiddenInput(
-        paymentDocument,
+    addHiddenInput(
         form,
         "privatekey",
         data.privateKey
-        );
+    );
 
-        addHiddenInput(
-        paymentDocument,
+    addHiddenInput(
         form,
         "merchant_id",
         data.merchantId
-        );
+    );
 
-        addHiddenInput(
-        paymentDocument,
+    addHiddenInput(
         form,
         "encdata",
         data.encData
-        );
+    );
 
-        addHiddenInput(
-        paymentDocument,
+    addHiddenInput(
         form,
         "checksum",
         data.checksum
-        );
+    );
 
-        addHiddenInput(
-        paymentDocument,
+    addHiddenInput(
         form,
         "apyVer",
         "4"
-        );
+    );
 
 
-        console.log(
-        "Submitting AirPay form..."
-        );
-
-        console.log(
-        "Payment URL:",
-        data.paymentUrl
-        );
+    // Add form to CURRENT document
+    document.body.appendChild(form);
 
 
-        form.submit();
-        }
+    console.log(
+        "Submitting AirPay in CURRENT TAB..."
+    );
 
 
-        // ========================================================
-        // ADD HIDDEN INPUT
-        // ========================================================
-        function addHiddenInput(
-        paymentDocument,
-        form,
-        name,
-        value
-        ) {
+    // ====================================================
+    // SUBMIT
+    // ====================================================
 
-        const input =
-        paymentDocument.createElement(
-        "input"
-        );
+    form.submit();
+}
 
-        input.type =
+
+// ========================================================
+// ADD HIDDEN INPUT
+// ========================================================
+function addHiddenInput(
+    form,
+    name,
+    value
+) {
+
+    const input =
+        document.createElement("input");
+
+    input.type =
         "hidden";
 
-        input.name =
+    input.name =
         name;
 
-        input.value =
+    input.value =
         value || "";
 
-        form.appendChild(
-        input
-        );
-        }
+    form.appendChild(input);
+}
 
 
-        // ========================================================
-        // RESET BUTTON
-        // ========================================================
-        function resetAirpayButton() {
+// ========================================================
+// RESET BUTTON
+// ========================================================
+function resetAirpayButton() {
 
-        const button =
+    const button =
         document.getElementById(
-        "btnAirpay"
+            "btnAirpay"
         );
 
-        if (button) {
+    if (button) {
 
         button.disabled =
-        false;
+            false;
 
         button.innerHTML =
-        "Pay with AirPay";
-        }
-        }
-
-
+            "Pay with AirPay";
+    }
+}
 
     </script>
 }
