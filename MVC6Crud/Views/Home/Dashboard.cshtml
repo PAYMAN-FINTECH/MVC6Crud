@@ -512,9 +512,22 @@
                                      class="mt-2"
                                      style="display:none;">
 
-                                    <small class="text-muted d-block mb-1">
-                                        Suggested Amounts
-                                    </small>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+
+                                        <small class="text-muted">
+                                            Suggested Amounts
+                                        </small>
+
+                                        <button type="button"
+                                                id="refreshAmountSuggestions"
+                                                class="btn btn-sm btn-light border-0 p-1"
+                                                title="Refresh Suggestions">
+
+                                            <i class="bi bi-arrow-clockwise"></i>
+
+                                        </button>
+
+                                    </div>
 
                                     <div id="amountSuggestionButtonsNew"
                                          class="d-flex flex-wrap gap-2">
@@ -845,74 +858,36 @@
             $('#Loader1').hide(); // ensure loader starts hidden
             var loginUser = '@Model.UserPhone';
 
-        $("#amountNew").on("input", function () {
+        /*
+        * Generate suggestions
+        * when amount is entered
+        */
+        $("#amountNew").on(
+        "input",
+        function () {
+
         isAmountSelectedNew = false;
 
-        const amountValue = $(this).val();
-
-        const container =
-        $("#amountSuggestionsNew");
-
-        const buttons =
-        $("#amountSuggestionButtonsNew");
-
-        buttons.empty();
-
-        if (!amountValue || amountValue <= 0) {
-        container.hide();
-        return;
+        generateAmountSuggestions();
         }
-
-        const amount = parseInt(amountValue);
-
-        /*
-        * Generate:
-        *
-        * amount - 3
-        * amount - 2
-        * amount - 1
-        * amount + 1
-        * amount + 2
-        * amount + 3
-        */
-
-        const suggestions = [
-        amount - 3,
-        amount - 2,
-        amount - 1,
-        amount + 1,
-        amount + 2,
-        amount + 3
-        ];
-
-        suggestions.forEach(function (suggestion) {
-
-        // Don't show zero or negative amounts
-        if (suggestion <= 0) {
-        return;
-        }
-
-        const button = $(`
-        <button type="button"
-        class="btn btn-sm btn-outline-primary amount-suggestion">
-        ₹${suggestion}
-        </button>
-        `);
-
-        button.attr(
-        "data-amount",
-        suggestion
         );
 
-        buttons.append(button);
-        });
 
-        container.show();
-        });
+        /*
+        * Refresh suggestions
+        */
+        $(document).on(
+        "click",
+        "#refreshAmountSuggestions",
+        function () {
+
+        generateAmountSuggestions();
+        }
+        );
 
 
         /*
-        * When user clicks suggested amount
+        * Select suggested amount
         */
         $(document).on(
         "click",
@@ -922,18 +897,125 @@
         const selectedAmount =
         $(this).attr("data-amount");
 
-        $("#amountNew")
-        .val(selectedAmount)
-        .trigger("input");
+        $("#amountNew").val(selectedAmount);
 
         isAmountSelectedNew = true;
+
+        $("#amountSuggestionsNew").hide();
 
         validateNewForm();
         }
         );
+        /*
+ * Generate random amount suggestions
+ */
+function generateAmountSuggestions() {
+
+    const amountValue = $("#amountNew").val();
+
+    const container = $("#amountSuggestionsNew");
+    const buttons = $("#amountSuggestionButtonsNew");
+
+    // Clear previous suggestions
+    buttons.empty();
+
+    if (!amountValue || Number(amountValue) <= 0) {
+        container.hide();
+        return;
+    }
+
+    const amount = parseInt(amountValue);
+
+    const randomSuggestions = [];
+    const usedAmounts = new Set();
+
+    // Number of suggestions
+    const suggestionCount = 6;
+
+    /*
+     * Example:
+     *
+     * Entered Amount = 49999
+     *
+     * Minimum = 39999
+     * Maximum = 49995
+     *
+     * Example Results:
+     *
+     * 42887
+     * 41743
+     * 48891
+     * 45469
+     * 49227
+     * 48034
+     */
+    const minimumAmount = Math.max(
+        1,
+        amount - 10000
+    );
+
+    // Don't suggest amount itself or within 3
+    const maximumAmount = amount - 4;
+
+    let attempts = 0;
+    const maxAttempts = 1000;
 
 
-            $('.toggle-checkbox').change(function () {
+    while (
+        randomSuggestions.length < suggestionCount &&
+        attempts < maxAttempts
+    ) {
+
+        attempts++;
+
+        // Random number within the range
+        const suggestion =
+            Math.floor(
+                Math.random() *
+                (maximumAmount - minimumAmount + 1)
+            ) + minimumAmount;
+
+
+        // Last digit should never be 0
+        if (suggestion % 10 === 0) {
+            continue;
+        }
+
+
+        // Prevent duplicate suggestions
+        if (usedAmounts.has(suggestion)) {
+            continue;
+        }
+
+
+        usedAmounts.add(suggestion);
+
+        randomSuggestions.push(suggestion);
+    }
+
+
+    /*
+     * Create suggestion buttons
+     */
+    randomSuggestions.forEach(function (suggestion) {
+
+        const button = $(`
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary amount-suggestion"
+                    data-amount="${suggestion}">
+                ₹${suggestion}
+            </button>
+        `);
+
+        buttons.append(button);
+    });
+
+
+    container.show();
+}
+        
+        
+        $('.toggle-checkbox').change(function () {
                 var isChecked = $(this).is(':checked');
                 var label = $(this).data('label');
                 $.ajax({
@@ -1413,9 +1495,9 @@
         message = "Please select one of the suggested amounts.";
 
     }
-                 else if (amountVal > 49999 && gatewayVal == "CoreVegaah") {
+                 else if (amountVal > 49999) {
                  isValid = false;
-                 message = "Amount cannot exceed 99,999.";
+                 message = "Amount cannot exceed 49,999.";
                  } else if (amountVal > 70000 && gatewayVal != "CoreVegaah") {
                      isValid = false;
                      message = "Amount cannot exceed 99,999.";

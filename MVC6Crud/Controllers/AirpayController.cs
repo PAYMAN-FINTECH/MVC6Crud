@@ -810,6 +810,9 @@ private string GenerateOrderId()
         [JsonProperty("card_type")]
         public string? CardType { get; set; }
 
+        [JsonProperty("bank_name")]
+        public string? BankName { get; set; }
+
 
         // =====================================================
         // BANK RESPONSE

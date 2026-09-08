@@ -204,39 +204,39 @@ namespace MVC6Crud.Controllers
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
 
-            if (gateWayDetails.Edu == true)
-            {
-                var payIns = _context.payManPayIns
-                    .Where(t => t.Created >= today
-                             && t.Created < tomorrow
-                             && t.Gateway == "Vegaah"
-                             && t.Status == true)
-                    .Sum(rr => (decimal?)rr.Amount) ?? 0;
+            //if (gateWayDetails.Edu == true)
+            //{
+            //    var payIns = _context.payManPayIns
+            //        .Where(t => t.Created >= today
+            //                 && t.Created < tomorrow
+            //                 && t.Gateway == "Vegaah"
+            //                 && t.Status == true)
+            //        .Sum(rr => (decimal?)rr.Amount) ?? 0;
 
-                if (payIns > gateWayDetails.EduEnableAmount)
-                {
-                    gateWayDetails.Edu = false;
-                    _context.PayManGateways.Update(gateWayDetails);
-                    _context.SaveChanges();
-                }
-            }
+            //    if (payIns > gateWayDetails.EduEnableAmount)
+            //    {
+            //        gateWayDetails.Edu = false;
+            //        _context.PayManGateways.Update(gateWayDetails);
+            //        _context.SaveChanges();
+            //    }
+            //}
 
-            if (gateWayDetails.PayOut == true)
-            {
-                var payouts = _context.payManPayOuts
-                    .Where(t => t.DateTime >= today
-                             && t.DateTime < tomorrow
-                             && t.PayOutType == "Pine Labs"
-                             && t.Status == true)
-                    .Count();
+            //if (gateWayDetails.PayOut == true)
+            //{
+            //    var payouts = _context.payManPayOuts
+            //        .Where(t => t.DateTime >= today
+            //                 && t.DateTime < tomorrow
+            //                 && t.PayOutType == "Pine Labs"
+            //                 && t.Status == true)
+            //        .Count();
 
-                if (payouts > gateWayDetails.PayoutCount)
-                {
-                    gateWayDetails.PayOut = false;
-                    _context.PayManGateways.Update(gateWayDetails);
-                    _context.SaveChanges();
-                }
-            }
+            //    if (payouts > gateWayDetails.PayoutCount)
+            //    {
+            //        gateWayDetails.PayOut = false;
+            //        _context.PayManGateways.Update(gateWayDetails);
+            //        _context.SaveChanges();
+            //    }
+            //}
 
 
 
@@ -267,7 +267,7 @@ namespace MVC6Crud.Controllers
                 decimal.TryParse(pineLabsAmountStr, out pineLabsAmount);
                 decimal.TryParse(instantPayAmountStr, out instantPayAmount);
 
-                if (pineLabsAmount > 0) // adjust condition as needed
+                if (instantPayAmount > 0) // adjust condition as needed   pineLabsAmount > 0
                 {
                     break; // Data is ready
                 }

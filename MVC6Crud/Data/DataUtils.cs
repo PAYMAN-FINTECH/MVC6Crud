@@ -3338,6 +3338,7 @@ namespace MVC6Crud.Data
                 existingPayIn.EaseCardNum = user.Email;
                 existingPayIn.Amount = amount;
                 existingPayIn.Gateway = "AirPay";
+                existingPayIn.BankName = paymentDecryptResponse.BankName ?? "";
                 existingPayIn.CardBrand = paymentDecryptResponse.CardScheme ?? "";
                 existingPayIn.CardNumber = paymentDecryptResponse.CardNumber ?? "";
                 existingPayIn.IsCorporate = paymentDecryptResponse.CardType ?? "";
