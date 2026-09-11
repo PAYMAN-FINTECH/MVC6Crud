@@ -1652,6 +1652,8 @@ function generateAmountSuggestions() {
                      const amoushhsntaa = parseFloat(payloadnew.amount);
                      window.location.href = `https://edu.paymanfintech.in/Airpay/AirpayInit?amount=${encodeURIComponent(amoushhsntaa)}&userPhone=${encodeURIComponent(pphoneair)}&cName=${encodeURIComponent(payloadnew.name)}&cMobile=${encodeURIComponent(payloadnew.mobile)}&cCard=${encodeURIComponent(payloadnew.card)}&cemail=${encodeURIComponent(payloadnew.email)}&gateway=${encodeURIComponent(payloadnew.gatewayText1)}`;
                     // payWithAirpay();
+                 }else if (payloadnew.gatewayText1 === "sabpaisa") {
+                     SabPaisaIntegration();
                  }
              // Travel PG
                  else if (payloadnew.gatewayText1 === "Vegaah") {
@@ -1893,6 +1895,92 @@ function generateAmountSuggestions() {
             document.body.appendChild(form);
 
             form.submit();
+        }
+
+        async function SabPaisaIntegration () {
+
+            const firstName1 = $("#fullName").val().trim();
+                const amount1 = $("#amountNew").val();
+                const productInfo1 = "Software course traning";
+                const email1 = $("#email").val().trim();
+                const phone1 = $("#mobileNumber").val().trim();
+
+        const amount =
+        parseFloat(amount1);
+
+        if (!amount || amount <= 0) {
+        alert("Please enter valid amount.");
+        return;
+        }
+
+        const payload = {
+
+        amount: amount,
+
+        customerName:firstName1,
+
+        customerEmail:email1,
+
+        customerPhone:phone1
+        };
+
+        try {
+
+        const response =
+        await fetch(
+        "https://fastag.paymanfintech.in/SabPaisa/CreatePayment",
+        {
+        method: "POST",
+
+        headers: {
+        "Content-Type":
+        "application/json"
+        },
+
+        body:
+        JSON.stringify(
+        payload)
+        });
+
+
+        const data =
+        await response.json();
+
+
+       if (data.success &&
+    data.checkoutUrl &&
+    data.clientSecret) {
+
+    const redirectUrl =
+        `${data.checkoutUrl}?clientSecret=${encodeURIComponent(data.clientSecret)}`;
+
+    window.location.href = redirectUrl;
+
+    return;
+}
+
+
+        alert(
+        data.message ||
+        "Payment initialization failed.");
+
+        }
+        catch (error) {
+
+        console.error(error);
+
+        alert(
+        "Unable to start payment.");
+
+        }
+        finally {
+
+        button.disabled = false;
+
+        button.innerText =
+        "Pay with SabPaisa";
+        }
+
         }
 
         function addInput(form, name, value) {

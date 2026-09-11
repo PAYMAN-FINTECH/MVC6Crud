@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using MVC6Crud.Controllers;
 using MVC6Crud.Data;
 using MVC6Crud.Models.Airpay;
+using MVC6Crud.Models.SabPaisa;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,6 +75,7 @@ builder.Services.AddSession(option =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<DataUtils>();
 builder.Services.AddScoped<BBPSService>();
+builder.Services.AddScoped<SabPaisaService>();
 //builder.Services.AddHttpClient<DigiLockerService>();
 builder.Services.AddScoped<DigiLockerService>();
 //builder.Services.Configure<CFConfig>(Configuration.GetSection("Cashfree"));
@@ -87,6 +89,9 @@ builder.Services.AddTransient<AgreementPdf>();
 
 builder.Services.Configure<AirpaySettings>(
     builder.Configuration.GetSection("Airpay"));
+
+builder.Services.Configure<SabPaisaOptions>(
+    builder.Configuration.GetSection("SabPaisa"));
 
 builder.Services.AddSingleton<
     AirpayCryptoService>();
