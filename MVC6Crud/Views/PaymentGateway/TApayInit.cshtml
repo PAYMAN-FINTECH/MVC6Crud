@@ -1,0 +1,99 @@
+﻿@using MVC6Crud.Controllers
+@model TaPaySessionModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Razorpay Init</title>
+
+    <!-- ✅ LOAD JQUERY FIRST -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+    <div id="Loader1" style="display:none">Processing...</div>
+
+    <script>
+        // ✅ GLOBAL VARIABLE
+        var amount = 0;
+        var orderId='';
+        var url = "";
+
+        $(document).ready(function () {
+
+            amount = parseFloat('@Model.Amount'.replace(',', '.'));
+            orderId = ('@Model.orderId');
+
+            TAPaymentGateway(amount);
+        });
+
+
+        
+     async function TAPaymentGateway(amount) {
+    //const amount = amount;
+    const name = '@Model.CName';
+    const email = '@Model.Cemail';
+    const phone = '@Model.CMobile';
+    const orderId = '@Model.orderId';
+
+    if (!amount || parseFloat(amount) <= 0) {
+    alert("Please enter valid amount");
+    return;
+    }
+
+    $("#btnPay")
+    .prop("disabled", true)
+    .text("Processing...");
+
+    $.ajax({
+    url:  'https://edu.paymanfintech.in/TAPay/CreatePayment',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({
+    amount: parseFloat(amount),
+    name: name,
+    email: email,
+    phone: phone,
+    orderId: orderId
+    }),
+
+    success: function (response) {
+
+    if (response.success && response.paymentUrl) {
+
+    // Open gateway payment page
+    window.location.href = response.paymentUrl;
+
+    } else {
+
+    alert(response.message || "Unable to create payment");
+
+    $("#btnPay")
+    .prop("disabled", false)
+    .text("Pay Now");
+    }
+    },
+
+    error: function (xhr) {
+
+    console.log(xhr.responseText);
+
+    alert("Payment gateway error");
+
+    $("#btnPay")
+    .prop("disabled", false)
+    .text("Pay Now");
+    }
+    });
+     }
+
+      
+                        </script>
+
+</body>
+</html>

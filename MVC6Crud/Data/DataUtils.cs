@@ -3432,6 +3432,123 @@ namespace MVC6Crud.Data
         }
 
 
+        public async Task<PaymentStatusViewModel> TAPayInDbCall(TAPayResponse paymentDecryptResponse)
+        {
+            // 🔐 Safety checks
+            if (paymentDecryptResponse == null)
+                throw new ArgumentNullException(nameof(paymentDecryptResponse));
+
+
+
+           
+
+
+
+            var easebuzzGateway = await _context.PayManGateways
+                .FirstOrDefaultAsync(t => t.GatewayName == "Easebuzz");
+
+            // ✅ Idempotency check
+            var existingPayIn = await _context.payManPayIns
+                .FirstOrDefaultAsync(t =>
+                    t.TxnId == paymentDecryptResponse.order_id);
+
+
+
+            var istTime = TimeZoneInfo.ConvertTimeFromUtc(
+                DateTime.UtcNow,
+                TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+
+            string jsonData = System.Text.Json.JsonSerializer.Serialize(paymentDecryptResponse);
+
+           
+
+            if (existingPayIn != null)
+            {
+                var user = await _context.payManUsers
+               .FirstOrDefaultAsync(u => u.Phone == existingPayIn.UserPhone);
+
+                if (user == null)
+                    throw new Exception("User not found");
+
+                var gatewayId = await _context.gateways
+                    .Where(g => g.StoreName == "tapay")
+                    .Select(g => g.Id)
+                    .FirstOrDefaultAsync();
+                var getMargin = await _context.userLookUps
+                    .Where(m => m.GatewayId == gatewayId && m.UserPhone == existingPayIn.UserPhone)
+                    .Select(m => m.GatewayMargin)
+                    .FirstOrDefaultAsync();
+
+                decimal amount =
+                    Convert.ToDecimal(paymentDecryptResponse.amount ?? "0");
+
+                decimal margin = getMargin > 0 ? getMargin : 0;
+
+                // Card based margin
+                //if (paymentDecryptResponse.cardNetwork?
+                //    .Equals("mastercard", StringComparison.OrdinalIgnoreCase) == true)
+                //{
+                //    margin = user.MasterMarigin ?? margin;
+                //}
+
+                //var mm = 1.50m;
+
+                existingPayIn.EasePayId = paymentDecryptResponse.transaction_id;
+                existingPayIn.Email = paymentDecryptResponse.email ?? "";
+                existingPayIn.EaseCardNum = user.Email;
+                existingPayIn.Amount = amount;
+                existingPayIn.Gateway = "TA PAY";
+                existingPayIn.BankName = "";//paymentDecryptResponse.BankName ?? "";
+                existingPayIn.CardBrand = paymentDecryptResponse.payment_channel ?? "";
+                existingPayIn.CardNumber = paymentDecryptResponse.cardmasked;//paymentDecryptResponse.CardNumber ?? "";
+                existingPayIn.IsCorporate = paymentDecryptResponse.bank_code ?? "";//paymentDecryptResponse.CardType ?? "";
+                existingPayIn.PayInCommission = amount * margin / 100;
+                existingPayIn.PaymanCommission = amount *
+                        Convert.ToDecimal(easebuzzGateway?.PaymanComm ?? 0) / 100;
+                existingPayIn.Created = istTime;
+                existingPayIn.Status = paymentDecryptResponse.response_message == "Transaction successful";
+                existingPayIn.Result = paymentDecryptResponse.response_message;
+
+                _context.payManPayIns.Update(existingPayIn);
+                await _context.SaveChangesAsync();
+
+                // ✅ Wallet & history ONLY if success
+                if (paymentDecryptResponse.response_message == "Transaction successful")
+                {
+                    var avlAmount = await GetUserWalletAmount(existingPayIn.UserPhone);
+
+                    var payInHistory = new PayManHistory
+                    {
+                        UserId = user.Id,
+                        UserPhone = existingPayIn.UserPhone,
+                        TxnId = paymentDecryptResponse.order_id,
+                        Amount = amount,
+                        Mode = "PayIn",
+                        Status = paymentDecryptResponse.response_message == "Transaction successful" ,
+                        Created = istTime,
+                        AvlBalance = Convert.ToDecimal(avlAmount),
+                        CardNumber = paymentDecryptResponse.cardmasked ?? "",
+                        PayInId = existingPayIn.Id
+                    };
+
+                    _context.payManHistories.Add(payInHistory);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+
+            // ✅ RETURN VIEW MODEL (FIXED)
+            return new PaymentStatusViewModel
+            {
+                IsSuccess = paymentDecryptResponse.response_message == "Transaction successful" ,
+                Amount = Convert.ToDouble(
+                    paymentDecryptResponse.amount ?? "0"),
+                TransactionId = paymentDecryptResponse.order_id,
+                CardNumber = paymentDecryptResponse?.cardmasked ?? "",
+                Gateway = existingPayIn?.CreditCardHolderNum ?? ""
+            };
+        }
+
 
 
         // Fix LogPayOutAsync - DO NOT call SaveChanges here. Just add to context.

@@ -210,6 +210,7 @@
                             <option value="paytm">Paytm</option>
                             <option value="razorPay">Razor Pay</option>
                             <option value="airpay">AirPay</option>
+                            <option value="ta">TA</option>
                         </select>
                     </div>
                     <!-- 👉 MODIFIED: Next checks login -->
@@ -551,6 +552,9 @@
     payWithAirpay(amoushhsnt);
 
              }
+    else if (gateway === "ta"){
+        TAPaymentGateway(amoushhsnt);
+    }
              else if(gateway === "paytm"){
                         const d = new Date();
     let orderid = 'PAYMAN' + d.getTime();
@@ -769,6 +773,63 @@
          const hashArray = Array.from(new Uint8Array(hashBuffer));
          const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
          return hashHex;
+     }
+
+     async function TAPaymentGateway(amount) {
+         alert("Tets");
+    //const amount = amount;
+    const name = 'jurra';
+    const email = 'jurrajanardhan@gmail.com';
+    const phone = '9849800697';
+
+    if (!amount || parseFloat(amount) <= 0) {
+    alert("Please enter valid amount");
+    return;
+    }
+
+    $("#btnPay")
+    .prop("disabled", true)
+    .text("Processing...");
+
+    $.ajax({
+    url: '@Url.Action("CreatePayment", "TAPay")',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({
+    amount: parseFloat(amount),
+    name: name,
+    email: email,
+    phone: phone
+    }),
+
+    success: function (response) {
+
+    if (response.success && response.paymentUrl) {
+
+    // Open gateway payment page
+    window.location.href = response.paymentUrl;
+
+    } else {
+
+    alert(response.message || "Unable to create payment");
+
+    $("#btnPay")
+    .prop("disabled", false)
+    .text("Pay Now");
+    }
+    },
+
+    error: function (xhr) {
+
+    console.log(xhr.responseText);
+
+    alert("Payment gateway error");
+
+    $("#btnPay")
+    .prop("disabled", false)
+    .text("Pay Now");
+    }
+    });
      }
 
     // ========================================================

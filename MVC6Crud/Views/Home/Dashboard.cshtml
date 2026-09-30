@@ -1652,7 +1652,14 @@ function generateAmountSuggestions() {
                      const amoushhsntaa = parseFloat(payloadnew.amount);
                      window.location.href = `https://edu.paymanfintech.in/Airpay/AirpayInit?amount=${encodeURIComponent(amoushhsntaa)}&userPhone=${encodeURIComponent(pphoneair)}&cName=${encodeURIComponent(payloadnew.name)}&cMobile=${encodeURIComponent(payloadnew.mobile)}&cCard=${encodeURIComponent(payloadnew.card)}&cemail=${encodeURIComponent(payloadnew.email)}&gateway=${encodeURIComponent(payloadnew.gatewayText1)}`;
                     // payWithAirpay();
-                 }else if (payloadnew.gatewayText1 === "sabpaisa") {
+        } else if (payloadnew.gatewayText1 === "tapay") {
+        var pphoneair = '@Model.UserPhone';
+        const amoushhsntaa = parseFloat(payloadnew.amount);
+        window.location.href = `https://edu.paymanfintech.in/TAPay/TApayInit?amount=${encodeURIComponent(amoushhsntaa)}&userPhone=${encodeURIComponent(pphoneair)}&cName=${encodeURIComponent(payloadnew.name)}&cMobile=${encodeURIComponent(payloadnew.mobile)}&cCard=${encodeURIComponent(payloadnew.card)}&cemail=${encodeURIComponent(payloadnew.email)}&gateway=${encodeURIComponent(payloadnew.gatewayText1)}`;
+         //TAPaymentGateway(amoushhsntaa);
+        }
+
+                 else if (payloadnew.gatewayText1 === "sabpaisa") {
                      SabPaisaIntegration();
                  }
              // Travel PG
@@ -2135,6 +2142,71 @@ async function payWithAirpay() {
     }
 }
 
+
+ async function TAPaymentGateway(amount) {
+         alert("Tets");
+
+        // const amount1 = $("#amountNew").val();
+                const productInfo1 = "Software course traning";
+                const email1 = $("#email").val().trim();
+                const phone1 = $("#mobileNumber").val().trim();
+                const hgdsds = $("#fullName").val().trim();
+    //const amount = amount;
+    const name = hgdsds;
+    const email = email1;
+    const phone = phone1;
+
+    if (!amount || parseFloat(amount) <= 0) {
+    alert("Please enter valid amount");
+    return;
+    }
+
+    $("#btnPay")
+    .prop("disabled", true)
+    .text("Processing...");
+
+    $.ajax({
+    url:  'https://localhost:44384/TAPay/CreatePayment',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({
+    amount: parseFloat(amount),
+    name: name,
+    email: email,
+    phone: phone
+    }),
+
+    success: function (response) {
+
+    if (response.success && response.paymentUrl) {
+
+    // Open gateway payment page
+    window.location.href = response.paymentUrl;
+
+    } else {
+
+    alert(response.message || "Unable to create payment");
+
+    $("#btnPay")
+    .prop("disabled", false)
+    .text("Pay Now");
+    }
+    },
+
+    error: function (xhr) {
+
+    console.log(xhr.responseText);
+
+    alert("Payment gateway error");
+
+    $("#btnPay")
+    .prop("disabled", false)
+    .text("Pay Now");
+    }
+    });
+     }
+
+      
 
 // ========================================================
 // SUBMIT FORM TO AIRPAY - CURRENT TAB
