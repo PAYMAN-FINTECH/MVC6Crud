@@ -1,11 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Humanizer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVC6Crud.Data;
 using MVC6Crud.Models;
+using MVC6Crud.Models.App;
 using MVC6Crud.Models.PaymanApp;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace MVC6Crud.Controllers
 {
@@ -16,6 +21,13 @@ namespace MVC6Crud.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly DataUtils _dataUtils;
         private readonly ApplicationDbContext _context;
+
+        private const string BINLIST_URL =
+           "https://raw.githubusercontent.com/venelinkochev/bin-list-data/refs/heads/master/bin-list-data.csv";
+
+        private static List<BinData>? _cachedData;
+        private static bool _isOnline;
+        private static readonly SemaphoreSlim _cacheLock = new(1, 1);
 
         public TAPayController(
             IConfiguration configuration,
@@ -274,10 +286,8 @@ namespace MVC6Crud.Controllers
             {
                 return new PaymentStatusResult
                 {
-                    Success = false,
-                    Message = $"Gateway HTTP Error: {response.StatusCode}",
-                    RawResponse = responseJson
                 };
+
             }
 
             try
@@ -293,13 +303,11 @@ namespace MVC6Crud.Controllers
                 {
                     return new PaymentStatusResult
                     {
-                        Success = false,
-                        Message = "Invalid gateway response.",
-                        RawResponse = responseJson
                     };
+
                 }
 
-                result.RawResponse = responseJson;
+                //result.RawResponse = responseJson;
 
                 return result;
             }
@@ -307,9 +315,6 @@ namespace MVC6Crud.Controllers
             {
                 return new PaymentStatusResult
                 {
-                    Success = false,
-                    Message = "Unable to parse gateway response.",
-                    RawResponse = responseJson
                 };
             }
         }
@@ -407,7 +412,7 @@ namespace MVC6Crud.Controllers
                 model.order_id,
                 model.transaction_id);
 
-            model.bank_code = status?.Data?.bank_code ?? string.Empty;
+            model.bank_code = status?.Data[0].BankCode ?? string.Empty;
 
 
             var res = await _dataUtils.TAPayInDbCall(model);
@@ -485,6 +490,911 @@ namespace MVC6Crud.Controllers
               );
         }
 
+
+        //[HttpPost]
+        //public async Task<IActionResult> CheckBin(
+        //  [FromBody] CardBinRequest request,
+        //  CancellationToken cancellationToken)
+        //{
+        //    if (string.IsNullOrWhiteSpace(request.Bin))
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            error = "BIN parameter is required"
+        //        });
+        //    }
+
+        //    if (!System.Text.RegularExpressions.Regex.IsMatch(request.Bin, @"^\d{6,8}$"))
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            error = "BIN must be 6 to 8 digits"
+        //        });
+        //    }
+
+        //    try
+        //    {
+        //        await LoadBinData(cancellationToken);
+
+        //        var foundBin = _cachedData?
+        //            .FirstOrDefault(x =>
+        //                string.Equals(x.BIN, request.Bin, StringComparison.OrdinalIgnoreCase));
+
+        //        if (foundBin == null)
+        //        {
+        //            return NotFound(new
+        //            {
+        //                error = "BIN not found"
+        //            });
+        //        }
+
+        //        return Ok(new
+        //        {
+        //            success = true,
+        //            source = "DATABASE",
+        //            message = "BIN found in local database.",
+        //            bin = foundBin.BIN,
+        //            bankName = foundBin.Issuer,
+        //            isActive = true
+        //        });
+
+        //        //return Ok(new
+        //        //{
+        //        //    foundBin.BIN,
+        //        //    foundBin.Brand,
+        //        //    foundBin.Type,
+        //        //    foundBin.Category,
+        //        //    foundBin.Issuer,
+        //        //    foundBin.Country,
+        //        //    foundBin.Currency,
+        //        //    source = _isOnline ? "Online" : "Local"
+        //        //});
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error processing BIN request: {ex}");
+
+        //        return StatusCode(500, new
+        //        {
+        //            error = "Internal Server Error"
+        //        });
+        //    }
+        //}
+
+        private async Task LoadBinData(CancellationToken cancellationToken)
+        {
+            if (_cachedData != null && _cachedData.Count > 0)
+                return;
+
+            await _cacheLock.WaitAsync(cancellationToken);
+
+            try
+            {
+                // Double-check after acquiring lock
+                if (_cachedData != null && _cachedData.Count > 0)
+                    return;
+
+                List<BinData>? data = null;
+
+                // ==========================================
+                // 1. Try GitHub CSV
+                // ==========================================
+                try
+                {
+                    using var httpClient = new HttpClient();
+
+                    httpClient.Timeout = TimeSpan.FromSeconds(30);
+
+                    var csvText = await httpClient.GetStringAsync(
+                        BINLIST_URL,
+                        cancellationToken);
+
+                    data = ParseCsv(csvText);
+
+                    if (data.Count > 0)
+                    {
+                        _isOnline = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(
+                        $"Online BIN fetch failed: {ex.Message}");
+                }
+
+                // ==========================================
+                // 2. Local CSV fallback
+                // ==========================================
+                if (data == null || data.Count == 0)
+                {
+                    var filePath = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "src",
+                        "data",
+                        "offline-bin-list-data.csv");
+
+                    if (!System.IO.File.Exists(filePath))
+                    {
+                        throw new FileNotFoundException(
+                            "Local BIN CSV file not found.",
+                            filePath);
+                    }
+
+                    var fileContent =
+                        await System.IO.File.ReadAllTextAsync(
+                            filePath,
+                            cancellationToken);
+
+                    data = ParseCsv(fileContent);
+
+                    _isOnline = false;
+                }
+
+                _cachedData = data;
+            }
+            finally
+            {
+                _cacheLock.Release();
+            }
+        }
+
+        private static List<BinData> ParseCsv(string csv)
+        {
+            var result = new List<BinData>();
+
+            using var reader = new StringReader(csv);
+
+            var headerLine = reader.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(headerLine))
+                return result;
+
+            var headers = ParseCsvLine(headerLine);
+
+            string? line;
+
+            while ((line = reader.ReadLine()) != null)
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                var values = ParseCsvLine(line);
+
+                if (values.Count == 0)
+                    continue;
+
+                var item = new BinData();
+
+                for (int i = 0; i < headers.Count && i < values.Count; i++)
+                {
+                    var header = headers[i]
+                        .Trim()
+                        .ToLowerInvariant();
+
+                    var value = values[i].Trim();
+
+                    switch (header)
+                    {
+                        case "bin":
+                            item.BIN = value;
+                            break;
+
+                        case "brand":
+                            item.Brand = value;
+                            break;
+
+                        case "type":
+                            item.Type = value;
+                            break;
+
+                        case "category":
+                            item.Category = value;
+                            break;
+
+                        case "issuer":
+                            item.Issuer = value;
+                            break;
+
+                        case "country":
+                            item.Country = value;
+                            break;
+
+                        case "currency":
+                            item.Currency = value;
+                            break;
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(item.BIN))
+                    result.Add(item);
+            }
+
+            return result;
+        }
+
+        private static List<string> ParseCsvLine(string line)
+        {
+            var result = new List<string>();
+            var current = "";
+            bool insideQuotes = false;
+
+            for (int i = 0; i < line.Length; i++)
+            {
+                char c = line[i];
+
+                if (c == '"')
+                {
+                    if (insideQuotes &&
+                        i + 1 < line.Length &&
+                        line[i + 1] == '"')
+                    {
+                        current += '"';
+                        i++;
+                    }
+                    else
+                    {
+                        insideQuotes = !insideQuotes;
+                    }
+                }
+                else if (c == ',' && !insideQuotes)
+                {
+                    result.Add(current);
+                    current = "";
+                }
+                else
+                {
+                    current += c;
+                }
+            }
+
+            result.Add(current);
+
+            return result;
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CheckBin(
+    [FromBody] CardBinRequest request,
+    CancellationToken ct)
+        {
+            // ============================================
+            // 1. Validate request
+            // ============================================
+
+            if (request == null || string.IsNullOrWhiteSpace(request.Bin))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "BIN is required."
+                });
+            }
+
+            var bin = request.Bin.Trim();
+
+            if (!Regex.IsMatch(bin, @"^\d{6,8}$"))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "BIN must be 6 to 8 digits."
+                });
+            }
+
+            try
+            {
+                // ============================================
+                // 2. FIRST CHECK LOCAL DATABASE
+                // ============================================
+
+                var existingBin = await _context.pMBinCheckers
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(
+                        x => x.CardNumber == bin,
+                        ct);
+
+                if (existingBin != null)
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        source = "DATABASE",
+                        message = "BIN found in local database.",
+                        bin = bin,
+                        bankName = existingBin.BankName,
+                        isActive = true
+                    });
+                }
+
+
+                // ============================================
+                // 3. BIN NOT FOUND IN DATABASE
+                //    CALL BINLIST API
+                // ============================================
+
+                var client = _httpClientFactory.CreateClient();
+
+                client.DefaultRequestHeaders.TryAddWithoutValidation(
+                    "Accept-Version",
+                    "3");
+
+                client.Timeout = TimeSpan.FromSeconds(10);
+
+                var apiUrl =
+                    $"https://lookup.binlist.net/{bin}";
+
+                using var response = await client.GetAsync(
+                    apiUrl,
+                    ct);
+
+
+                // ============================================
+                // 4. BIN NOT FOUND FROM BINLIST
+                // ============================================
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        source = "BINLIST",
+                        bin = bin,
+                        message = "BIN not found."
+                    });
+                }
+
+
+                // ============================================
+                // 5. RATE LIMIT
+                // ============================================
+
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                {
+                    return StatusCode(429, new
+                    {
+                        success = false,
+                        source = "BINLIST",
+                        bin = bin,
+                        message = "BIN API rate limit reached."
+                    });
+                }
+
+
+                // ============================================
+                // 6. OTHER BINLIST ERROR
+                // ============================================
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return StatusCode(502, new
+                    {
+                        success = false,
+                        source = "BINLIST",
+                        bin = bin,
+                        message = "BIN API failed.",
+                        statusCode = (int)response.StatusCode
+                    });
+                }
+
+
+                // ============================================
+                // 7. READ BINLIST JSON
+                // ============================================
+
+                var json =
+                    await response.Content.ReadAsStringAsync(ct);
+
+
+                // ============================================
+                // 8. DESERIALIZE
+                // ============================================
+
+                var binData =
+                    JsonSerializer.Deserialize<BinResponse>(
+                        json,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+
+                if (binData == null)
+                {
+                    return StatusCode(502, new
+                    {
+                        success = false,
+                        source = "BINLIST",
+                        bin = bin,
+                        message = "Invalid BIN API response."
+                    });
+                }
+
+
+                // ============================================
+                // 9. GET BANK NAME
+                // ============================================
+
+                var bankName =
+                    binData.Bank?.Name?.Trim();
+                var brand = binData.Brand;
+
+
+                // ============================================
+                // 10. BANK NAME VALIDATION
+                // ============================================
+
+                if (string.IsNullOrWhiteSpace(bankName))
+                {
+                    return Ok(new
+                    {
+                        success = false,
+                        source = "BINLIST",
+                        bin = bin,
+                        message = "BIN found but bank name is not available.",
+                        bankName = "",
+                        isActive = false
+                    });
+                }
+
+
+                // ============================================
+                // 11. CHECK AGAIN BEFORE INSERT
+                //    Prevent duplicate records if two requests
+                //    arrive at the same time.
+                // ============================================
+
+                var alreadyInserted =
+                    await _context.pMBinCheckers
+                        .FirstOrDefaultAsync(
+                            x => x.CardNumber == bin,
+                            ct);
+
+                if (alreadyInserted == null)
+                {
+                    // ========================================
+                    // 12. INSERT BIN INTO DATABASE
+                    // ========================================
+
+                    var newBin = new PMBinChecker
+                    {
+                        // DO NOT SET Id
+                        // SQL Server will generate identity Id
+
+                        CardNumber = bin,
+                        BankName = bankName,
+                        brand = brand,
+                        response = json,
+                        IsActive = true,
+                        Created = DateTime.Now
+
+                    };
+
+                    _context.pMBinCheckers.Add(newBin);
+
+                    await _context.SaveChangesAsync(ct);
+                }
+
+
+                // ============================================
+                // 13. RETURN BINLIST RESULT
+                // ============================================
+
+                return Ok(new
+                {
+                    success = true,
+                    source = "BINLIST",
+                    message = "BIN found and saved successfully.",
+                    bin = bin,
+                    bankName = bankName,
+                    scheme = binData.Scheme,
+                    type = binData.Type,
+                    brand = binData.Brand,
+                    country = binData.Country?.Name,
+                    isActive = true
+                });
+            }
+            catch (TaskCanceledException)
+                when (!ct.IsCancellationRequested)
+            {
+                return StatusCode(504, new
+                {
+                    success = false,
+                    bin = bin,
+                    message = "BIN API request timed out."
+                });
+            }
+            catch (OperationCanceledException)
+                when (ct.IsCancellationRequested)
+            {
+                return StatusCode(499, new
+                {
+                    success = false,
+                    bin = bin,
+                    message = "Request cancelled."
+                });
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(502, new
+                {
+                    success = false,
+                    bin = bin,
+                    message = "Unable to connect to BIN API.",
+                    error = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    bin = bin,
+                    message = "Unexpected error.",
+                    error = ex.Message
+                });
+            }
+        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> CheckBin([FromBody] CardBinRequest request)
+        //{
+        //    // Validate: only 6-8 digits
+        //    if (string.IsNullOrWhiteSpace(request.Bin) ||
+        //        !System.Text.RegularExpressions.Regex.IsMatch(request.Bin, @"^\d{6,8}$"))
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            error = "Invalid BIN"
+        //        });
+        //    }
+
+        //    try
+        //    {
+        //        var apiKey = "apv_55779472-18ff-4af7-b7c6-937a02e8df04";
+
+        //        if (string.IsNullOrWhiteSpace(apiKey))
+        //        {
+        //            return StatusCode(500, new
+        //            {
+        //                error = "APIVerve API key is not configured"
+        //            });
+        //        }
+
+        //        var client = _httpClientFactory.CreateClient();
+
+        //        var url =
+        //            $"https://api.apiverve.com/v1/binlookup?bin={request.Bin}";
+
+        //        using var requestResult = new HttpRequestMessage(
+        //            HttpMethod.Get,
+        //            url);
+
+        //        requestResult.Headers.Add("x-api-key", apiKey);
+
+        //        using var response = await client.SendAsync(requestResult);
+
+        //        var responseBody = await response.Content.ReadAsStringAsync();
+
+        //        var result = JsonSerializer.Deserialize<ApiVerveBinResponse>(
+        //    responseBody,
+        //    new JsonSerializerOptions
+        //    {
+        //        PropertyNameCaseInsensitive = true
+        //    });
+
+        //        return Json(new
+        //        {
+        //            success = true,
+        //            source = "DATABASE",
+        //            message = "BIN found in local database.",
+        //            bin = result.Data.Bin,
+        //            bankName = result.Data.Issuer.Name,
+        //            isActive = true
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(502, new
+        //        {
+        //            error = "Lookup failed",
+        //            message = ex.Message
+        //        });
+        //    }
+        //}
+
+
+        //   [HttpPost]
+        //   public async Task<IActionResult> CheckBin(
+        //[FromBody] CardBinRequest request)
+        //   {
+        //       try
+        //       {
+
+
+        //           var apiKey1 = "apv_55779472-18ff-4af7-b7c6-937a02e8df04";
+
+        //           if (string.IsNullOrWhiteSpace(apiKey1))
+        //           {
+        //               return StatusCode(500, new
+        //               {
+        //                   error = "APIVerve API key is not configured"
+        //               });
+        //           }
+
+        //           var clientw = _httpClientFactory.CreateClient();
+
+        //           var url =
+        //               $"https://api.apiverve.com/v1/binlookup?bin={request.Bin}";
+
+        //           using var requesta = new HttpRequestMessage(
+        //               HttpMethod.Get,
+        //               url);
+
+        //           requesta.Headers.Add("x-api-key", apiKey1);
+
+        //           using var response2 = await clientw.SendAsync(requesta);
+
+        //           var responseBodyd = await response2.Content.ReadAsStringAsync();
+
+
+        //           // ============================================
+        //           // 1. Validate request
+        //           // ============================================
+
+        //           if (request == null || string.IsNullOrWhiteSpace(request.Bin))
+        //           {
+        //               return Json(new
+        //               {
+        //                   success = false,
+        //                   message = "BIN is required."
+        //               });
+        //           }
+
+        //           var bin = request.Bin.Trim();
+
+        //           if (!bin.All(char.IsDigit) ||
+        //               (bin.Length != 6 && bin.Length != 8))
+        //           {
+        //               return Json(new
+        //               {
+        //                   success = false,
+        //                   message = "BIN must contain exactly 6 or 8 digits."
+        //               });
+        //           }
+
+
+        //           // ============================================
+        //           // 2. Convert to 8 digit BIN
+        //           // ============================================
+        //           //
+        //           // Your table contains CardFirst8.
+        //           //
+        //           // If request contains 8 digits:
+        //           //     use all 8.
+        //           //
+        //           // If request contains 6 digits:
+        //           //     first check whether we have matching
+        //           //     8-digit BINs starting with those 6 digits.
+        //           //
+
+        //           if (bin.Length == 8)
+        //           {
+        //               // ========================================
+        //               // 3. Check local DB first
+        //               // ========================================
+
+        //               var localBin = await _context.pMBinCheckers.FirstOrDefaultAsync(x =>
+        //                       x.CardNumber == bin &&
+        //                       x.IsActive == true);
+
+        //               if (localBin != null)
+        //               {
+        //                   return Json(new
+        //                   {
+        //                       success = true,
+        //                       source = "DATABASE",
+        //                       message = "BIN found in local database.",
+        //                       bin = localBin.CardNumber,
+        //                       bankName = localBin.BankName,
+        //                       isActive = localBin.IsActive
+        //                   });
+        //               }
+        //           }
+        //           else
+        //           {
+        //               // ========================================
+        //               // 3A. For 6 digit BIN:
+        //               // Check whether we already have an
+        //               // 8-digit BIN under this 6-digit range.
+        //               // ========================================
+
+        //               var localBins = await _context.pMBinCheckers
+        //                   .AsNoTracking()
+        //                   .Where(x =>
+        //                       x.IsActive == true &&
+        //                       x.CardNumber.StartsWith(bin))
+        //                   .Select(x => new
+        //                   {
+        //                       x.CardNumber,
+        //                       x.BankName,
+        //                       x.IsActive
+        //                   })
+        //                   .ToListAsync();
+
+        //               if (localBins.Count == 1)
+        //               {
+        //                   var localBin = localBins[0];
+
+        //                   return Json(new
+        //                   {
+        //                       success = true,
+        //                       source = "DATABASE",
+        //                       message = "BIN found in local database.",
+        //                       bin = localBin.CardNumber,
+        //                       bankName = localBin.BankName,
+        //                       isActive = localBin.IsActive
+        //                   });
+        //               }
+
+        //               // If multiple 8-digit BINs exist under the
+        //               // same 6-digit BIN, we cannot safely choose one.
+        //               //
+        //               // Therefore continue to external API.
+        //           }
+
+
+        //           // ============================================
+        //           // 4. BIN not found locally
+        //           //    Call TA BIN API
+        //           // ============================================
+
+        //           var apiKey =
+        //               _configuration["TAPaymentGateway:ApiKey"];
+
+        //           var apiSecret =
+        //               _configuration["TAPaymentGateway:Salt"];
+
+        //           if (string.IsNullOrWhiteSpace(apiKey) ||
+        //               string.IsNullOrWhiteSpace(apiSecret))
+        //           {
+        //               return Json(new
+        //               {
+        //                   success = false,
+        //                   message = "BIN API credentials are missing."
+        //               });
+        //           }
+
+
+        //           // ============================================
+        //           // 5. Unique reference ID
+        //           // ============================================
+
+        //           var clientRefId =
+        //               $"PAYMANBIN{DateTime.UtcNow:yyyyMMddHHmmssfff}{Random.Shared.Next(1000, 9999)}";
+
+
+        //           // ============================================
+        //           // 6. Request payload
+        //           // ============================================
+
+        //           var payload = new
+        //           {
+        //               clientRefId = clientRefId,
+        //               bin = bin,
+        //               latitude = "12.9716",
+        //               longitude = "77.5946"
+        //           };
+
+        //           var requestJson =
+        //               JsonSerializer.Serialize(payload);
+
+
+        //           // ============================================
+        //           // 7. HTTP client
+        //           // ============================================
+
+        //           var client =
+        //               _httpClientFactory.CreateClient();
+
+        //           client.DefaultRequestHeaders.Remove("X-Api-Key");
+        //           client.DefaultRequestHeaders.Remove("X-Api-Secret");
+
+        //           client.DefaultRequestHeaders.Add(
+        //               "X-Api-Key",
+        //               apiKey);
+
+        //           client.DefaultRequestHeaders.Add(
+        //               "X-Api-Secret",
+        //               apiSecret);
+
+
+        //           // ============================================
+        //           // 8. API URL
+        //           // ============================================
+
+        //           var apiUrl =
+        //               _configuration["TAPaymentGateway:ApiUrl"];
+
+        //           if (string.IsNullOrWhiteSpace(apiUrl))
+        //           {
+        //               return Json(new
+        //               {
+        //                   success = false,
+        //                   message = "BIN API URL is missing."
+        //               });
+        //           }
+
+
+        //           // ============================================
+        //           // 9. Call external BIN API
+        //           // ============================================
+
+        //           using var content =
+        //               new StringContent(
+        //                   requestJson,
+        //                   Encoding.UTF8,
+        //                   "application/json");
+
+        //           var response =
+        //               await client.PostAsync(
+        //                   $"{apiUrl.TrimEnd('/')}/api/v1/verify/bin-check",
+        //                   content);
+
+        //           var responseBody =
+        //               await response.Content.ReadAsStringAsync();
+
+
+        //           // ============================================
+        //           // 10. Log API response
+        //           // ============================================
+
+        //           var responseLog = new ErrorModel
+        //           {
+        //               payload = "TA Pay BIN Check",
+        //               agId = "",
+        //               reqTime = requestJson,
+        //               respTime = responseBody,
+        //               requestId = clientRefId,
+        //               uid = "",
+        //               statuscode = response.IsSuccessStatusCode,
+        //               jsonBody = ""
+        //           };
+
+        //           _context.errorModels.Add(responseLog);
+        //           await _context.SaveChangesAsync();
+
+
+        //           // ============================================
+        //           // 11. Empty response
+        //           // ============================================
+
+        //           if (string.IsNullOrWhiteSpace(responseBody))
+        //           {
+        //               return Json(new
+        //               {
+        //                   success = false,
+        //                   message = "Empty response from BIN API."
+        //               });
+        //           }
+
+
+        //           // ============================================
+        //           // 12. Return external API response
+        //           // ============================================
+
+        //           return Content(
+        //               responseBody,
+        //               "application/json");
+        //       }
+        //       catch (Exception ex)
+        //       {
+        //           return Json(new
+        //           {
+        //               success = false,
+        //               message = ex.Message
+        //           });
+        //       }
+        //   }
     }
 
     public class PaymentRequest
@@ -501,43 +1411,92 @@ namespace MVC6Crud.Controllers
 
     public class PaymentStatusResult
     {
-        public bool Success { get; set; }
+        [JsonPropertyName("data")]
+        public List<PaymentStatusData>? Data { get; set; }
 
-        public string? Message { get; set; }
-
-        public string? RawResponse { get; set; }
-
-        public PaymentStatusData? Data { get; set; }
-
-        public PaymentStatusError? Error { get; set; }
+        [JsonPropertyName("hash")]
+        public string? Hash { get; set; }
     }
 
     public class PaymentStatusData
     {
-        public string? Transaction_Id { get; set; }
-        public string? bank_code { get; set; }
+        [JsonPropertyName("transaction_id")]
+        public string? TransactionId { get; set; }
 
-        public string? Order_Id { get; set; }
+        [JsonPropertyName("bank_code")]
+        public string? BankCode { get; set; }
 
+        [JsonPropertyName("payment_mode")]
+        public string? PaymentMode { get; set; }
+
+        [JsonPropertyName("payment_channel")]
+        public string? PaymentChannel { get; set; }
+
+        [JsonPropertyName("payment_datetime")]
+        public string? PaymentDatetime { get; set; }
+
+        [JsonPropertyName("response_code")]
+        public int ResponseCode { get; set; }
+
+        [JsonPropertyName("response_message")]
+        public string? ResponseMessage { get; set; }
+
+        [JsonPropertyName("authorization_staus")]
+        public string? AuthorizationStatus { get; set; }
+
+        [JsonPropertyName("order_id")]
+        public string? OrderId { get; set; }
+
+        [JsonPropertyName("amount")]
         public string? Amount { get; set; }
 
+        [JsonPropertyName("amount_orig")]
+        public string? AmountOrig { get; set; }
+
+        [JsonPropertyName("tdr_amount")]
+        public decimal TdrAmount { get; set; }
+
+        [JsonPropertyName("tax_on_tdr_amount")]
+        public decimal TaxOnTdrAmount { get; set; }
+
+        [JsonPropertyName("description")]
+        public string? Description { get; set; }
+
+        [JsonPropertyName("error_desc")]
+        public string? ErrorDesc { get; set; }
+
+        [JsonPropertyName("customer_phone")]
+        public string? CustomerPhone { get; set; }
+
+        [JsonPropertyName("customer_name")]
+        public string? CustomerName { get; set; }
+
+        [JsonPropertyName("customer_email")]
+        public string? CustomerEmail { get; set; }
+
+        [JsonPropertyName("currency")]
         public string? Currency { get; set; }
 
-        public string? Response_Code { get; set; }
+        [JsonPropertyName("cardmasked")]
+        public string? CardMasked { get; set; }
 
-        public string? Response_Message { get; set; }
+        [JsonPropertyName("udf1")]
+        public string? Udf1 { get; set; }
 
-        public string? Payment_Mode { get; set; }
+        [JsonPropertyName("udf2")]
+        public string? Udf2 { get; set; }
 
-        public string? Payment_Channel { get; set; }
+        [JsonPropertyName("udf3")]
+        public string? Udf3 { get; set; }
 
-        public string? Payment_Datetime { get; set; }
+        [JsonPropertyName("udf4")]
+        public string? Udf4 { get; set; }
 
-        public string? Name { get; set; }
+        [JsonPropertyName("udf5")]
+        public string? Udf5 { get; set; }
 
-        public string? Email { get; set; }
-
-        public string? Phone { get; set; }
+        [JsonPropertyName("bank_ref_id")]
+        public string? BankRefId { get; set; }
     }
 
     public class PaymentStatusError
@@ -564,6 +1523,13 @@ namespace MVC6Crud.Controllers
         public string divice { get; set; }
         public string gateway { get; set; }
         public string orderId { get; set; }
+    }
+
+    public class CardBinRequest
+    {
+        public string Bin { get; set; } = "";
+        public string? Latitude { get; set; }
+        public string? Longitude { get; set; }
     }
 
     public class TAPayResponse
@@ -606,4 +1572,113 @@ namespace MVC6Crud.Controllers
     }
 
 
+
+    public class ApiVerveBinResponse
+    {
+        public string? Status { get; set; }
+        public string? Error { get; set; }
+        public ApiVerveBinData? Data { get; set; }
+        public ApiVervePremium? Premium { get; set; }
+    }
+
+    public class ApiVerveBinData
+    {
+        public string? Bin { get; set; }
+        public string? Brand { get; set; }
+        public string? Type { get; set; }
+        public string? Category { get; set; }
+        public string? Country { get; set; }
+        public ApiVerveIssuer? Issuer { get; set; }
+        public ApiVerveLocation? Location { get; set; }
+    }
+
+    public class ApiVerveIssuer
+    {
+        public string? Name { get; set; }
+        public string? Country { get; set; }
+        public string? Phone { get; set; }
+        public string? Website { get; set; }
+    }
+
+    public class ApiVerveLocation
+    {
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
+        public string? Alpha2 { get; set; }
+        public string? Alpha3 { get; set; }
+    }
+
+    public class ApiVervePremium
+    {
+        public string? Message { get; set; }
+        public string? Upgrade_Url { get; set; }
+        public List<string>? Locked_Fields { get; set; }
+    }
+
+
+    public class BinResponse
+    {
+        [JsonPropertyName("number")]
+        public BinNumber Number { get; set; }
+
+        [JsonPropertyName("scheme")]
+        public string Scheme { get; set; }
+
+        [JsonPropertyName("type")]
+        public string Type { get; set; }
+
+        [JsonPropertyName("brand")]
+        public string Brand { get; set; }
+
+        [JsonPropertyName("country")]
+        public BinCountry Country { get; set; }
+
+        [JsonPropertyName("bank")]
+        public BinBank Bank { get; set; }
+    }
+    public class BinData
+    {
+        public string? BIN { get; set; }
+        public string? Brand { get; set; }
+        public string? Type { get; set; }
+        public string? Category { get; set; }
+        public string? Issuer { get; set; }
+        public string? Country { get; set; }
+        public string? Currency { get; set; }
+    }
+
+    public class BinNumber
+    {
+        // Currently empty in the response: "number": {}
+    }
+
+    public class BinCountry
+    {
+        [JsonPropertyName("numeric")]
+        public string Numeric { get; set; }
+
+        [JsonPropertyName("alpha2")]
+        public string Alpha2 { get; set; }
+
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [JsonPropertyName("emoji")]
+        public string Emoji { get; set; }
+
+        [JsonPropertyName("currency")]
+        public string Currency { get; set; }
+
+        [JsonPropertyName("latitude")]
+        public decimal Latitude { get; set; }
+
+        [JsonPropertyName("longitude")]
+        public decimal Longitude { get; set; }
+    }
+
+    public class BinBank
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+    }
 }

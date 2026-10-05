@@ -17,4 +17,15 @@
         public string? PinResetOtp { get; set; }
         public DateTime? PinResetOtpExpiry { get; set; }
     }
+
+    public class PMBinChecker
+    {
+        public Guid Id { get; set; }
+        public string CardNumber { get; set; }
+        public string BankName { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime Created { get; set; }
+        public string? brand { get; set; }
+        public string? response { get; set; }
+    }
 }

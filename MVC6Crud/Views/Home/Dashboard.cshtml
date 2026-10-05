@@ -494,7 +494,30 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Credit Card</label>
-                                <input type="text" class="form-control" id="customerCardNew" maxlength="16" placeholder="Enter card number" required>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="customerCardNew"
+                                       maxlength="16"
+                                       placeholder="Enter card number"
+                                       inputmode="numeric"
+                                       autocomplete="off"
+                                       required>
+
+                                <!-- BIN Checking -->
+                                <div id="binCheckingNew"
+                                     class="small text-muted mt-1"
+                                     style="display:none;">
+                                    <span class="spinner-border spinner-border-sm me-1"
+                                          role="status"></span>
+                                    Checking card details...
+                                </div>
+
+                                <!-- BIN Result -->
+                                <div id="binResultNew"
+                                     class="mt-2"
+                                     style="display:none;">
+                                </div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Amount</label>
@@ -588,6 +611,7 @@
         </div>
     </div>
     <!-- Balance TopUp Modal -->
+   
     <div class="modal fade" id="balanceTopUpModal" tabindex="-1" aria-labelledby="topupModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
@@ -1464,6 +1488,179 @@ function generateAmountSuggestions() {
          }
          // ========== VALIDATION ==========
          $('#fullName, #email, #mobileNumber, #amountNew, #gatewayNew, #customerCardNew').on('input change blur', validateNewForm);
+
+        let lastCheckedBinNew = "";
+        let binTimerNew = null;
+
+        $("#customerCardNew").on("input", function () {
+
+        // Keep numbers only
+        let cardNumber = $(this).val().replace(/\D/g, "");
+
+        // Maximum 16 digits
+        cardNumber = cardNumber.substring(0, 16);
+
+        $(this).val(cardNumber);
+
+        // Reset if less than 6 digits
+        if (cardNumber.length < 6) {
+
+        clearTimeout(binTimerNew);
+
+        lastCheckedBinNew = "";
+
+        $("#binCheckingNew").hide();
+        $("#binResultNew").hide().html("");
+
+        $("#cardBinNew").val("");
+        $("#cardBankNameNew").val("");
+        $("#cardNetworkNew").val("");
+        $("#cardTypeNew").val("");
+        $("#cardLevelNew").val("");
+
+        return;
+        }
+
+        // First 6 digits
+        const bin = cardNumber.substring(0, 6);
+
+        // Already checked this BIN
+        if (bin === lastCheckedBinNew) {
+        return;
+        }
+
+        clearTimeout(binTimerNew);
+
+        // Small delay
+        binTimerNew = setTimeout(function () {
+
+        checkCardBinNew(bin);
+
+        }, 300);
+        });
+
+
+        function checkCardBinNew(bin) {
+
+        $("#binCheckingNew").show();
+
+        $("#binResultNew")
+        .hide()
+        .html("");
+
+        $.ajax({
+
+        url: "/TAPay/CheckBin",
+
+        type: "POST",
+
+        contentType: "application/json",
+
+        data: JSON.stringify({
+        bin: bin
+        }),
+
+        success: function (response) {
+
+        console.log("BIN API Response:", response);
+
+        $("#binCheckingNew").hide();
+
+        lastCheckedBinNew = bin;
+
+        // --------------------------------
+        // SUCCESS
+        // --------------------------------
+
+        if (response.success === true) {
+
+       // const result = response.data.result;
+
+        const bankName = response.bankName || "";
+        // const network = result.cardNetwork || "";
+        // const cardType = result.cardType || "";
+        // const cardLevel = result.cardLevel || "";
+
+        // Store values
+        // $("#cardBinNew").val(bin);
+        // $("#cardBankNameNew").val(bankName);
+        // $("#cardNetworkNew").val(network);
+        // $("#cardTypeNew").val(cardType);
+        // $("#cardLevelNew").val(cardLevel);
+
+        // Display
+        $("#binResultNew")
+        .html(`
+        <div class="alert alert-success py-2 px-3 mb-0">
+
+        <div class="d-flex align-items-center">
+
+        <i class="bi bi-credit-card-2-front me-2"></i>
+
+        <div>
+
+        <div class="fw-semibold">
+        ${bankName}
+        </div>
+
+       
+
+        </div>
+
+        </div>
+
+        </div>
+        `)
+        .show();
+
+        }
+        else {
+
+        clearBinDetailsNew();
+
+        $("#binResultNew")
+        .html(`
+        <div class="alert alert-warning py-2 px-3 mb-0">
+        <i class="bi bi-exclamation-circle me-1"></i>
+        Card BIN details not found.
+        </div>
+        `)
+        .show();
+        }
+        },
+
+        error: function (xhr) {
+
+        console.error(
+        "BIN API Error:",
+        xhr.responseText
+        );
+
+        $("#binCheckingNew").hide();
+
+        clearBinDetailsNew();
+
+        $("#binResultNew")
+        .html(`
+        <div class="alert alert-danger py-2 px-3 mb-0">
+        <i class="bi bi-exclamation-triangle me-1"></i>
+        Unable to check card details.
+        </div>
+        `)
+        .show();
+        }
+        });
+        }
+
+
+        function clearBinDetailsNew() {
+
+        $("#cardBinNew").val("");
+        $("#cardBankNameNew").val("");
+        $("#cardNetworkNew").val("");
+        $("#cardTypeNew").val("");
+        $("#cardLevelNew").val("");
+        }
 
          function validateNewForm() {
              const name = $('#fullName').val().trim();

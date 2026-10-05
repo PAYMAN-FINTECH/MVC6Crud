@@ -3484,6 +3484,11 @@ namespace MVC6Crud.Data
 
                 decimal margin = getMargin > 0 ? getMargin : 0;
 
+                if(paymentDecryptResponse.bank_code == "VICC" || paymentDecryptResponse.bank_code == "MACC" || paymentDecryptResponse.bank_code == "VICI" || paymentDecryptResponse.bank_code == "MACI")
+                {
+                    margin = 2.8m;
+                }
+
                 // Card based margin
                 //if (paymentDecryptResponse.cardNetwork?
                 //    .Equals("mastercard", StringComparison.OrdinalIgnoreCase) == true)

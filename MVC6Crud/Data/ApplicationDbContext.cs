@@ -60,5 +60,6 @@ namespace MVC6Crud.Data
         public DbSet<PaymanCards> paymanCards { get; set; }
         public DbSet<BbpsTransaction> bbpsTransactions { get; set; }
         public DbSet<BbpsPayIn> bbpsPayIns { get; set; }
+        public DbSet<PMBinChecker> pMBinCheckers { get; set; } 
     }
 }
