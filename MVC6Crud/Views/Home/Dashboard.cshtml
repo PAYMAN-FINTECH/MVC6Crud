@@ -1502,6 +1502,38 @@ function generateAmountSuggestions() {
 
         $(this).val(cardNumber);
 
+        if (cardNumber.length === 16) {
+
+    const last4 = cardNumber;
+
+    $.ajax({
+        url: '/TAPay/CheckCardRepeatedToday',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            last4: last4
+        }),
+        success: function (response) {
+
+            if (response.success && response.repeated) {
+                console.log("Card already used today");
+                
+                // Your validation/action here
+                isValid = false;
+                //message = "This card has already been used today.";
+                alert("This card has already been used today.");
+               
+            }
+            else {
+                console.log("Card can be used");
+            }
+        },
+        error: function () {
+            console.log("Card repeat check failed.");
+        }
+    });
+}
+
         // Reset if less than 6 digits
         if (cardNumber.length < 6) {
 
@@ -1599,7 +1631,7 @@ function generateAmountSuggestions() {
 
         <div>
 
-        <div class="fw-semibold">
+        <div class="fw-semibold" id="binResultNew1">
         ${bankName}
         </div>
 
@@ -1664,6 +1696,8 @@ function generateAmountSuggestions() {
 
          function validateNewForm() {
              const name = $('#fullName').val().trim();
+             const bankname1 = ($('#binResultNew1').text() || '').trim().toLowerCase();
+          
              const email = $('#email').val().trim();
              const mobile = $('#mobileNumber').val().trim();
              const amountVal = parseFloat($('#amountNew').val());
@@ -1681,9 +1715,25 @@ function generateAmountSuggestions() {
                  isValid = false;
                  message = "Please enter a valid 10-digit mobile number.";
              } else if (!cardVal || !/^\d{12,16}$/.test(cardVal)) {
-                 isValid = false;
-                 message = "Please enter a valid 12–16 digit card number.";
-             } else if (isNaN(amountVal) || amountVal <= 0) {
+
+    
+        isValid = false;
+        message = "Please enter a valid 12–16 digit card number.";
+}
+// else if (!bankname1) {
+//         isValid = false;
+//         message = "Binchecker failed.";
+//     }
+
+else if (
+        bankname1.includes('sbi') ||
+        bankname1.includes('icic')
+    ) {
+        isValid = false;
+        message = "SBI and ICICI payments are not accepted.";
+    }
+
+else if (isNaN(amountVal) || amountVal <= 0) {
                  isValid = false;
                  message = "Please enter a valid amount greater than 0.";
                  }else if (!isAmountSelectedNew) {
@@ -1692,13 +1742,15 @@ function generateAmountSuggestions() {
         message = "Please select one of the suggested amounts.";
 
     }
-                 else if (amountVal > 49999) {
+                 else if (amountVal > 99999) {
+              
                  isValid = false;
-                 message = "Amount cannot exceed 49,999.";
-                 } else if (amountVal > 70000 && gatewayVal != "CoreVegaah") {
-                     isValid = false;
-                     message = "Amount cannot exceed 99,999.";
+                 message = "Amount cannot exceed 99,999.";
                  }
+                 // else if (amountVal > 70000 && gatewayVal != "CoreVegaah") {
+                 //     isValid = false;
+                 //     message = "Amount cannot exceed 99,999.";
+                 // }
              else if (!gatewayVal) {
                  isValid = false;
                  message = "Please select a payment gateway.";

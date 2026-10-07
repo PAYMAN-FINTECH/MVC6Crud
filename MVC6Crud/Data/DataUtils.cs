@@ -3489,6 +3489,16 @@ namespace MVC6Crud.Data
                     margin = 2.8m;
                 }
 
+                var existingLast4 = existingPayIn.CreditCardHolderNum?.Length >= 4? existingPayIn.CreditCardHolderNum[^4..] : "";
+
+                var responseLast4 = paymentDecryptResponse.cardmasked?.Trim();
+
+                if (!string.Equals(existingLast4, responseLast4, StringComparison.OrdinalIgnoreCase))
+                {
+                    margin = 2.8m;
+                }
+
+
                 // Card based margin
                 //if (paymentDecryptResponse.cardNetwork?
                 //    .Equals("mastercard", StringComparison.OrdinalIgnoreCase) == true)

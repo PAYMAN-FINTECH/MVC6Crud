@@ -27,5 +27,8 @@
         public DateTime Created { get; set; }
         public string? brand { get; set; }
         public string? response { get; set; }
+
+        public string? CardType { get; set; }
+        public string? CardLevel { get; set; }
     }
 }
