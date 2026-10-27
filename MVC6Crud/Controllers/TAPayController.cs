@@ -339,14 +339,22 @@ namespace MVC6Crud.Controllers
                 var today = DateTime.Today;
                 var tomorrow = today.AddDays(1);
 
+                var requestLast4 = request.Last4?.Length >= 4
+    ? request.Last4[^4..]
+    : request.Last4;
+
                 var repeated = await _context.payManPayIns
                     .AsNoTracking()
                     .AnyAsync(x =>
-                        x.CreditCardHolderNum != null &&
-                        x.CreditCardHolderNum == request.Last4 &&
+                        !string.IsNullOrEmpty(x.CreditCardHolderNum) &&
+                        x.CreditCardHolderNum.Length >= 4 &&
+                        x.CreditCardHolderNum.Substring(
+                            x.CreditCardHolderNum.Length - 4
+                        ) == requestLast4 &&
                         x.Created >= today &&
                         x.Created < tomorrow &&
-                        x.Status == true
+                        x.Status == true &&
+                        x.UserPhone == request.userphone
                     );
 
                 return Json(new
@@ -2074,6 +2082,7 @@ namespace MVC6Crud.Controllers
     public class CardRepeatRequest
     {
         public string Last4 { get; set; }
+        public string userphone { get; set; }
     }
 
     public class BinCheckResponse

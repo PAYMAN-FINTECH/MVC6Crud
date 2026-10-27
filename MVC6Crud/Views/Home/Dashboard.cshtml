@@ -518,6 +518,10 @@
                                      class="mt-2"
                                      style="display:none;">
                                 </div>
+                                <div id="cardalrdyexists"
+                                     class="mt-2"
+                                     style="display:none;">
+                                </div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Amount</label>
@@ -1663,6 +1667,7 @@
 
         // Keep numbers only
         let cardNumber = $(this).val().replace(/\D/g, "");
+        var userloginphone = '@Model.UserPhone';
 
         // Maximum 16 digits
         cardNumber = cardNumber.substring(0, 16);
@@ -1672,13 +1677,16 @@
         if (cardNumber.length === 16) {
 
     const last4 = cardNumber;
+        $("#cardalrdyexists").hide().html("");
+         $("#cardalrdyexists1").hide().html("");
 
     $.ajax({
         url: '/TAPay/CheckCardRepeatedToday',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({
-            last4: last4
+            last4: last4,
+            userphone: userloginphone
         }),
         success: function (response) {
 
@@ -1687,8 +1695,33 @@
                 
                 // Your validation/action here
                 isValid = false;
+
+        $("#cardalrdyexists")
+        .html(`
+        <div class="alert alert-success py-2 px-3 mb-0">
+
+        <div class="d-flex align-items-center">
+
+        <i class="bi bi-credit-card-2-front me-2"></i>
+
+        <div>
+
+        <div class="fw-semibold" id="cardalrdyexists1">
+        This card has already been used today.
+        </div>
+
+       
+
+        </div>
+
+        </div>
+
+        </div>
+        `)
+        .show();
+        validateNewForm();
                 //message = "This card has already been used today.";
-                alert("This card has already been used today.");
+              //  alert("This card has already been used today.");
                
             }
             else {
@@ -1864,6 +1897,7 @@
          function validateNewForm() {
              const name = $('#fullName').val().trim();
              const bankname1 = ($('#binResultNew1').text() || '').trim().toLowerCase();
+             const cardalrdyexists1 = ($('#cardalrdyexists1').text() || '').trim().toLowerCase(); 
           
              const email = $('#email').val().trim();
              const mobile = $('#mobileNumber').val().trim();
@@ -1899,6 +1933,9 @@ else if (
         isValid = false;
         message = "SBI and ICICI payments are not accepted.";
     }
+        else if(cardalrdyexists1 != ''){
+        isValid = false;
+        }
 
 else if (isNaN(amountVal) || amountVal <= 0) {
                  isValid = false;
