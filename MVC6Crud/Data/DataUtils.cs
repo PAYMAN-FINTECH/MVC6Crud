@@ -3062,6 +3062,8 @@ namespace MVC6Crud.Data
                 existingPayIn.Created = istTime;
                 existingPayIn.Status = paymentDecryptResponse.respDescription == "Transaction successful";
                 existingPayIn.Result = paymentDecryptResponse.respDescription;
+                existingPayIn.BankName = paymentDecryptResponse.reponse;
+
 
                 _context.payManPayIns.Update(existingPayIn);
                 await _context.SaveChangesAsync();

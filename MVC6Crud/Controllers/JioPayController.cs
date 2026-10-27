@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Irony.Parsing;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVC6Crud.Data;
 using MVC6Crud.Models;
@@ -8,7 +9,10 @@ using MVC6Crud.Models.PaymanWeb;
 using MVC6Crud.Models.PineLab;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Globalization;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using XAct.Library.Settings;
 
 namespace MVC6Crud.Controllers
@@ -19,11 +23,13 @@ namespace MVC6Crud.Controllers
         private readonly JiopayService _ps;
         private readonly ApplicationDbContext _db;
         private readonly DataUtils _dataUtils;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public JioPayController(IConfiguration cfg,  JiopayService ps, ApplicationDbContext db, DataUtils dataUtils)
+        public JioPayController(IConfiguration cfg,  JiopayService ps, ApplicationDbContext db, DataUtils dataUtils, IHttpClientFactory  httpClientFactory)
         {
-            _cfg = cfg;  _ps = ps; _db = db; _dataUtils = dataUtils;
+            _cfg = cfg;  _ps = ps; _db = db; _dataUtils = dataUtils; _httpClientFactory = httpClientFactory;
         }
+        private string PaymentsUrl = "https://api.payu.in/v2/payments";
         public IActionResult Index()
         {
             return View();
@@ -44,6 +50,165 @@ namespace MVC6Crud.Controllers
             };
 
             return View(model);
+        }
+
+        // ============================================================
+        // CREATE PAYMENT
+        // POST: api/PayUPayment/CreatePayment
+        // ============================================================
+        [HttpPost]
+        public async Task<IActionResult> CreatePayment(decimal amount, string userPhone, string CName, string CMobile, string CCard, string Cemail, string divice, string loadGateways)
+        {
+            try
+            {
+
+                if (amount < 1)
+                {
+                    return Ok(new
+                    {
+                        success = false,
+                        message = "Invalid amount"
+                    });
+                }
+
+                var user = await _db.payManUsers
+                    .FirstOrDefaultAsync(t => t.Phone == userPhone);
+
+                if (user == null)
+                {
+                    return Ok(new
+                    {
+                        success = false,
+                        message = "User not found"
+                    });
+                }
+
+                var orderId =
+                    $"PAYMAN{DateTime.UtcNow:yyyyMMddHHmmssfff}{Random.Shared.Next(1000, 9999)}";
+
+                var istNow = TimeZoneInfo.ConvertTimeFromUtc(
+                    DateTime.UtcNow,
+                    TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+
+
+
+                var encodedOrder = Uri.EscapeDataString(orderId);
+
+                var payload = new
+                {
+                    accountId = "46yIgi",
+                    txnId = orderId,
+                    currency = "INR",
+                    order = new
+                    {
+                        productInfo = "Education fee payments",
+                        paymentChargeSpecification = new
+                        {
+                            price = amount
+                        }
+                    },
+                    additionalInfo = new
+                    {
+                        txnFlow = "nonseamless",
+                        createOrder = true,
+                        orderId = orderId
+                    },
+                    callBackActions = new
+                    {
+                        successAction = $"https://edu.paymanfintech.in/JioPay/Success?orderId={encodedOrder}",
+                        failureAction = $"https://edu.paymanfintech.in/JioPay/Failure?orderId={encodedOrder}",
+                        cancelAction = $"https://edu.paymanfintech.in/JioPay/Cancel?orderId={encodedOrder}"
+                    },
+                    billingDetails = new
+                    {
+                        firstName = string.IsNullOrWhiteSpace(CName) ? "Customer" : CName,
+                        phone = CMobile ?? "",
+                        email = Cemail ?? user.Email ?? "",
+                        address1 = "NA",
+                        city = "NA",
+                        state = "NA",
+                        country = "India",
+                        zipCode = "500050"
+                    }
+                };
+
+                // The exact string that is hashed must be the string that is sent.
+                var body = System.Text.Json.JsonSerializer.Serialize(payload);
+
+              
+                var date = DateTime.UtcNow.ToString("r", CultureInfo.InvariantCulture);
+
+                using var message = new HttpRequestMessage(System.Net.Http.HttpMethod.Post, PaymentsUrl)
+                {
+                    Content = new StringContent(body, Encoding.UTF8, "application/json")
+                };
+                message.Headers.TryAddWithoutValidation("date", date);
+                message.Headers.TryAddWithoutValidation(
+                    "authorization", BuildAuthorization(body, date));
+
+                var client = _httpClientFactory.CreateClient();
+                var response = await client.SendAsync(message);
+                var responseText = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return Ok(new
+                    {
+                        success = false,
+                        message = "PayU request failed",
+                        response = responseText
+                    });
+                }
+
+                using var json = JsonDocument.Parse(responseText);
+
+                string? checkoutUrl = null;
+
+                if (json.RootElement.TryGetProperty("result", out var result) &&
+                    result.ValueKind == JsonValueKind.Object &&
+                    result.TryGetProperty("checkoutUrl", out var url))
+                {
+                    checkoutUrl = url.GetString();
+                }
+
+                if (string.IsNullOrWhiteSpace(checkoutUrl))
+                {
+                    return Ok(new
+                    {
+                        success = false,
+                        message = "PayU checkout URL was not returned",
+                        response = responseText
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    orderId,
+                    redirectUrl = checkoutUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+
+        private string BuildAuthorization(string body, string date)
+        {
+            var key = "46yIgi";
+            var salt = "LVppnjLWrPGK67pOt2T2oOBw2oqDyshm";
+
+            var bytes = SHA512.HashData(
+                Encoding.UTF8.GetBytes($"{body}|{date}|{salt}"));
+
+            var signature = Convert.ToHexString(bytes).ToLowerInvariant();
+
+            return $"hmac username=\"{key}\", algorithm=\"sha512\", headers=\"date\", signature=\"{signature}\"";
         }
 
         [HttpPost]
@@ -289,12 +454,22 @@ namespace MVC6Crud.Controllers
         }
 
 
-        //  private readonly string secretKey = "41d2971e1fd444cca9364f44d4b5e3b6";
-
-        // ===============================
-        // 🔷 B2B RETURN URL
-        // ===============================
         [HttpPost]
+        public async Task<IActionResult> Success(string orderId)
+        {
+            return Redirect(
+                       $"https://paymanfintech.in/PayMan/PayStatus" +
+                       $"?IsSuccess=true" +
+                       $"&Amount=100" +
+                       $"&TransactionId=Sucess"
+                   );
+        }
+            //  private readonly string secretKey = "41d2971e1fd444cca9364f44d4b5e3b6";
+
+            // ===============================
+            // 🔷 B2B RETURN URL
+            // ===============================
+            [HttpPost]
         public async Task<IActionResult> Return()
         {
             try
@@ -313,6 +488,13 @@ namespace MVC6Crud.Controllers
 
                 _db.errorModels.Add(user1);
                 await _db.SaveChangesAsync();
+
+                var formData = Request.Form.ToDictionary(
+          x => x.Key,
+          x => x.Value.ToString()
+      );
+
+                var jsonData11 = System.Text.Json.JsonSerializer.Serialize(formData);
 
                 var responseObj = new JiopayResponse
                 {
@@ -333,7 +515,8 @@ namespace MVC6Crud.Controllers
                     paymentID = Request.Form["paymentID"].ToString(),
                     merchantTxnNo = Request.Form["merchantTxnNo"].ToString(),
                     paymentDateTime = Request.Form["paymentDateTime"].ToString(),
-                    txnID = Request.Form["txnID"].ToString()
+                    txnID = Request.Form["txnID"].ToString(),
+                    reponse = jsonData11
                 };
 
                 string jsonData = System.Text.Json.JsonSerializer.Serialize(responseObj);
@@ -503,6 +686,7 @@ namespace MVC6Crud.Controllers
         public string merchantTxnNo { get; set; }
         public string paymentDateTime { get; set; }
         public string txnID { get; set; }
+        public string reponse {  get; set; }
     }
 
     public class JiopayCommandRequest

@@ -933,110 +933,277 @@
         /*
  * Generate random amount suggestions
  */
-function generateAmountSuggestions() {
 
-    const amountValue = $("#amountNew").val();
+        function generateAmountSuggestions() {
 
-    const container = $("#amountSuggestionsNew");
-    const buttons = $("#amountSuggestionButtonsNew");
+        const amountValue = $("#amountNew").val();
 
-    // Clear previous suggestions
-    buttons.empty();
+        const container = $("#amountSuggestionsNew");
+        const buttons = $("#amountSuggestionButtonsNew");
 
-    if (!amountValue || Number(amountValue) <= 0) {
+        // Clear previous suggestions
+        buttons.empty();
+
+        if (!amountValue || Number(amountValue) <= 0) {
         container.hide();
         return;
-    }
+        }
 
-    const amount = parseInt(amountValue);
+        let amount = parseInt(amountValue);
 
-    const randomSuggestions = [];
-    const usedAmounts = new Set();
+        // Maximum allowed entered amount
+        amount = Math.min(amount, 99999);
 
-    // Number of suggestions
-    const suggestionCount = 6;
+        const randomSuggestions = [];
+        const usedAmounts = new Set();
 
-    /*
-     * Example:
-     *
-     * Entered Amount = 49999
-     *
-     * Minimum = 39999
-     * Maximum = 49995
-     *
-     * Example Results:
-     *
-     * 42887
-     * 41743
-     * 48891
-     * 45469
-     * 49227
-     * 48034
-     */
-    const minimumAmount = Math.max(
-        1,
-        amount - 10000
-    );
+        const suggestionCountBelow = 3;
+        const suggestionCountAbove = 3;
 
-    // Don't suggest amount itself or within 3
-    const maximumAmount = amount - 4;
+        const range = 50;
 
-    let attempts = 0;
-    const maxAttempts = 1000;
+        /*
+        * BELOW RANGE
+        *
+        * Example:
+        * Amount = 49999
+        * Below range = 49949 - 49998
+        *
+        * Amount = 50000
+        * Below range = 49950 - 49999
+        */
+        const belowMin = Math.max(1, amount - range);
+        const belowMax = amount - 1;
 
 
-    while (
-        randomSuggestions.length < suggestionCount &&
-        attempts < maxAttempts
-    ) {
+        /*
+        * ABOVE RANGE
+        *
+        * Example:
+        * Amount = 49999
+        * Above range = 50000 - 50049
+        *
+        * Amount = 50000
+        * Above range = 50001 - 50050
+        */
+        const aboveMin = amount + 1;
+        const aboveMax = Math.min(99999, amount + range);
+
+
+        function getRandomAmount(min, max) {
+
+        if (min > max) {
+        return null;
+        }
+
+        let attempts = 0;
+
+        while (attempts < 1000) {
 
         attempts++;
 
-        // Random number within the range
         const suggestion =
-            Math.floor(
-                Math.random() *
-                (maximumAmount - minimumAmount + 1)
-            ) + minimumAmount;
+        Math.floor(
+        Math.random() * (max - min + 1)
+        ) + min;
 
-
-        // Last digit should never be 0
-        if (suggestion % 10 === 0) {
-            continue;
+        // Maximum allowed
+        if (suggestion > 99999) {
+        continue;
         }
 
+        // Don't suggest entered amount
+        if (suggestion === amount) {
+        continue;
+        }
 
-        // Prevent duplicate suggestions
+        // Don't duplicate
         if (usedAmounts.has(suggestion)) {
-            continue;
+        continue;
         }
-
 
         usedAmounts.add(suggestion);
 
+        return suggestion;
+        }
+
+        return null;
+        }
+
+
+        // ============================================
+        // Get 3 RANDOM amounts BELOW
+        // ============================================
+
+        for (let i = 0; i < suggestionCountBelow; i++) {
+
+        const suggestion = getRandomAmount(
+        belowMin,
+        belowMax
+        );
+
+        if (suggestion !== null) {
         randomSuggestions.push(suggestion);
-    }
+        }
+        }
 
 
-    /*
-     * Create suggestion buttons
-     */
-    randomSuggestions.forEach(function (suggestion) {
+        // ============================================
+        // Get 3 RANDOM amounts ABOVE
+        // ============================================
+
+        for (let i = 0; i < suggestionCountAbove; i++) {
+
+        const suggestion = getRandomAmount(
+        aboveMin,
+        aboveMax
+        );
+
+        if (suggestion !== null) {
+        randomSuggestions.push(suggestion);
+        }
+        }
+
+
+        // ============================================
+        // Shuffle suggestions
+        // ============================================
+
+        randomSuggestions.sort(() => Math.random() - 0.5);
+
+
+        // ============================================
+        // Create buttons
+        // ============================================
+
+        randomSuggestions.forEach(function (suggestion) {
 
         const button = $(`
-            <button type="button"
-                    class="btn btn-sm btn-outline-primary amount-suggestion"
-                    data-amount="${suggestion}">
-                ₹${suggestion}
-            </button>
+        <button type="button"
+        class="btn btn-sm btn-outline-primary amount-suggestion"
+        data-amount="${suggestion}">
+        ₹${suggestion}
+        </button>
         `);
 
         buttons.append(button);
-    });
+        });
 
 
-    container.show();
-}
+        // Show suggestions
+        if (randomSuggestions.length > 0) {
+        container.show();
+        } else {
+        container.hide();
+        }
+        }
+
+
+       
+// function generateAmountSuggestions() {
+
+//     const amountValue = $("#amountNew").val();
+
+//     const container = $("#amountSuggestionsNew");
+//     const buttons = $("#amountSuggestionButtonsNew");
+
+//     // Clear previous suggestions
+//     buttons.empty();
+
+//     if (!amountValue || Number(amountValue) <= 0) {
+//         container.hide();
+//         return;
+//     }
+
+//     const amount = parseInt(amountValue);
+
+//     const randomSuggestions = [];
+//     const usedAmounts = new Set();
+
+//     // Number of suggestions
+//     const suggestionCount = 6;
+
+//     /*
+//      * Example:
+//      *
+//      * Entered Amount = 49999
+//      *
+//      * Minimum = 39999
+//      * Maximum = 49995
+//      *
+//      * Example Results:
+//      *
+//      * 42887
+//      * 41743
+//      * 48891
+//      * 45469
+//      * 49227
+//      * 48034
+//      */
+//     const minimumAmount = Math.max(
+//         1,
+//         amount - 10000
+//     );
+
+//     // Don't suggest amount itself or within 3
+//     const maximumAmount = amount - 4;
+
+//     let attempts = 0;
+//     const maxAttempts = 1000;
+
+
+//     while (
+//         randomSuggestions.length < suggestionCount &&
+//         attempts < maxAttempts
+//     ) {
+
+//         attempts++;
+
+//         // Random number within the range
+//         const suggestion =
+//             Math.floor(
+//                 Math.random() *
+//                 (maximumAmount - minimumAmount + 1)
+//             ) + minimumAmount;
+
+
+//         // Last digit should never be 0
+//         if (suggestion % 10 === 0) {
+//             continue;
+//         }
+
+
+//         // Prevent duplicate suggestions
+//         if (usedAmounts.has(suggestion)) {
+//             continue;
+//         }
+
+
+//         usedAmounts.add(suggestion);
+
+//         randomSuggestions.push(suggestion);
+//     }
+
+
+//     /*
+//      * Create suggestion buttons
+//      */
+//     randomSuggestions.forEach(function (suggestion) {
+
+//         const button = $(`
+//             <button type="button"
+//                     class="btn btn-sm btn-outline-primary amount-suggestion"
+//                     data-amount="${suggestion}">
+//                 ₹${suggestion}
+//             </button>
+//         `);
+
+//         buttons.append(button);
+//     });
+
+
+//     container.show();
+// }
         
         
         $('.toggle-checkbox').change(function () {
